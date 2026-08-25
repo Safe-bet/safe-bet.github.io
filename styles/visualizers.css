@@ -1,0 +1,452 @@
+/* ==========================================================================
+   SUYASH KUMAR — INTERACTIVE WORKBENCHES & SIMULATORS
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Honeywell Ingestion Pipeline (Baseline Profiling & Schema Drift)
+   -------------------------------------------------------------------------- */
+.pipeline-sim-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  width: 100%;
+}
+
+.pipeline-step-nav {
+  display: flex;
+  gap: 0.35rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.pipeline-step-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.pipe-step-btn {
+  padding: 0.3rem 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+}
+
+.pipe-step-btn.active {
+  background: var(--accent-terracotta);
+  color: #FFFFFF;
+  border-color: var(--accent-terracotta);
+}
+
+.pipeline-interactive-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.pipe-step-view {
+  display: none;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.pipe-step-view.active {
+  display: flex;
+}
+
+.pipe-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+}
+
+.pipe-data-table th {
+  background: var(--bg-subtle);
+  color: var(--accent-terracotta);
+  text-align: left;
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid var(--border-medium);
+  font-weight: 600;
+}
+
+.pipe-data-table td {
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+}
+
+.pipe-tag-chip {
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  font-size: 0.6rem;
+  font-weight: 600;
+}
+
+.tag-struct { background: rgba(217, 119, 6, 0.15); color: var(--accent-amber); }
+.tag-rename { background: rgba(224, 122, 95, 0.15); color: var(--accent-terracotta); }
+.tag-union { background: rgba(74, 107, 93, 0.15); color: var(--accent-sage); }
+
+.pipe-live-logs {
+  background: #171513;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: #D6D3CD;
+  height: 95px;
+  overflow-y: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.25rem;
+}
+
+.pipe-log-line {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pipe-log-line.log-alert { color: var(--accent-amber); }
+.pipe-log-line.log-success { color: var(--accent-sage); }
+.pipe-log-line.log-info { color: #E07A5F; }
+
+
+/* --------------------------------------------------------------------------
+   2. Honeywell 3x Thor Distributed Ray Cluster & Dynamic Router Simulator
+   -------------------------------------------------------------------------- */
+.router-sim-viewport {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  background: #141210;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-medium);
+  overflow: hidden;
+}
+
+#routerCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.router-controls-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-top: 0.75rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem;
+}
+
+.router-input-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+}
+
+.gpu-toggles-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.45rem;
+}
+
+.gpu-kill-btn {
+  padding: 0.35rem 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border: 1px solid var(--border-medium);
+}
+
+.gpu-kill-btn.online {
+  background: rgba(74, 107, 93, 0.12);
+  color: var(--accent-sage);
+  border-color: rgba(74, 107, 93, 0.3);
+}
+
+.gpu-kill-btn.killed {
+  background: rgba(224, 122, 95, 0.15);
+  color: var(--accent-terracotta);
+  border-color: rgba(224, 122, 95, 0.4);
+}
+
+/* --------------------------------------------------------------------------
+   3. LENEK Technologies: Multi-Modal X-Ray Vision Diagnostic Heatmap
+   -------------------------------------------------------------------------- */
+.xray-stage-box {
+  position: relative;
+  width: 100%;
+  height: 250px;
+  background: #0D0C0B;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-medium);
+  overflow: hidden;
+}
+
+#xrayCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.xray-hud-overlay {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.xray-findings-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.75rem;
+}
+
+/* --------------------------------------------------------------------------
+   4. ATAL AUV Physics Simulator & Mouse-Follow Canvas
+   -------------------------------------------------------------------------- */
+.auv-workbench-viewport {
+  position: relative;
+  width: 100%;
+  height: 270px;
+  background: #141210;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-medium);
+  overflow: hidden;
+  cursor: crosshair;
+}
+
+#auvCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.auv-hud-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.auv-telemetry-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: #EDE8E1;
+  background: rgba(20, 18, 16, 0.85);
+  backdrop-filter: blur(6px);
+  padding: 0.35rem 0.65rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(240, 230, 215, 0.1);
+}
+
+.auv-control-toggles {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+/* --------------------------------------------------------------------------
+   5. ISRO Lunar XRF Spectrum Visualizer
+   -------------------------------------------------------------------------- */
+.spectrum-viewport {
+  position: relative;
+  width: 100%;
+  height: 210px;
+  background: #141210;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-medium);
+  overflow: hidden;
+}
+
+#spectrumCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.spectrum-legend {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0.65rem;
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  margin-top: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+}
+
+.elem-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.elem-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+/* --------------------------------------------------------------------------
+   6. SURGE Particle Flow Chute Profiler
+   -------------------------------------------------------------------------- */
+.surge-analyzer-box {
+  width: 100%;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.particle-canvas-wrapper {
+  position: relative;
+  width: 100%;
+  height: 190px;
+  background: #141210;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+#particleCanvas {
+  width: 100%;
+  height: 100%;
+}
+
+.morphology-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.morph-card {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.45rem;
+  text-align: center;
+}
+
+.morph-val {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--accent-terracotta);
+}
+
+.morph-lbl {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+}
+
+/* --------------------------------------------------------------------------
+   7. Face Reconstruction GAN Split Slider with Full Portrait Visibility
+   -------------------------------------------------------------------------- */
+.face-reconstruction-slider-box {
+  position: relative;
+  width: 100%;
+  height: 380px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border-medium);
+  user-select: none;
+  background: #141210;
+}
+
+.face-split-layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.face-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center center;
+  display: block;
+}
+
+.face-overlay-label {
+  position: absolute;
+  bottom: 12px;
+  padding: 0.28rem 0.65rem;
+  background: rgba(20, 18, 16, 0.88);
+  backdrop-filter: blur(6px);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  font-weight: 600;
+  color: #EDE8E1;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  z-index: 5;
+}
+
+.slider-handle-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2.5px;
+  background: var(--accent-terracotta);
+  box-shadow: 0 0 8px rgba(194, 94, 56, 0.6);
+  z-index: 10;
+  cursor: ew-resize;
+}
+
+.slider-handle-thumb {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30px;
+  height: 30px;
+  background: var(--accent-terracotta);
+  border: 2px solid #FFFFFF;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  font-size: 0.72rem;
+  font-weight: bold;
+}
