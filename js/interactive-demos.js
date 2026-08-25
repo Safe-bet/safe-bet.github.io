@@ -16,7 +16,7 @@ const InteractiveDemos = {
     this.initHoneywellThorRouter();
     this.initLenekXRaySim();
     this.initAUVPhysicsSim();
-    this.initSurgeChuteSim();
+    this.initSurgeCarousel();
     this.initISROSim();
     this.initFaceSlider();
   },
