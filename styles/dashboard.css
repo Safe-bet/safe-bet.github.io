@@ -625,6 +625,69 @@
   line-height: 1.5;
 }
 
+/* Open Source Contributions Grid (3-Column) */
+.opensource-grid-3col {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 992px) {
+  .opensource-grid-3col {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.opensource-card {
+  padding: 2rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-xl);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all var(--transition-normal);
+}
+
+.opensource-card:hover {
+  border-color: var(--accent-terracotta);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-2px);
+}
+
+.os-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.85rem;
+}
+
+.os-title {
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.35rem;
+}
+
+.os-repo {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  color: var(--accent-terracotta);
+  margin-bottom: 0.85rem;
+}
+
+.os-desc {
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1.25rem;
+}
+
+.os-actions {
+  margin-top: auto;
+}
+
 /* Leadership & Impact Cards (3-Column / Distinct Cards) */
 .leadership-grid-3col {
   display: grid;

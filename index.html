@@ -853,6 +853,88 @@
     </section>
 
     <!-- ====================================================================
+         SECTION 2.5: OPEN SOURCE CONTRIBUTIONS
+         ==================================================================== -->
+    <section id="opensource" class="dashboard-section" style="background: var(--bg-secondary); border-top: 1px solid var(--border-subtle);">
+      <div class="container">
+        <div class="section-header-hud">
+          <div>
+            <span class="section-prefix">// 02. CORE REPOSITORIES</span>
+            <h2 class="section-title">Open-Source Contributions</h2>
+          </div>
+          <p class="section-subtitle">
+            Direct upstream contributions to leading GPU compute libraries, marine robotics operating systems, and autonomous flight firmware.
+          </p>
+        </div>
+
+        <div class="opensource-grid-3col">
+          <!-- Card 1: NVIDIA CCCL -->
+          <div class="opensource-card">
+            <div>
+              <div class="os-header-row">
+                <span class="badge badge-sage">C++ / CUDA PR #10890</span>
+                <span class="badge">NVIDIA</span>
+              </div>
+              <h3 class="os-title">NVIDIA CUDA Core Compute Libraries (CCCL / CUB)</h3>
+              <div class="os-repo">github.com/NVIDIA/cccl</div>
+              <p class="os-desc">
+                Enforced explicit <code style="font-family:var(--font-mono); color:var(--accent-terracotta);">alignas(VectorT)</code> attributes on stack-allocated temporary buffers in <code style="font-family:var(--font-mono);">cub::DeviceFind::FindIf</code> (<code style="font-family:var(--font-mono);">agent_find.cuh</code>), preventing hardware misaligned load exceptions across NVIDIA GPU compute architectures.
+              </p>
+            </div>
+            <div class="os-actions">
+              <a href="https://github.com/NVIDIA/cccl/pull/10890" target="_blank" class="btn btn-secondary btn-sm">
+                <span>VIEW PR #10890</span>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Card 2: BlueRobotics BlueOS -->
+          <div class="opensource-card">
+            <div>
+              <div class="os-header-row">
+                <span class="badge badge-terracotta">FASTAPI / DOCKER</span>
+                <span class="badge">BLUEROBOTICS</span>
+              </div>
+              <h3 class="os-title">BlueRobotics BlueOS Marine Vehicle OS</h3>
+              <div class="os-repo">github.com/bluerobotics/BlueOS</div>
+              <p class="os-desc">
+                Resolved container streaming crashes with existence pre-checks (PR #4186), refactored Kraken extension lifecycle to raise structured HTTP 404 exceptions (PR #4185), and added platform safety checks for non-Linux / STM32 serial interfaces (PR #4184).
+              </p>
+            </div>
+            <div class="os-actions">
+              <a href="https://github.com/bluerobotics/BlueOS/pull/4186" target="_blank" class="btn btn-secondary btn-sm">
+                <span>VIEW PRs #4186, #4185, #4184</span>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Card 3: ArduPilot -->
+          <div class="opensource-card">
+            <div>
+              <div class="os-header-row">
+                <span class="badge badge-amber">C++ / FLIGHT FIRMWARE</span>
+                <span class="badge">ARDUPILOT</span>
+              </div>
+              <h3 class="os-title">ArduPilot Autopilot System</h3>
+              <div class="os-repo">github.com/ArduPilot/ardupilot</div>
+              <p class="os-desc">
+                Standardized default return conditionals to IEEE-754 single-precision float (<code style="font-family:var(--font-mono); color:var(--accent-terracotta);">0.0f</code>) literals across gimbal control and vehicle telemetry logic, eliminating implicit conversion warnings across bare-metal compiler targets.
+              </p>
+            </div>
+            <div class="os-actions">
+              <a href="https://github.com/ArduPilot/ardupilot/pull/29624" target="_blank" class="btn btn-secondary btn-sm">
+                <span>VIEW PR #29624</span>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
          SECTION 3: SCHOLASTIC ACHIEVEMENTS
          ==================================================================== -->
     <section id="scholastic" class="dashboard-section" style="background: var(--bg-secondary); border-top: 1px solid var(--border-subtle); border-bottom: 1px solid var(--border-subtle);">
@@ -1077,7 +1159,7 @@
             
             <div class="coursework-table-grid">
               <div class="course-chip"><span>Fundamentals of Computing</span></div>
-              <div class="course-chip ongoing"><span>Intrd. to Cognitive Science*</span> <span class="badge badge-amber" style="font-size:0.6rem;">*</span></div>
+              <div class="course-chip ongoing"><span>Introd. to Cognitive Science*</span> <span class="badge badge-amber" style="font-size:0.6rem;">*</span></div>
               <div class="course-chip ongoing"><span>Introd. to Machine Learning*</span> <span class="badge badge-amber" style="font-size:0.6rem;">*</span></div>
               <div class="course-chip ongoing"><span>ML for Chemical Engineers*</span> <span class="badge badge-amber" style="font-size:0.6rem;">*</span></div>
               <div class="course-chip"><span>Applied Cognitive Science</span></div>
@@ -1085,9 +1167,17 @@
               <div class="course-chip"><span>Numerical Methods</span></div>
               <div class="course-chip"><span>Single Variable Calculus</span></div>
               <div class="course-chip"><span>Several Variable Calculus</span></div>
-              <div class="course-chip"><span>Partial Differential Equations</span></div>
-              <div class="course-chip"><span>Ordinary Differential Equations</span></div>
+              <div class="course-chip"><span>Partial Differential Eqns.</span></div>
+              <div class="course-chip"><span>Ordinary Differential Eqns.</span></div>
               <div class="course-chip"><span>Energy, Climate & Sustainability</span></div>
+              <div class="course-chip"><span>Heat Transfer</span></div>
+              <div class="course-chip"><span>Chemical Process Industries</span></div>
+              <div class="course-chip"><span>Fluid Mechanics</span></div>
+              <div class="course-chip"><span>Chemical Thermodynamics</span></div>
+              <div class="course-chip"><span>Mass Transfer</span></div>
+              <div class="course-chip ongoing"><span>Neurobiology*</span> <span class="badge badge-amber" style="font-size:0.6rem;">*</span></div>
+              <div class="course-chip"><span>Introd. to Electronics</span></div>
+              <div class="course-chip"><span>Chemical Reaction Eng.</span></div>
             </div>
           </div>
         </div>
@@ -1129,7 +1219,7 @@
 
           <div class="footer-social-links">
             <a href="https://github.com/safe-bet" target="_blank" class="footer-social-link">GitHub</a>
-            <a href="https://www.linkedin.com/in/suyashkumar/" target="_blank" class="footer-social-link">LinkedIn</a>
+            <a href="https://www.linkedin.com/in/suyash-kumar-b062491bb/" target="_blank" class="footer-social-link">LinkedIn</a>
             <a href="https://www.kaggle.com/safebet1034" target="_blank" class="footer-social-link">Kaggle</a>
             <a href="mailto:k.suyashc@gmail.com" class="footer-social-link">Email</a>
           </div>
@@ -1187,7 +1277,7 @@
       <span>GitHub</span>
     </a>
     <div class="dock-divider"></div>
-    <a href="https://www.linkedin.com/in/suyashkumar/" target="_blank" class="dock-link-btn" title="LinkedIn Profile">
+    <a href="https://www.linkedin.com/in/suyash-kumar-b062491bb/" target="_blank" class="dock-link-btn" title="LinkedIn Profile">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
       <span>LinkedIn</span>
     </a>

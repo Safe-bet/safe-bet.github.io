@@ -15,8 +15,9 @@ const DeveloperTerminal = {
 --------------------------------------------------
 <span class="text-amber">skills</span>       : View primary technical proficiencies & stack
 <span class="text-amber">projects</span>     : List core engineering workbenches
-<span class="text-amber">honeywell</span>    : Architecture breakdown of Multi-Agent Pipeline
+<span class="text-amber">honeywell</span>    : Architecture breakdown of Multi-Agent Pipeline & 3x Thor GPUs
 <span class="text-amber">auv</span>          : Details on ATAL AUV 6-DoF Autonomy & SAUVC
+<span class="text-amber">opensource</span>   : Upstream contributions to NVIDIA CCCL, BlueRobotics, & ArduPilot
 <span class="text-amber">isro</span>         : Chandrayaan-II Lunar Surface Spectral Pipeline
 <span class="text-amber">surge</span>        : Granular Particle Flow Profiler (YOLOv11+SAM2)
 <span class="text-amber">scholastic</span>   : Scholastic ranks (JEE Adv, KVPY, NTSE)
@@ -25,6 +26,16 @@ const DeveloperTerminal = {
 <span class="text-amber">theme [dark|light]</span> : Toggle visual appearance
 <span class="text-amber">contact</span>      : Display direct communication channels
 <span class="text-amber">clear</span>        : Clear the terminal output buffer
+`
+    },
+
+    opensource: {
+      desc: "Upstream open-source contributions",
+      exec: () => `
+<span class="text-terracotta font-bold">UPSTREAM OPEN-SOURCE CONTRIBUTIONS</span>
+• <span class="text-sage">NVIDIA CCCL / CUB</span>: <a href="https://github.com/NVIDIA/cccl/pull/10890" target="_blank" class="text-amber">PR #10890</a> — Fixed SIMD alignment specifiers on stack-allocated CUDA temporary buffers.
+• <span class="text-sage">BlueRobotics BlueOS</span>: <a href="https://github.com/bluerobotics/BlueOS/pull/4186" target="_blank" class="text-amber">PR #4186, #4185, #4184</a> — Added container pre-checks, extension HTTP 404 handler, and non-Linux serial device safety.
+• <span class="text-sage">ArduPilot</span>: <a href="https://github.com/ArduPilot/ardupilot/pull/29624" target="_blank" class="text-amber">PR #29624</a> — Standardized IEEE-754 float literals (0.0f) across flight control logic for bare-metal targets.
 `
     },
 
@@ -41,11 +52,12 @@ const DeveloperTerminal = {
     projects: {
       desc: "Overview of key engineering workbenches",
       exec: () => `
-1. <span class="text-terracotta font-bold">Honeywell Forge</span>: Agentic Data Ingestion Pipeline (Kafka, Ray, 3x Thor GPUs, Claude+Phi-4)
-2. <span class="text-terracotta font-bold">ATAL AUV Autonomy</span>: 6-DoF EKF State Estimation & Cascaded PID Control (SAUVC Singapore)
-3. <span class="text-terracotta font-bold">ISRO Lunar Spectral Mapping</span>: Chandrayaan-II XRF Flare Filter (Inter-IIT 2nd/6th)
+1. <span class="text-terracotta font-bold">Honeywell Ingestion</span>: Databricks .whl pipeline connecting Kafka/Postgres/ES to Delta Lake (Claude Opus + Phi-4 self-healing)
+2. <span class="text-terracotta font-bold">Honeywell 3x Thor GPUs</span>: Distributed parallel inference benchmark on Qwen-32B with dynamic Ray router & failover
+3. <span class="text-terracotta font-bold">ATAL AUV Autonomy</span>: 8-Thruster 6-DoF cascaded PID & EKF state estimation (SAUVC '25 Singapore)
 4. <span class="text-terracotta font-bold">SURGE '25 Flow Profiler</span>: Granular Morphology with YOLOv11 + SAM2 (99.2% mAP)
-5. <span class="text-terracotta font-bold">Face Reconstruction</span>: CCTV Motion Deblurring GANs & 3D Yaw Frontalization
+5. <span class="text-terracotta font-bold">ISRO Lunar Spectral Mapping</span>: Chandrayaan-II XRF Flare Filter (Inter-IIT 2nd/6th)
+6. <span class="text-terracotta font-bold">Face Reconstruction</span>: CCTV Motion Deblurring GANs & 3D Yaw Frontalization
 `
     },
 
@@ -53,10 +65,11 @@ const DeveloperTerminal = {
       desc: "Honeywell Forge AI team engineering achievements",
       exec: () => `
 <span class="text-terracotta font-bold">HONEYWELL TECHNOLOGIES | AI INTERN (BENGALURU)</span>
-• Built plug-and-play connectors unifying Kafka, PostgreSQL, and Elasticsearch.
-• Integrated Master Claude LLM + Phi-4 sub-agents for automated schema drift self-healing.
-• Engineered distributed parallel inference across 3 NVIDIA Thor GPUs using Ray.
-• Proved multi-instance replication superior for real-time throughput vs model splitting.
+• Architected OOP Python ingestion framework connecting Kafka, PostgreSQL, and Elasticsearch to Delta Lake (.whl on Databricks).
+• Automated schema drift resolution, Spark casing collision auto-renaming (Col A vs col a -> a2), and reason-based audit tables.
+• Profiled cardinality/null stats with Phi-4 for canonical metadata; clustered embeddings for safe unions (Simple/Cast/Struct-Enlarge).
+• Orchestrated Claude Opus for baseline review, autonomous root-cause error diagnosis, dynamic parameter auto-tuning, and Jira tickets.
+• Engineered distributed parallel inference across 3 NVIDIA Thor GPUs using Ray; proved multi-instance replication superior for real-time throughput.
 `
     },
 
@@ -147,7 +160,7 @@ const DeveloperTerminal = {
 <span class="text-terracotta font-bold">DIRECT CHANNELS</span>
 • Email: <a href="mailto:k.suyashc@gmail.com" class="text-amber">k.suyashc@gmail.com</a>
 • Phone: <a href="tel:+919807199316" class="text-amber">+91 9807199316</a>
-• LinkedIn: <a href="https://www.linkedin.com/in/suyashkumar/" target="_blank" class="text-amber">linkedin.com/in/suyashkumar</a>
+• LinkedIn: <a href="https://www.linkedin.com/in/suyash-kumar-b062491bb/" target="_blank" class="text-amber">linkedin.com/in/suyash-kumar</a>
 • GitHub: <a href="https://github.com/safe-bet" target="_blank" class="text-amber">github.com/safe-bet</a>
 • Kaggle: <a href="https://www.kaggle.com/safebet1034" target="_blank" class="text-amber">kaggle.com/safebet1034</a>
 `
