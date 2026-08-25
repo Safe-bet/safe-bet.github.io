@@ -525,7 +525,11 @@
               </div>
 
               <div class="xray-stage-box">
-                <canvas id="xrayCanvas"></canvas>
+                <img id="xrayViewerImg" src="assets/xray/xray_cardiomegaly.jpg" alt="Clinical Chest X-Ray with Grad-CAM" class="xray-viewer-img">
+                <div class="xray-overlay-hud">
+                  <span class="xray-hud-tag" id="xrayHudCondition">CARDIOVASCULAR: ENLARGED CARDIAC SILHOUETTE</span>
+                  <span class="xray-hud-tag text-amber" id="xrayHudConfidence">CONF: 96.4%</span>
+                </div>
               </div>
 
               <div class="xray-findings-pills">
@@ -660,7 +664,7 @@
               </div>
             </div>
 
-            <!-- Interactive Stage 5: Chute Flow Simulator -->
+            <!-- Interactive Stage 5: SURGE '25 Granular Flow Carousel (Images + Video) -->
             <div class="wb-interactive-stage">
               <div class="stage-top-hud">
                 <span class="stage-title">
@@ -671,8 +675,43 @@
               </div>
 
               <div class="surge-analyzer-box">
-                <div class="particle-canvas-wrapper">
-                  <canvas id="particleCanvas"></canvas>
+                <div class="surge-carousel-wrapper">
+                  <!-- Slide 1: S2.jpg (YOLOv11 + SAM2 Clusters) -->
+                  <div class="surge-slide active" data-slide="0">
+                    <img src="assets/surge/surge_annotated_s2.jpg" alt="SAM2 Particle Instance Segmentation" class="surge-slide-img">
+                  </div>
+                  <!-- Slide 2: WA.jpg (Multi-Material Bounding Boxes) -->
+                  <div class="surge-slide" data-slide="1">
+                    <img src="assets/surge/surge_annotated_wa.jpg" alt="Particle Bounding Boxes" class="surge-slide-img">
+                  </div>
+                  <!-- Slide 3: Ore.jpg (Iron Ore Particles) -->
+                  <div class="surge-slide" data-slide="2">
+                    <img src="assets/surge/surge_annotated_ore.jpg" alt="Iron Ore Granular Chute Stream" class="surge-slide-img">
+                  </div>
+                  <!-- Slide 4: Sinter.jpg (Sinter Silhouette) -->
+                  <div class="surge-slide" data-slide="3">
+                    <img src="assets/surge/surge_annotated_sinter.jpg" alt="Sinter Particle Silhouette Segmentation" class="surge-slide-img">
+                  </div>
+                  <!-- Slide 5: High-Speed Video Clip -->
+                  <div class="surge-slide" data-slide="4">
+                    <video src="assets/surge/surge_video_clip.mp4" autoplay loop muted playsinline class="surge-slide-video"></video>
+                  </div>
+                </div>
+
+                <div class="surge-carousel-nav">
+                  <button class="surge-nav-btn" id="surgePrevBtn">◀ PREV</button>
+                  <div class="surge-dots-group" id="surgeDotsGroup">
+                    <span class="surge-dot active" data-idx="0"></span>
+                    <span class="surge-dot" data-idx="1"></span>
+                    <span class="surge-dot" data-idx="2"></span>
+                    <span class="surge-dot" data-idx="3"></span>
+                    <span class="surge-dot" data-idx="4"></span>
+                  </div>
+                  <button class="surge-nav-btn" id="surgeNextBtn">NEXT ▶</button>
+                </div>
+
+                <div class="surge-caption-text" id="surgeCaptionText">
+                  [1/5] YOLOv11 + SAM2 Instance Segmentation on Granular Bed
                 </div>
 
                 <div class="morphology-metrics-grid">
