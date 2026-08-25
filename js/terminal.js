@@ -102,11 +102,11 @@ const DeveloperTerminal = {
     },
 
     scholastic: {
-      desc: "Scholastic honors and competitive ranks",
+      desc: "Scholastic honors and competitive standings",
       exec: () => `
 <span class="text-terracotta font-bold">SCHOLASTIC ACHIEVEMENTS</span>
-• <span class="text-sage">AIR 5705</span>: JEE Advanced (2023) among 1.8 Lakh candidates nationwide
-• <span class="text-sage">AIR 5095</span>: JEE Main (2023) among 11.6 Lakh candidates (Top 0.5%)
+• <span class="text-sage">Qualified</span>: JEE Advanced (2023) — admission into IIT Kanpur
+• <span class="text-sage">Qualified</span>: JEE Main (2023) — National Engineering Entrance Examination
 • <span class="text-sage">AIR 1034</span>: KVPY-SA (2022) conducted by IISc Bangalore
 • <span class="text-sage">NTSE Scholar</span>: National Talent Search Stage 2 (State Rank 20 in Stage 1)
 `
