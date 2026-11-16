@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="js">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -18,8 +18,19 @@
 <body>
   <a class="skip" href="#main">Skip to content</a>
 
+  <!-- Pre-dive boot: sonar + systems check, then strips drain away -->
+  <div id="intro" aria-hidden="true">
+    <div class="intro-strips"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="intro-core">
+      <div class="intro-sonar"><span></span><span></span><span></span><b></b></div>
+      <pre id="introLog"></pre>
+    </div>
+    <button type="button" class="intro-skip" id="introSkip">Skip intro</button>
+  </div>
+
   <!-- Fixed ocean: light shafts, marine snow, bubbles. Darkens with scroll depth. -->
   <canvas id="ocean" aria-hidden="true"></canvas>
+  <canvas id="life" aria-hidden="true"></canvas>
 
   <!-- Depth gauge -->
   <aside class="gauge" aria-hidden="true">
@@ -35,6 +46,7 @@
     </a>
     <nav aria-label="Primary">
       <ul class="nav-links" id="navLinks">
+        <li><a href="#about">About</a></li>
         <li><a href="#now">Now</a></li>
         <li><a href="#work">Work</a></li>
         <li><a href="#journey">Journey</a></li>
@@ -86,10 +98,15 @@
         </div>
       </div>
       <div class="torch" id="torch" aria-hidden="true"></div>
+      <canvas id="heroSub" aria-hidden="true"></canvas>
 
       <div class="hero-inner">
         <p class="eyebrow"><span class="dot"></span> Vision Intern @ Armatrix · IIT Kanpur '27</p>
-        <h1 class="hero-title">I build robots that<br><span class="beam-text">see in the dark.</span></h1>
+        <h1 class="hero-title"><span class="ln"><span>I build robots that</span></span><span class="ln"><span class="beam-text">see in the dark.</span></span></h1>
+        <p class="slot" aria-label="Focus areas: underwater autonomy, 3-D vision for welding, GPU-scale inference, medical imaging">
+          <span class="slot-k">Now tuning</span>
+          <span class="slot-win"><span class="slot-reel" id="slotReel"><span>underwater autonomy</span><span>3-D vision for welding</span><span>GPU-scale inference</span><span>medical imaging AI</span><span>underwater autonomy</span></span></span>
+        </p>
         <p class="hero-lead">
           AI + robotics engineer. Underwater autonomy and stereo perception on AUV-IITK's <strong>ATAL</strong>,
           3-D vision for robotic welding at <strong>Armatrix</strong>, and multi-GPU inference at <strong>Honeywell Forge</strong>.
@@ -98,7 +115,7 @@
           <a class="btn btn-primary" href="#work">See the work</a>
           <a class="btn btn-ghost" href="#journey"><code>git log</code> my journey</a>
         </div>
-        <p class="torch-hint" id="torchHint">Move your torch — there's something down here.</p>
+        <p class="torch-hint" id="torchHint">ATAL follows your cursor — steer its lamp. Click anywhere to ping sonar.</p>
       </div>
 
       <dl class="stats">
@@ -107,6 +124,14 @@
         <div><dt>Throughput</dt><dd data-count="3" data-prefix="~" data-suffix="×">0</dd><span>Qwen-32B on 3× NVIDIA Thor</span></div>
         <div><dt>Upstream</dt><dd data-count="5" data-suffix=" PRs">0</dd><span>merged · NVIDIA, BlueOS, ArduPilot</span></div>
       </dl>
+    </section>
+
+    <!-- ============================== MANIFESTO (scroll-lit) ============================== -->
+    <section class="manifesto" id="about" data-depth="80" data-zone="SUNLIGHT ZONE" aria-label="About">
+      <div class="wrap">
+        <p class="kicker">0080 m · About</p>
+        <p class="lit" id="lit">I'm a Chemical Engineering student at IIT Kanpur who fell for robots. I led a 30-person team that put <em>ATAL</em> in the water at SAUVC Singapore, scaled LLM inference across <em>NVIDIA Thor</em> GPUs at Honeywell, and now I'm teaching a welding arm to find its own seams at <em>Armatrix</em>. I like problems where the water is murky, the depth is noisy, and the answer still has to run in real time.</p>
+      </div>
     </section>
 
     <!-- ============================== NOW: ARMATRIX ============================== -->
@@ -148,6 +173,16 @@
           <h2>Robots, vision and the GPUs behind them</h2>
           <p class="sec-lead">Each project runs a small live visual of what the system actually does. Most of them respond to clicks.</p>
         </header>
+
+        <ol class="index reveal" id="workIndex">
+          <li><a href="#now" data-prev="seamCanvas"><span class="ix-n">01</span><span class="ix-t">SeamFinder</span><span class="ix-m">Armatrix · 3-D vision for welding</span><span class="ix-y">Now</span></a></li>
+          <li><a href="#atal" data-prev="atalCanvas"><span class="ix-n">02</span><span class="ix-t">ATAL AUV</span><span class="ix-m">AUV-IITK · perception + 6-DoF control</span><span class="ix-y">2024–</span></a></li>
+          <li><a href="#thor" data-prev="thorCanvas"><span class="ix-n">03</span><span class="ix-t">3× Thor inference</span><span class="ix-m">Honeywell Forge · Ray, Qwen-32B</span><span class="ix-y">2026</span></a></li>
+          <li><a href="#flow" data-img="assets/surge/surge_annotated_s2.jpg"><span class="ix-n">04</span><span class="ix-t">Particle flow</span><span class="ix-m">IIT Kanpur research · YOLOv11 + SAM2</span><span class="ix-y">2025–</span></a></li>
+          <li><a href="#xray" data-img="assets/xray/xray_cardiomegaly.jpg"><span class="ix-n">05</span><span class="ix-t">Chest X-ray AI</span><span class="ix-m">LENEK · Grad-CAM</span><span class="ix-y">2025</span></a></li>
+          <li><a href="#oss" data-img=""><span class="ix-n">06</span><span class="ix-t">Upstream PRs</span><span class="ix-m">NVIDIA CCCL · BlueOS · ArduPilot</span><span class="ix-y">5 merged</span></a></li>
+        </ol>
+        <div class="ix-preview" id="ixPreview" aria-hidden="true"><img alt=""></div>
 
         <!-- ATAL -->
         <article class="case reveal" id="atal">
@@ -402,6 +437,7 @@
 
   <script src="js/data.js"></script>
   <script src="js/ocean.js"></script>
+  <script src="js/life.js"></script>
   <script src="js/projects.js"></script>
   <script src="js/journey.js"></script>
   <script src="js/main.js"></script>

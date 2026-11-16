@@ -11,7 +11,7 @@
       ctx.setTransform(d, 0, 0, d, 0, 0);
     };
     fit(); new ResizeObserver(fit).observe(canvas);
-    new IntersectionObserver(es => { s.visible = es[0].isIntersecting; }, { rootMargin: '100px' }).observe(canvas);
+    new IntersectionObserver(es => { s.visible = es[0].isIntersecting; }, { rootMargin: '700px 0px' }).observe(canvas);
     return s;
   }
   const loop = (s, draw) => {

@@ -8,6 +8,7 @@
   let W = 0, H = 0, DPR = 1;
   let depth = 0;                 // 0..1 (surface → seabed)
   const torch = { x: -9999, y: -9999, on: false, r: 220 };
+  window.DIVE = { torch, get depth() { return depth; } };
 
   const snow = [], bubbles = [], glow = [];
   function resize() {
