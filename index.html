@@ -1,1346 +1,409 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Suyash Kumar — AI Systems & Autonomous Robotics | IIT Kanpur</title>
-  <meta name="description" content="Engineering portfolio of Suyash Kumar — AI Systems Engineer, Autonomous Robotics Lead & Deep Learning Researcher at IIT Kanpur.">
-  <meta name="keywords" content="Suyash Kumar, IIT Kanpur, Honeywell AI Intern, LENEK Technologies, Ray, NVIDIA Thor, Jetson Orin, YOLOv11, EKF, ISRO">
-  <meta name="author" content="Suyash Kumar">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='16' fill='%23C25E38'/><text x='50%' y='65%' font-family='serif' font-weight='600' font-size='52' fill='%23FFFFFF' text-anchor='middle'>SK</text></svg>">
-  
-  <!-- Stylesheets -->
-  <link rel="stylesheet" href="styles/main.css">
-  <link rel="stylesheet" href="styles/dashboard.css">
-  <link rel="stylesheet" href="styles/visualizers.css">
-  <link rel="stylesheet" href="styles/terminal.css">
-  <link rel="stylesheet" href="styles/responsive.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Suyash Kumar — AI & Robotics Engineer</title>
+  <meta name="description" content="Suyash Kumar — AI and robotics engineer at IIT Kanpur. Vision Intern at Armatrix, ex-Honeywell Forge AI, former Team Head of AUV-IITK (ATAL AUV, SAUVC '25).">
+  <meta name="theme-color" content="#020812">
+  <meta property="og:title" content="Suyash Kumar — AI & Robotics Engineer">
+  <meta property="og:description" content="Robots that see in the dark: underwater autonomy, 3-D vision for robotic welding, and GPU-scale AI.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%23020812'/><circle cx='32' cy='32' r='18' fill='none' stroke='%2346e3ff' stroke-width='4'/><circle cx='32' cy='32' r='6' fill='%23ffc061'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/site.css">
 </head>
 <body>
-  <!-- Ambient Blueprint Grid Overlay -->
-  <div class="bg-grid-overlay"></div>
+  <a class="skip" href="#main">Skip to content</a>
 
-  <!-- Top Navigation HUD -->
-  <header class="navbar-hud">
-    <div class="container navbar-inner">
-      <a href="#" class="nav-brand" id="brandLink">
-        <div class="brand-logo">SK</div>
-        <div class="brand-text">
-          <span class="brand-name">Suyash Kumar</span>
-          <span class="brand-sub">IIT Kanpur // Systems & Robotics</span>
-        </div>
-      </a>
+  <!-- Fixed ocean: light shafts, marine snow, bubbles. Darkens with scroll depth. -->
+  <canvas id="ocean" aria-hidden="true"></canvas>
 
-      <!-- Telemetry Center & Nav Links -->
-      <div class="nav-telemetry-cluster">
-        <div class="badge badge-live">
-          <span class="pulse-dot"></span>
-          <span>AVAILABLE FOR ROLES</span>
-        </div>
+  <!-- Depth gauge -->
+  <aside class="gauge" aria-hidden="true">
+    <div class="gauge-track"><div class="gauge-fill" id="gaugeFill"></div></div>
+    <div class="gauge-read"><span id="gaugeDepth">0000</span><small>m</small></div>
+    <div class="gauge-zone" id="gaugeZone">SURFACE</div>
+  </aside>
 
-        <ul class="nav-links">
-          <li class="nav-link-item active"><a href="#overview">Overview</a></li>
-          <li class="nav-link-item"><a href="#workbenches">Workbenches</a></li>
-          <li class="nav-link-item"><a href="#scholastic">Honors</a></li>
-          <li class="nav-link-item"><a href="#leadership">Leadership</a></li>
-          <li class="nav-link-item"><a href="#skills">Matrix</a></li>
-          <li class="nav-link-item"><a href="#contact">Contact</a></li>
-        </ul>
-      </div>
-
-      <!-- Action Controls -->
-      <div class="nav-actions">
-        <div class="time-pill" id="utcClock">IST --:--:--</div>
-        
-        <button class="cmd-k-trigger" id="cmdTriggerBtn" title="Developer Terminal (⌘K)">
-          <span>CLI</span>
-          <span class="cmd-k-key">⌘K</span>
-        </button>
-
-        <button class="btn btn-icon btn-secondary" id="themeToggleBtn" title="Toggle Appearance">
-          <span id="themeIcon">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-          </span>
-        </button>
-
-        <a href="assets/Suyash_Kumar_Resume.pdf" target="_blank" class="btn btn-primary btn-sm" id="navResumeBtn">
-          <span>RESUME</span>
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
-        </a>
-
-        <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle Navigation">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-        </button>
-      </div>
-    </div>
+  <header class="nav" id="nav">
+    <a href="#top" class="brand" aria-label="Suyash Kumar, home">
+      <span class="brand-mark"></span>
+      <span>Suyash Kumar</span>
+    </a>
+    <nav aria-label="Primary">
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#now">Now</a></li>
+        <li><a href="#work">Work</a></li>
+        <li><a href="#journey">Journey</a></li>
+        <li><a href="#elements">Elements</a></li>
+        <li><a href="#oss">Open source</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+    <a class="btn btn-sm btn-ghost nav-cv" href="assets/Suyash_Kumar_Resume.pdf" target="_blank" rel="noopener">Résumé ↗</a>
+    <button class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false"><span></span><span></span></button>
   </header>
 
-  <!-- Mobile Drawer -->
-  <div class="mobile-menu-drawer" id="mobileMenuDrawer">
-    <a href="#overview" class="mobile-nav-link"><span>01. Overview</span> <span>→</span></a>
-    <a href="#workbenches" class="mobile-nav-link"><span>02. Engineering Workbenches</span> <span>→</span></a>
-    <a href="#scholastic" class="mobile-nav-link"><span>03. Scholastic Achievements</span> <span>→</span></a>
-    <a href="#leadership" class="mobile-nav-link"><span>04. Leadership & Impact</span> <span>→</span></a>
-    <a href="#skills" class="mobile-nav-link"><span>05. Technical Matrix</span> <span>→</span></a>
-    <a href="#contact" class="mobile-nav-link"><span>06. Connect & Channels</span> <span>→</span></a>
-  </div>
-
-  <main>
-    <!-- ====================================================================
-         SECTION 1: HERO & EXECUTIVE SYSTEMS OVERVIEW
-         ==================================================================== -->
-    <section id="overview" class="hero-section">
-      <div class="container hero-grid">
-        <!-- Left: Main Bio & Track Record -->
-        <div class="glass-panel hero-main-card tech-corner">
-          <div>
-            <div class="hero-tag-row">
-              <span class="badge badge-terracotta">IIT KANPUR ('27)</span>
-              <span class="badge badge-sage">HONEYWELL AI INTERN</span>
-              <span class="badge badge-amber">LENEK AI INTERN</span>
-              <span class="badge">MAJOR: CHEMICAL ENG.</span>
-              <span class="badge">MINOR: COGNITIVE SCIENCE</span>
-            </div>
-
-            <h1 class="hero-title">
-              Engineering <span class="title-accent">Autonomous Robotics</span> & Scaled AI Systems.
-            </h1>
-
-            <p class="hero-description">
-              Undergraduate engineer at IIT Kanpur specializing in distributed multi-agent data pipelines, parallel multi-GPU model inference, 6-DoF underwater robotic autonomy, and multi-modal deep learning vision systems.
-            </p>
-
-            <!-- 4 Core Pillars Grid -->
-            <div class="hero-core-pillars">
-              <div class="pillar-item">
-                <span class="pillar-icon">◆</span>
-                <div class="pillar-text">
-                  <strong>Distributed AI Systems</strong>
-                  Multi-agent ingestion & 3x Thor GPU Ray load balancing @ Honeywell Forge
-                </div>
-              </div>
-              <div class="pillar-item">
-                <span class="pillar-icon">◆</span>
-                <div class="pillar-text">
-                  <strong>Autonomous Robotics</strong>
-                  8-thruster 6-DoF cascaded control & EKF state estimation @ AUV-IITK
-                </div>
-              </div>
-              <div class="pillar-item">
-                <span class="pillar-icon">◆</span>
-                <div class="pillar-text">
-                  <strong>Medical AI Vision</strong>
-                  Multi-modal chest X-ray pathology diagnostic models @ LENEK Tech
-                </div>
-              </div>
-              <div class="pillar-item">
-                <span class="pillar-icon">◆</span>
-                <div class="pillar-text">
-                  <strong>Computer Vision Research</strong>
-                  SURGE '25 granular flow profiling (99.2% mAP) & ISRO spectral mapping
-                </div>
-              </div>
-            </div>
-
-            <div class="cta-btn-group" style="justify-content: flex-start;">
-              <a href="#workbenches" class="btn btn-primary">
-                <span>EXPLORE WORKBENCHES</span>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-              </a>
-              <button class="btn btn-secondary" onclick="DeveloperTerminal.openModal()">
-                <span>RUN CLI (⌘K)</span>
-              </button>
-              <a href="mailto:k.suyashc@gmail.com" class="btn btn-outline-terracotta">
-                <span>GET IN TOUCH</span>
-              </a>
-            </div>
-          </div>
+  <main id="main">
+    <!-- ============================== HERO: TORCHLIGHT ============================== -->
+    <section class="hero" id="top" data-depth="0" data-zone="SURFACE">
+      <!-- Hidden layer: only visible inside the torch beam -->
+      <div class="hero-hidden" id="heroHidden" aria-hidden="true">
+        <svg class="auv-blueprint" viewBox="0 0 900 420" fill="none" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <pattern id="bpgrid" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M30 0H0V30" stroke="rgba(70,227,255,.16)" stroke-width="1"/></pattern>
+          </defs>
+          <rect x="-400" y="-200" width="1700" height="820" fill="url(#bpgrid)"/>
+          <g stroke="#46e3ff" stroke-width="2">
+            <rect x="200" y="150" width="460" height="110" rx="55"/>
+            <path d="M660 160 Q745 205 660 250"/>
+            <rect x="140" y="120" width="70" height="30" rx="6"/><rect x="140" y="260" width="70" height="30" rx="6"/>
+            <rect x="640" y="120" width="70" height="30" rx="6"/><rect x="640" y="260" width="70" height="30" rx="6"/>
+            <rect x="330" y="105" width="60" height="45" rx="6"/><rect x="470" y="105" width="60" height="45" rx="6"/>
+            <circle cx="700" cy="190" r="10"/><circle cx="700" cy="222" r="10"/>
+            <rect x="280" y="180" width="120" height="50" rx="4" stroke-dasharray="6 5"/>
+            <rect x="430" y="180" width="110" height="50" rx="4" stroke-dasharray="6 5"/>
+            <path d="M200 205 H120 M100 205 h-40" stroke-dasharray="4 6"/>
+          </g>
+          <g font-family="JetBrains Mono, monospace" font-size="13" fill="#9eeeff">
+            <text x="282" y="172">JETSON ORIN</text><text x="432" y="172">INTEL NUC</text>
+            <text x="690" y="160">STEREO IDS ×2</text>
+            <text x="300" y="98">VERT THRUSTERS</text>
+            <text x="120" y="320">IMU · DVL · PRESSURE</text>
+            <text x="560" y="320">EKF @ MCU · 6-DoF PID</text>
+            <text x="30" y="40">ATAL / AUV-IITK — GENERAL ARRANGEMENT (SCHEMATIC)</text>
+          </g>
+          <g stroke="#ffc061" stroke-width="1.5"><path d="M720 205 l120 -60 M720 205 l120 60" stroke-dasharray="3 5"/></g>
+        </svg>
+        <div class="hidden-tags">
+          <span style="left:6%;top:24%">yolov11 · 30 fps</span>
+          <span style="left:72%;top:18%">seam lock · icp</span>
+          <span style="left:74%;top:72%">qwen-32b × 3 thor</span>
+          <span style="left:8%;top:76%">sam2 · 99.2% mAP</span>
         </div>
+      </div>
+      <div class="torch" id="torch" aria-hidden="true"></div>
 
-        <!-- Right: Executive Snapshot Matrix -->
-        <div class="hero-snapshot-matrix">
-          <!-- Card 1: Experience -->
-          <div class="snapshot-box">
-            <div>
-              <div class="snapshot-tag">INDUSTRY EXPERIENCE</div>
-              <div class="snapshot-headline">2 AI Internships</div>
-              <div class="snapshot-desc">Honeywell Forge (Ray, 3x Thor GPUs) & LENEK Technologies (Medical X-Ray Vision).</div>
-            </div>
-            <div class="snapshot-badge-row">
-              <span class="badge badge-sage">HONEYWELL</span>
-              <span class="badge badge-amber">LENEK TECH</span>
-            </div>
-          </div>
+      <div class="hero-inner">
+        <p class="eyebrow"><span class="dot"></span> Vision Intern @ Armatrix · IIT Kanpur '27</p>
+        <h1 class="hero-title">I build robots that<br><span class="beam-text">see in the dark.</span></h1>
+        <p class="hero-lead">
+          AI + robotics engineer. Underwater autonomy and stereo perception on AUV-IITK's <strong>ATAL</strong>,
+          3-D vision for robotic welding at <strong>Armatrix</strong>, and multi-GPU inference at <strong>Honeywell Forge</strong>.
+        </p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="#work">See the work</a>
+          <a class="btn btn-ghost" href="#journey"><code>git log</code> my journey</a>
+        </div>
+        <p class="torch-hint" id="torchHint">Move your torch — there's something down here.</p>
+      </div>
 
-          <!-- Card 2: Robotics -->
-          <div class="snapshot-box">
-            <div>
-              <div class="snapshot-tag">ROBOTICS & AUTONOMY</div>
-              <div class="snapshot-headline">ATAL AUV Lead</div>
-              <div class="snapshot-desc">6-DoF dynamic stabilization, EKF sensor fusion, and 30 FPS Jetson Orin Nano perception.</div>
-            </div>
-            <div class="snapshot-badge-row">
-              <span class="badge badge-terracotta">SAUVC SINGAPORE</span>
-              <span class="badge">ROS / EKF</span>
-            </div>
-          </div>
+      <dl class="stats">
+        <div><dt>mAP@0.5</dt><dd data-count="99.2" data-dec="1" data-suffix="%">0</dd><span>particle segmentation</span></div>
+        <div><dt>Onboard</dt><dd data-count="30" data-suffix=" fps">0</dd><span>AUV detection, Jetson Orin</span></div>
+        <div><dt>Throughput</dt><dd data-count="3" data-prefix="~" data-suffix="×">0</dd><span>Qwen-32B on 3× NVIDIA Thor</span></div>
+        <div><dt>Upstream</dt><dd data-count="5" data-suffix=" PRs">0</dd><span>merged · NVIDIA, BlueOS, ArduPilot</span></div>
+      </dl>
+    </section>
 
-          <!-- Card 3: Competitive Merit -->
-          <div class="snapshot-box">
-            <div>
-              <div class="snapshot-tag">COMPETITIVE STANDING</div>
-              <div class="snapshot-headline">Qualified</div>
-              <div class="snapshot-desc">Qualified JEE Advanced & Main, KVPY Fellowship AIR 1034 (IISc Bangalore), and NTSE Scholar.</div>
-            </div>
-            <div class="snapshot-badge-row">
-              <span class="badge badge-terracotta">JEE QUALIFIED</span>
-              <span class="badge badge-sage">KVPY FELLOW</span>
-            </div>
-          </div>
+    <!-- ============================== NOW: ARMATRIX ============================== -->
+    <section class="section" id="now" data-depth="200" data-zone="SUNLIGHT ZONE">
+      <div class="wrap">
+        <header class="sec-head reveal">
+          <p class="kicker">0200 m · Now</p>
+          <h2>Vision Intern, <span class="hl">Armatrix</span></h2>
+          <p class="sec-lead">I'm building <strong>SeamFinder</strong>: mark a weld seam on the CAD model, point a depth camera at the real part, and the welding arm gets exact torch poses — even when the part isn't quite where the drawing says it is.</p>
+        </header>
 
-          <!-- Card 4: Research & Impact -->
-          <div class="snapshot-box">
-            <div>
-              <div class="snapshot-tag">CAMPUS LEADERSHIP</div>
-              <div class="snapshot-headline">₹70L+ Funding</div>
-              <div class="snapshot-desc">AUV-IITK Team Head, Pragaman Overall Coordinator (₹25L+ budget), Programming Club Secy.</div>
-            </div>
-            <div class="snapshot-badge-row">
-              <span class="badge">30+ ENGINEERS</span>
-              <span class="badge badge-live">PRAGAMAN</span>
-            </div>
+        <article class="case case-feature reveal">
+          <div class="viz">
+            <div class="viz-bar"><span>seamfinder · lock</span><span class="chip" id="sfState">SEARCH POSES</span></div>
+            <canvas id="seamCanvas" aria-label="Animation: a depth point cloud of a part, candidate CAD poses tested, the pose locks, and weld seams are measured and sent to the arm"></canvas>
+            <ol class="viz-steps" id="sfSteps">
+              <li>Load CAD</li><li>Search poses</li><li>ICP refine</li><li>Measure seams</li><li>Send to arm</li>
+            </ol>
           </div>
+          <div class="case-body">
+            <ul class="points">
+              <li><b>Pose lock.</b> Tries every stable resting pose × 24 rotations of the CAD, scores each by rendering it against RealSense D435 depth, then refines with ICP. Symmetric look-alikes that would move a seam are flagged as ambiguous instead of guessed.</li>
+              <li><b>Measured seams.</b> Fits the two real plates around each seam in the depth and intersects them, so the seam lands where tack distortion and cut tolerance actually put it.</li>
+              <li><b>Per-seam confidence.</b> Occlusion-tested against the CAD: green = seen, amber = partly seen or &gt; 3 mm off CAD, red = hidden. Never weld blind.</li>
+              <li><b>Robot output.</b> Start / path / end torch poses per seam through the hand-eye <code>T_base_cam</code>, sent to the arm only when every seam passes.</li>
+              <li><b>Plus</b> a hand-held 3-D scanner (ChArUco-tracked or ICP) with CAD deviation maps, and a printable accuracy kit with test coupons designed to find where the system breaks.</li>
+            </ul>
+            <div class="tags"><span>RealSense D435</span><span>Point clouds</span><span>ICP</span><span>Hand-eye calibration</span><span>ChArUco</span><span>FastAPI</span><span>three.js</span><span>C++</span></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============================== SELECTED WORK ============================== -->
+    <section class="section" id="work" data-depth="600" data-zone="TWILIGHT ZONE">
+      <div class="wrap">
+        <header class="sec-head reveal">
+          <p class="kicker">0600 m · Selected work</p>
+          <h2>Robots, vision and the GPUs behind them</h2>
+          <p class="sec-lead">Each project runs a small live visual of what the system actually does. Most of them respond to clicks.</p>
+        </header>
+
+        <!-- ATAL -->
+        <article class="case reveal" id="atal">
+          <div class="viz">
+            <div class="viz-bar"><span>atal · front camera</span>
+              <div class="seg" role="group" aria-label="ATAL view">
+                <button class="on" data-atal="hud">Perception HUD</button><button data-atal="3d">3-D model</button>
+              </div>
+            </div>
+            <div class="atal-stage">
+              <canvas id="atalCanvas" aria-label="Animation: underwater camera view with YOLO detections on a gate and buoy, attitude indicator settling under PID control"></canvas>
+              <div class="atal-3d" id="atal3d" hidden>
+                <button class="btn btn-ghost" id="load3d">Load interactive 3-D model (Sketchfab)</button>
+              </div>
+            </div>
+            <div class="viz-foot"><button class="btn btn-sm btn-ghost" id="atalKick">Hit it with a current</button><span class="readout" id="atalMode">AUTONOMOUS</span></div>
+          </div>
+          <div class="case-body">
+            <p class="org">AUV-IITK · Prof. Indranil Saha · Apr 2024 – present</p>
+            <h3>ATAL AUV — perception, depth and 6-DoF control</h3>
+            <ul class="points">
+              <li><b>Detection.</b> YOLOv11 and SSD fine-tuned on a custom turbid-pool dataset (gates, buoys, flares, buckets) at 30 fps on a Jetson Orin.</li>
+              <li><b>Depth.</b> Synchronized dual-IDS stereo with dense disparity for metric obstacle distance; MiDaS evaluated under underwater scattering.</li>
+              <li><b>Control.</b> 2-loop cascaded PID (inner rate, outer attitude/position) on 6-DoF; EKF fusing IMU, DVL and pressure on the microcontroller; teleop ↔ autonomous switching.</li>
+              <li><b>Ops.</b> Web telemetry dashboard: live PID tuning, auto-tune, attitude, arming and kill-switch. Jetson ↔ Intel NUC over an onboard ethernet switch.</li>
+            </ul>
+            <p class="result">Qualified for the SAUVC '25 finals in Singapore — 100+ teams from 20 countries.</p>
+            <div class="tags"><span>ROS</span><span>C++</span><span>YOLOv11</span><span>Stereo</span><span>EKF</span><span>PID</span><span>Jetson Orin</span></div>
+          </div>
+        </article>
+
+        <!-- THOR -->
+        <article class="case case-flip reveal" id="thor">
+          <div class="viz">
+            <div class="viz-bar"><span>ray · 3× nvidia thor</span>
+              <div class="seg" role="group" aria-label="Serving strategy" id="thorSeg">
+                <button class="on" data-mode="rep">Replication</button><button data-mode="tp">Tensor parallel</button>
+              </div>
+            </div>
+            <canvas id="thorCanvas" aria-label="Animation: a Ray router dispatching requests to three GPUs; click a GPU to kill it and watch failover"></canvas>
+            <div class="viz-foot"><span class="muted">Click a GPU to kill or revive it</span><span class="readout" id="thorRps">0 req/s</span></div>
+          </div>
+          <div class="case-body">
+            <p class="org">Honeywell Forge AI · Bengaluru · May – Jul 2026</p>
+            <h3>Parallel LLM inference on edge GPUs</h3>
+            <ul class="points">
+              <li><b>Cluster.</b> 3-node Ray cluster over three NVIDIA Thor GPUs serving Qwen-32B.</li>
+              <li><b>Finding.</b> One model instance per GPU scaled near-linearly (~3×); tensor-parallel sharding lost to inter-GPU latency for a model that fits on one GPU.</li>
+              <li><b>Router.</b> Custom Ray router tracking live GPU load, queue depth and memory headroom; killed a worker under load to prove zero-downtime failover and re-integration.</li>
+              <li><b>Also built</b> a self-healing data-ingestion agent: Kafka / Postgres / Elasticsearch → Delta Lake on Databricks, schema-drift handling, and Claude Opus supervising reruns with human-in-the-loop escalation.</li>
+            </ul>
+            <div class="tags"><span>Ray</span><span>NVIDIA Thor</span><span>Qwen-32B</span><span>PyTorch</span><span>Databricks</span><span>Delta Lake</span></div>
+          </div>
+        </article>
+
+        <!-- PARTICLE FLOW -->
+        <article class="case reveal" id="flow">
+          <div class="viz">
+            <div class="viz-bar"><span>yolov11 + sam2 · chute</span>
+              <div class="seg" role="group" aria-label="Material" id="flowTabs">
+                <button class="on" data-i="0">Bed</button><button data-i="1">Iron ore</button><button data-i="2">Sinter</button><button data-i="3">Mixed</button><button data-i="4">Live</button>
+              </div>
+            </div>
+            <div class="scan" id="flowScan">
+              <img class="scan-raw" alt="" src="assets/surge/surge_annotated_s2.jpg">
+              <img class="scan-seg" alt="Particles segmented by YOLOv11 + SAM2 on an inclined chute" src="assets/surge/surge_annotated_s2.jpg">
+              <div class="scan-line"></div>
+              <div class="scan-hud"><span id="flowLabel">SEGMENTING</span><span id="flowCount">0 masks</span></div>
+            </div>
+            <div class="viz-foot"><span class="muted">Grey = raw frame · colour = model output</span><span class="readout">ψ 0.91 · AR 1.34</span></div>
+          </div>
+          <div class="case-body">
+            <p class="org">Research Intern · Prof. Anurag Tripathi · IIT Kanpur · May 2025 – present</p>
+            <h3>Granular particle flow profiler</h3>
+            <ul class="points">
+              <li><b>Rig.</b> Inclined flow bench with DC backlighting and matte lining; high-FPS capture; pixel-to-mm calibration with a reference square.</li>
+              <li><b>Model.</b> YOLOv11 detection feeding SAM2 masks for touching, occluded, fast-moving particles across iron ore, coke, sinter and pellets.</li>
+              <li><b>Physics out.</b> Aspect ratio, sphericity and contact eccentricity per particle, feeding a hybrid multi-material classifier.</li>
+            </ul>
+            <p class="result">99.2% mAP@0.5 · 89.5% mAP@0.95 on unseen flow.</p>
+            <div class="tags"><span>YOLOv11</span><span>SAM2</span><span>OpenCV</span><span>PyTorch</span></div>
+          </div>
+        </article>
+
+        <!-- LENEK -->
+        <article class="case case-flip reveal" id="xray">
+          <div class="viz">
+            <div class="viz-bar"><span>chest x-ray · grad-cam</span>
+              <div class="seg" role="group" aria-label="Finding" id="xrayTabs">
+                <button class="on" data-i="0">Cardiomegaly</button><button data-i="1">Effusion</button><button data-i="2">Pneumothorax</button>
+              </div>
+            </div>
+            <div class="scan scan-v" id="xrayScan">
+              <img class="scan-raw" alt="" src="assets/xray/xray_cardiomegaly.jpg">
+              <img class="scan-seg" alt="Chest X-ray with Grad-CAM attention over the finding" src="assets/xray/xray_cardiomegaly.jpg">
+              <div class="scan-line"></div>
+              <div class="scan-hud"><span id="xrayLabel">READING</span><span class="conf"><i id="xrayBar"></i></span></div>
+            </div>
+            <div class="viz-foot"><span class="muted">Attention appears as the model reads the film</span><span class="readout" id="xrayConf">—</span></div>
+          </div>
+          <div class="case-body">
+            <p class="org">LENEK Technologies · AI Intern · Jul – Dec 2025</p>
+            <h3>Chest X-ray diagnosis with visual evidence</h3>
+            <ul class="points">
+              <li><b>Goal.</b> Cut clinical dependence on CT by reading cheap X-rays well.</li>
+              <li><b>Model.</b> Multi-modal vision model on CheXpert for cardiomegaly, pleural effusion, lung shrinkage, pneumothorax and more.</li>
+              <li><b>Trust.</b> Grad-CAM localization so radiologists see <i>why</i>, not just a score.</li>
+            </ul>
+            <div class="tags"><span>PyTorch</span><span>Vision Transformers</span><span>CheXpert</span><span>Grad-CAM</span></div>
+          </div>
+        </article>
+
+        <!-- Smaller work -->
+        <div class="mini-grid">
+          <article class="mini reveal">
+            <div class="compare" id="faceCompare" style="--pos:50%">
+              <img src="assets/forensic_cctv_lowres.jpg" alt="Blurred low-resolution CCTV face" loading="lazy">
+              <img class="after" src="assets/forensic_gan_restored.jpg" alt="Restored frontal face" loading="lazy">
+              <input type="range" min="0" max="100" value="50" aria-label="Compare before and after restoration">
+              <span class="cmp-l">CCTV</span><span class="cmp-r">Restored</span>
+            </div>
+            <p class="org">Course research · Aug – Oct 2024</p>
+            <h4>Forensic face reconstruction</h4>
+            <p>YOLOv8 blur detection, GAN deblurring (PSNR / SSIM), 3-D yaw estimation, and extreme poses routed to Qwen-2.5 Image Edit for frontalization. Drag to compare.</p>
+          </article>
+          <article class="mini reveal">
+            <canvas id="xrfCanvas" class="mini-canvas" aria-label="Animated X-ray fluorescence spectrum with Mg, Al, Si, Ca and Fe peaks"></canvas>
+            <p class="org">ISRO · 13th Inter-IIT Tech Meet · Oct – Dec 2024</p>
+            <h4>Lunar elemental mapping, Chandrayaan-2</h4>
+            <p>Flare-isolated XRF spectra, background estimation and 2-D spatial interpolation into a high-res lunar map. <b>2nd in XRF catalogue, 6th overall</b> of 23 IITs.</p>
+            <a class="link" href="https://github.com/Safe-bet/ISRO-High-Prep-Inter-IIT-Tech-13.0" target="_blank" rel="noopener">Repository ↗</a>
+          </article>
         </div>
       </div>
     </section>
 
-    <!-- ====================================================================
-         SECTION 2: INTERACTIVE ENGINEERING WORKBENCHES
-         ==================================================================== -->
-    <section id="workbenches" class="dashboard-section">
-      <div class="container">
-        <div class="section-header-hud">
-          <div>
-            <span class="section-prefix">// 01. CORE SYSTEMS & RESEARCH</span>
-            <h2 class="section-title">Engineering Workbenches</h2>
-          </div>
-          <p class="section-subtitle">
-            Live interactive simulations across distributed multi-GPU routing, agentic schema healing, medical X-ray vision diagnostics, and 6-DoF underwater robotics.
-          </p>
-        </div>
-
-        <!-- Category Selector -->
-        <div class="workbench-filter-bar">
-          <button class="filter-btn active" data-filter="all">All Workbenches (7)</button>
-          <button class="filter-btn" data-filter="honeywell">Honeywell AI Projects (2)</button>
-          <button class="filter-btn" data-filter="medical">Medical AI (LENEK)</button>
-          <button class="filter-btn" data-filter="robotics">Autonomous Robotics</button>
-          <button class="filter-btn" data-filter="vision">Vision & Research</button>
-        </div>
-
-        <!-- Workbench Grid -->
-        <div class="workbench-grid">
-
-          <!-- WORKBENCH 1: Honeywell Forge Agentic Data Ingestion Pipeline -->
-          <div class="workbench-card" data-category="honeywell">
-            <div class="wb-content">
-              <div class="wb-header">
-                <div class="wb-tag-row">
-                  <span class="badge badge-terracotta">HONEYWELL TECHNOLOGIES</span>
-                  <span class="badge badge-sage">AI INTERN</span>
-                  <span class="badge">MAY 2025 – JUL 2025</span>
-                </div>
-                <h3 class="wb-title">Agentic Data Ingestion Pipeline & Delta Lake Engine</h3>
-                <div class="wb-org">Honeywell Forge Team • Bengaluru, India</div>
-              </div>
-
-              <div class="wb-body">
-                <p class="wb-desc">
-                  Architected an object-oriented ingestion framework connecting Kafka, PostgreSQL, and Elasticsearch to Delta Lake. Packaged as Python wheels (<code style="font-family:var(--font-mono); color:var(--accent-terracotta);">.whl</code>) for CI/CD deployment on Databricks.
-                </p>
-                <ul class="wb-bullet-list">
-                  <li class="wb-bullet-item">
-                    <span class="wb-bullet-icon">◆</span>
-                    <span><strong>Source Abstraction to Delta Lake</strong>: Source-dependent only at the initial connector layer; downstream operations are 100% unified on Delta Lake tables.</span>
-                  </li>
-                  <li class="wb-bullet-item">
-                    <span class="wb-bullet-icon">◆</span>
-                    <span><strong>Spark Collision & Struct Auditing</strong>: Handled schema drift, nested struct changes, and Spark lowercase casing collisions (e.g. <em>Col A</em> vs <em>col a</em> $\rightarrow$ <em>a2</em>) via automated conflict-renaming and reason-based audit tables.</span>
-                  </li>
-                  <li class="wb-bullet-item">
-                    <span class="wb-bullet-icon">◆</span>
-                    <span><strong>Phi-4 Canonical Metadata & Safe Unions</strong>: Profiled column stats (cardinality, null rates) with Phi-4, clustering semantic embeddings to execute safe unions (Simple, Cast, Struct-Enlarge) under strict mutual exclusivity.</span>
-                  </li>
-                  <li class="wb-bullet-item">
-                    <span class="wb-bullet-icon">◆</span>
-                    <span><strong>Claude Opus Self-Healing</strong>: Orchestrated Claude Opus for baseline review, automated root-cause error diagnosis, dynamic parameter auto-tuning, job reruns, and ticketing/email alerts.</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div>
-                <div class="wb-tech-stack">
-                  <span class="tech-chip">Kafka</span>
-                  <span class="tech-chip">PostgreSQL</span>
-                  <span class="tech-chip">Elasticsearch</span>
-                  <span class="tech-chip">Delta Lake</span>
-                  <span class="tech-chip">Databricks (.whl)</span>
-                  <span class="tech-chip">Phi-4 SLM</span>
-                  <span class="tech-chip">Claude Opus</span>
-                  <span class="tech-chip">Embeddings</span>
-                </div>
-                <div class="wb-actions">
-                  <button class="btn btn-primary btn-sm" id="triggerDriftBtn">
-                    <span>⚡ SIMULATE SCHEMA DRIFT & SELF-HEAL</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Interactive Stage 1: Pipeline Flow with Interactive Steps -->
-            <div class="wb-interactive-stage">
-              <div class="stage-top-hud">
-                <span class="stage-title">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--accent-terracotta)" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                  AGENTIC INGESTION ARCHITECTURE
-                </span>
-                <span class="badge badge-live">DATABRICKS .WHL DEPLOYED</span>
-              </div>
-
-              <div class="pipeline-sim-container">
-                <!-- Interactive Step Selector -->
-                <div class="pipeline-step-nav">
-                  <button class="pipe-step-btn active" data-step="1">1. Raw Landing</button>
-                  <button class="pipe-step-btn" data-step="2">2. Casing & Struct Conflicts</button>
-                  <button class="pipe-step-btn" data-step="3">3. Phi-4 Canonical Metadata</button>
-                  <button class="pipe-step-btn" data-step="4">4. Opus Self-Healing</button>
-                </div>
-
-                <div class="pipeline-interactive-box">
-                  <!-- Step 1 View -->
-                  <div class="pipe-step-view active" id="pipeViewStep1">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                      <span class="text-terracotta font-bold" style="font-family:var(--font-mono); font-size:0.7rem;">SOURCE CONNECTORS ➔ DELTA LAKE RAW TABLE</span>
-                      <span class="badge badge-sage">SOURCE-INDEPENDENT</span>
-                    </div>
-                    <table class="pipe-data-table">
-                      <thead>
-                        <tr><th>Source</th><th>Raw Payload</th><th>Delta Destination</th><th>Status</th></tr>
-                      </thead>
-                      <tbody>
-                        <tr><td>Kafka</td><td><code>topic/telemetry_v1</code></td><td><code>/mnt/delta/raw_stream</code></td><td><span class="pipe-tag-chip tag-union">Active</span></td></tr>
-                        <tr><td>Postgres</td><td><code>orders_cdc_stream</code></td><td><code>/mnt/delta/raw_postgres</code></td><td><span class="pipe-tag-chip tag-union">Active</span></td></tr>
-                        <tr><td>Elastic</td><td><code>logs_telemetry_idx</code></td><td><code>/mnt/delta/raw_elastic</code></td><td><span class="pipe-tag-chip tag-union">Active</span></td></tr>
-                      </tbody>
-                    </table>
-                  </div>
-
-                  <!-- Step 2 View -->
-                  <div class="pipe-step-view" id="pipeViewStep2">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                      <span class="text-terracotta font-bold" style="font-family:var(--font-mono); font-size:0.7rem;">SPARK CASING & STRUCT AUDIT LOG</span>
-                      <span class="badge badge-amber">AUTO-RENAMED</span>
-                    </div>
-                    <table class="pipe-data-table">
-                      <thead>
-                        <tr><th>Incoming Column</th><th>Spark Collision Action</th><th>Target Column</th><th>Audit Reason</th></tr>
-                      </thead>
-                      <tbody>
-                        <tr><td><code>Col A (Int)</code></td><td>Lowered</td><td><code>col_a</code></td><td>Baseline Registered</td></tr>
-                        <tr><td><code>col a (Float)</code></td><td>Casing Collision</td><td><code>col_a_2</code></td><td><span class="pipe-tag-chip tag-rename">Spark Case Duplicate</span></td></tr>
-                        <tr><td><code>device_meta</code></td><td>Struct Field Add</td><td><code>device_meta_v2</code></td><td><span class="pipe-tag-chip tag-struct">Struct Mutated</span></td></tr>
-                      </tbody>
-                    </table>
-                  </div>
-
-                  <!-- Step 3 View -->
-                  <div class="pipe-step-view" id="pipeViewStep3">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                      <span class="text-terracotta font-bold" style="font-family:var(--font-mono); font-size:0.7rem;">PHI-4 CANONICAL CLUSTERING & UNIONS</span>
-                      <span class="badge badge-sage">EMBEDDING COSINE SIM</span>
-                    </div>
-                    <table class="pipe-data-table">
-                      <thead>
-                        <tr><th>Column Pair</th><th>Cosine Sim</th><th>Phi-4 Union Strategy</th><th>Collisions</th></tr>
-                      </thead>
-                      <tbody>
-                        <tr><td><code>col_a + col_a_2</code></td><td>0.96</td><td><span class="pipe-tag-chip tag-union">Cast Union (Int➔Float)</span></td><td>0 (Exclusive)</td></tr>
-                        <tr><td><code>device_meta_v2</code></td><td>0.94</td><td><span class="pipe-tag-chip tag-struct">Struct-Enlarge Union</span></td><td>0 (Exclusive)</td></tr>
-                        <tr><td><code>cust_id + user_id</code></td><td>0.98</td><td><span class="pipe-tag-chip tag-union">Simple Union</span></td><td>0 (Exclusive)</td></tr>
-                      </tbody>
-                    </table>
-                  </div>
-
-                  <!-- Step 4 View -->
-                  <div class="pipe-step-view" id="pipeViewStep4">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                      <span class="text-terracotta font-bold" style="font-family:var(--font-mono); font-size:0.7rem;">CLAUDE OPUS BASELINE & SELF-HEALING</span>
-                      <span class="badge badge-sage">AUTOPILOT</span>
-                    </div>
-                    <div style="font-family:var(--font-mono); font-size:0.68rem; color:var(--text-secondary); line-height:1.5;">
-                      • <strong>Diagnosis</strong>: Autonomous root-cause error analysis on pipeline failures.<br>
-                      • <strong>Parameter Auto-tuning</strong>: Dynamically adjusts batch timeouts & memory buffers.<br>
-                      • <strong>Auto-Ticketing</strong>: Triggers automated Jira incident tickets & developer email alerts.
-                    </div>
-                  </div>
-                </div>
-
-                <div class="pipe-live-logs" id="pipeLogs"></div>
-                <span class="text-muted" style="font-family:var(--font-mono); font-size:0.65rem;">Click tabs above or press 'Simulate Schema Drift' to observe real-time self-healing</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- WORKBENCH 2: Honeywell 3x Thor Distributed Ray Cluster & Dynamic Router -->
-          <div class="workbench-card" data-category="honeywell">
-            <div class="wb-content">
-              <div class="wb-header">
-                <div class="wb-tag-row">
-                  <span class="badge badge-terracotta">HONEYWELL TECHNOLOGIES</span>
-                  <span class="badge badge-sage">AI INTERN</span>
-                  <span class="badge">MAY 2025 – JUL 2025</span>
-                </div>
-                <h3 class="wb-title">Distributed Multi-GPU Inference & Dynamic Ray Router</h3>
-                <div class="wb-org">Honeywell Forge Team • Bengaluru, India</div>
-              </div>
-
-              <div class="wb-body">
-                <p class="wb-desc">
-                  Engineered high-throughput distributed parallel inference across a cluster of 3 NVIDIA Thor GPUs using Ray. Designed an intelligent central load-balancing router with automated failover and dynamic disaster recovery.
-                </p>
-                <ul class="wb-bullet-list">
-                  <li class="wb-bullet-item">
-                    <span class="wb-bullet-icon">◆</span>
-                    <span><strong>Central Load-Balancing Router</strong>: Dynamically distributed streaming inference requests across active Thor GPUs with sub-millisecond scheduling.</span>
-                  </li>
-                  <li class="wb-bullet-item">
-                    <span class="wb-bullet-icon">◆</span>
-                    <span><strong>Automated Disaster Recovery</strong>: Designed instant failover rerouting traffic when a GPU node goes offline and rebalancing load seamlessly upon node revival.</span>
-                  </li>
-                  <li class="wb-bullet-item">
-                    <span class="wb-bullet-icon">◆</span>
-                    <span><strong>Parallelism Benchmark Findings</strong>: Proved <strong>Tensor Parallelism</strong> optimal for large model training memory-fit, and <strong>Multi-Instance Replication</strong> vastly superior for high-throughput real-time inference.</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div>
-                <div class="wb-tech-stack">
-                  <span class="tech-chip">3x NVIDIA Thor</span>
-                  <span class="tech-chip">Ray Distributed</span>
-                  <span class="tech-chip">PyTorch</span>
-                  <span class="tech-chip">Dynamic Routing</span>
-                  <span class="tech-chip">CUDA</span>
-                  <span class="tech-chip">Disaster Recovery</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Interactive Stage 2: Ray Router & Kill/Restore GPU -->
-            <div class="wb-interactive-stage">
-              <div class="stage-top-hud">
-                <span class="stage-title">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sage)" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
-                  RAY LOAD ROUTER & FAILOVER SIMULATOR
-                </span>
-                <span class="badge badge-live">DYNAMIC REDISTRIBUTION</span>
-              </div>
-
-              <div class="router-sim-viewport">
-                <canvas id="routerCanvas"></canvas>
-              </div>
-
-              <div class="router-controls-bar">
-                <div class="router-input-row">
-                  <span>TOTAL INCOMING TRAFFIC:</span>
-                  <strong id="reqDisplayVal" class="text-terracotta">2400 req/s</strong>
-                </div>
-                <input type="range" id="reqSlider" min="500" max="5000" step="100" value="2400" style="width:100%; accent-color:var(--accent-terracotta);">
-
-                <div style="font-family:var(--font-mono); font-size:0.65rem; color:var(--text-tertiary); margin-top:0.25rem;">
-                  TEST FAULT TOLERANCE (KILL / REVIVE GPUS TO OBSERVE AUTO-FAILOVER):
-                </div>
-                <div class="gpu-toggles-row">
-                  <button class="gpu-kill-btn online" id="killGpu1Btn">KILL THOR #1</button>
-                  <button class="gpu-kill-btn online" id="killGpu2Btn">KILL THOR #2</button>
-                  <button class="gpu-kill-btn online" id="killGpu3Btn">KILL THOR #3</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- WORKBENCH 3: LENEK Technologies Multi-Modal Medical AI Vision -->
-          <div class="workbench-card" data-category="medical">
-            <div class="wb-content">
-              <div class="wb-header">
-                <div class="wb-tag-row">
-                  <span class="badge badge-amber">LENEK TECHNOLOGIES</span>
-                  <span class="badge badge-sage">AI INTERN</span>
-                  <span class="badge">JUL 2025 – DEC 2025</span>
-                </div>
-                <h3 class="wb-title">Multi-Modal Chest X-Ray Diagnostic Vision Model</h3>
-                <div class="wb-org">AI Medical Diagnostics Group • India</div>
-              </div>
-
-              <div class="wb-body">
-                <p class="wb-desc">
-                  Developed a multi-modal vision model for automated disease diagnosis from chest X-ray imaging, reducing dependency on expensive and radiation-heavy CT scans.
-                </p>
-                <ul class="wb-bullet-list">
-                  <li class="wb-bullet-item">
-                    <span class="wb-bullet-icon">◆</span>
-                    <span><strong>Thoracic Pathology Detection</strong>: Engineered vision models automatically detecting cardiomegaly, pleural effusion, lung shrinkage, pneumothorax, and advanced pulmonary pathologies.</span>
-                  </li>
-                  <li class="wb-bullet-item">
-                    <span class="wb-bullet-icon">◆</span>
-                    <span><strong>Radiologist Assistance Tool</strong>: Built visual attention localization (Grad-CAM) assisting radiologists in obtaining faster, more accurate diagnoses.</span>
-                  </li>
-                  <li class="wb-bullet-item">
-                    <span class="wb-bullet-icon">◆</span>
-                    <span><strong>Affordable Healthcare Screening</strong>: Enabled accurate triage using low-cost conventional X-rays in place of expensive secondary scans.</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div>
-                <div class="wb-tech-stack">
-                  <span class="tech-chip">PyTorch</span>
-                  <span class="tech-chip">Vision Transformers</span>
-                  <span class="tech-chip">Chest X-Ray</span>
-                  <span class="tech-chip">Grad-CAM</span>
-                  <span class="tech-chip">Multi-Modal AI</span>
-                  <span class="tech-chip">Medical Imaging</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Interactive Stage 3: X-Ray Diagnostic Heatmap -->
-            <div class="wb-interactive-stage">
-              <div class="stage-top-hud">
-                <span class="stage-title">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--accent-amber)" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-                  DIAGNOSTIC PATHOLOGY LOCALIZATION
-                </span>
-                <span class="badge badge-amber">GRAD-CAM ATTENTION</span>
-              </div>
-
-              <div class="xray-stage-box">
-                <img id="xrayViewerImg" src="assets/xray/xray_cardiomegaly.jpg" alt="Clinical Chest X-Ray with Grad-CAM" class="xray-viewer-img">
-                <div class="xray-overlay-hud">
-                  <span class="xray-hud-tag" id="xrayHudCondition">CARDIOVASCULAR: ENLARGED CARDIAC SILHOUETTE</span>
-                  <span class="xray-hud-tag text-amber" id="xrayHudConfidence">CONF: 96.4%</span>
-                </div>
-              </div>
-
-              <div class="xray-findings-pills">
-                <button class="filter-btn xray-cond-btn active" data-condition="cardiomegaly">Cardiomegaly (96.4%)</button>
-                <button class="filter-btn xray-cond-btn" data-condition="pleural">Pleural Effusion (91.8%)</button>
-                <button class="filter-btn xray-cond-btn" data-condition="pneumothorax">Pneumothorax (89.2%)</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- WORKBENCH 4: ATAL AUV 6-DoF Control & Perception -->
-          <div class="workbench-card" data-category="robotics">
-            <div class="wb-content">
-              <div class="wb-header">
-                <div class="wb-tag-row">
-                  <span class="badge badge-terracotta">AUV-IITK & SAUVC SINGAPORE</span>
-                  <span class="badge">APR 2024 – PRESENT</span>
-                </div>
-                <h3 class="wb-title">ATAL AUV — 8-Thruster 6-DoF Cascaded Autonomy</h3>
-                <div class="wb-org">Autonomy & Perception Lead | Prof. Indranil Saha • IIT Kanpur</div>
-              </div>
-
-              <div class="wb-body">
-                <p class="wb-desc">
-                  Designed 8-thruster 6-DoF dynamic stabilization, state estimation with Extended Kalman Filters (EKF), and real-time underwater computer vision running on NVIDIA Jetson Orin Nano for international maritime competition.
-                </p>
-                <ul class="wb-bullet-list">
-                  <li class="wb-bullet-item">
-                    <span class="wb-bullet-icon">◆</span>
-                    <span><strong>8-Thruster Cascaded Control</strong>: 4 vectored horizontal + 4 vertical thrusters governing pitch, roll, yaw, depth, surge, and sway.</span>
-                  </li>
-                  <li class="wb-bullet-item">
-                    <span class="wb-bullet-icon">◆</span>
-                    <span><strong>Custom EKF Sensor Fusion</strong>: Fused IMU, Doppler Velocity Log (DVL), and Bar30 pressure depth sensors in real time.</span>
-                  </li>
-                  <li class="wb-bullet-item">
-                    <span class="wb-bullet-icon">◆</span>
-                    <span><strong>Perception at 30 FPS</strong>: Fine-tuned YOLOv11 & SSD on turbid pool datasets with dual IDS imaging cameras.</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div>
-                <div class="wb-tech-stack">
-                  <span class="tech-chip">ROS</span>
-                  <span class="tech-chip">C++</span>
-                  <span class="tech-chip">Python</span>
-                  <span class="tech-chip">NVIDIA Jetson Orin</span>
-                  <span class="tech-chip">YOLOv11</span>
-                  <span class="tech-chip">EKF</span>
-                  <span class="tech-chip">8-Thruster PID</span>
-                </div>
-                <div class="wb-actions">
-                  <a href="https://auviitk.com/#/vehicles/atal" target="_blank" class="btn btn-secondary btn-sm">
-                    <span>VIEW ATAL VEHICLE SPECS</span>
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            <!-- Interactive Stage 4: ATAL AUV Physics Simulator -->
-            <div class="wb-interactive-stage">
-              <div class="stage-top-hud">
-                <span class="stage-title">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--accent-terracotta)" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                  ATAL 8-THRUSTER HYDRODYNAMICS
-                </span>
-                <span class="badge badge-live">30.0 FPS LOCKED</span>
-              </div>
-
-              <div class="auv-workbench-viewport">
-                <canvas id="auvCanvas"></canvas>
-                <div class="auv-hud-overlay">
-                  <div class="auv-telemetry-strip">
-                    <span>EKF CONF: <strong id="auvEKFConf" class="text-sage">99.8%</strong></span>
-                    <span>DEPTH: <strong id="auvDepthVal" class="text-terracotta">3.42 m</strong></span>
-                    <span>HEADING: <strong id="auvHeadingVal" class="text-amber">0°</strong></span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="auv-control-toggles">
-                <button class="btn btn-sm btn-outline-terracotta" id="auvModeToggle">
-                  MODE: AUTONOMOUS
-                </button>
-                <span class="text-muted" style="font-family:var(--font-mono); font-size:0.68rem;">Switch to Manual to steer sub with mouse (click to ping sonar)</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- WORKBENCH 5: Granular Particle Flow Chute Profiler (SURGE '25) -->
-          <div class="workbench-card" data-category="vision">
-            <div class="wb-content">
-              <div class="wb-header">
-                <div class="wb-tag-row">
-                  <span class="badge badge-terracotta">SURGE '25 RESEARCH INTERNSHIP</span>
-                  <span class="badge">MAY 2025 – PRESENT</span>
-                </div>
-                <h3 class="wb-title">Granular Particle Flow Chute Profiler</h3>
-                <div class="wb-org">Research Intern | Prof. Anurag Tripathi • IIT Kanpur</div>
-              </div>
-
-              <div class="wb-body">
-                <p class="wb-desc">
-                  Coupled YOLOv11 particle detection with SAM2 instance segmentation on high-speed industrial chute video streams for automated multiphase quality control.
-                </p>
-                <ul class="wb-bullet-list">
-                  <li class="wb-bullet-item">
-                    <span class="wb-bullet-icon">◆</span>
-                    <span><strong>Chute Bench Setup</strong>: Engineered an inclined-plane experimental bench with LED backlighting for iron ore and sinter particles.</span>
-                  </li>
-                  <li class="wb-bullet-item">
-                    <span class="wb-bullet-icon">◆</span>
-                    <span><strong>99.2% mAP@0.5 Accuracy</strong>: Hybrid computer vision pipeline segmenting occluded and high-velocity moving particles.</span>
-                  </li>
-                  <li class="wb-bullet-item">
-                    <span class="wb-bullet-icon">◆</span>
-                    <span><strong>Morphology Extraction</strong>: Computed real-time aspect ratio, sphericity, and contact eccentricity metrics.</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div>
-                <div class="wb-tech-stack">
-                  <span class="tech-chip">YOLOv11</span>
-                  <span class="tech-chip">SAM2</span>
-                  <span class="tech-chip">PyTorch</span>
-                  <span class="tech-chip">OpenCV</span>
-                  <span class="tech-chip">High-Speed Video</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Interactive Stage 5: SURGE '25 Granular Flow Carousel (Images + Video) -->
-            <div class="wb-interactive-stage">
-              <div class="stage-top-hud">
-                <span class="stage-title">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--accent-sage)" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                  INCLINED-PLANE FLOW PROFILER
-                </span>
-                <span class="badge badge-live">99.2% mAP@0.5</span>
-              </div>
-
-              <div class="surge-analyzer-box">
-                <div class="surge-carousel-wrapper">
-                  <!-- Slide 1: S2.jpg (YOLOv11 + SAM2 Clusters) -->
-                  <div class="surge-slide active" data-slide="0">
-                    <img src="assets/surge/surge_annotated_s2.jpg" alt="SAM2 Particle Instance Segmentation" class="surge-slide-img">
-                  </div>
-                  <!-- Slide 2: WA.jpg (Multi-Material Bounding Boxes) -->
-                  <div class="surge-slide" data-slide="1">
-                    <img src="assets/surge/surge_annotated_wa.jpg" alt="Particle Bounding Boxes" class="surge-slide-img">
-                  </div>
-                  <!-- Slide 3: Ore.jpg (Iron Ore Particles) -->
-                  <div class="surge-slide" data-slide="2">
-                    <img src="assets/surge/surge_annotated_ore.jpg" alt="Iron Ore Granular Chute Stream" class="surge-slide-img">
-                  </div>
-                  <!-- Slide 4: Sinter.jpg (Sinter Silhouette) -->
-                  <div class="surge-slide" data-slide="3">
-                    <img src="assets/surge/surge_annotated_sinter.jpg" alt="Sinter Particle Silhouette Segmentation" class="surge-slide-img">
-                  </div>
-                  <!-- Slide 5: High-Speed Video Stream -->
-                  <div class="surge-slide" data-slide="4">
-                    <img src="assets/surge/surge_particle_stream.webp" alt="High-Speed Industrial Camera Feed @ 120 FPS Particle Tracking" class="surge-slide-img">
-                  </div>
-                </div>
-
-                <div class="surge-carousel-nav">
-                  <button class="surge-nav-btn" id="surgePrevBtn">◀ PREV</button>
-                  <div class="surge-dots-group" id="surgeDotsGroup">
-                    <span class="surge-dot active" data-idx="0"></span>
-                    <span class="surge-dot" data-idx="1"></span>
-                    <span class="surge-dot" data-idx="2"></span>
-                    <span class="surge-dot" data-idx="3"></span>
-                    <span class="surge-dot" data-idx="4"></span>
-                  </div>
-                  <button class="surge-nav-btn" id="surgeNextBtn">NEXT ▶</button>
-                </div>
-
-                <div class="surge-caption-text" id="surgeCaptionText">
-                  [1/5] YOLOv11 + SAM2 Instance Segmentation on Granular Bed
-                </div>
-
-                <div class="morphology-metrics-grid">
-                  <div class="morph-card">
-                    <div class="morph-val">0.91</div>
-                    <div class="morph-lbl">SPHERICITY (ψ)</div>
-                  </div>
-                  <div class="morph-card">
-                    <div class="morph-val">1.34</div>
-                    <div class="morph-lbl">ASPECT RATIO (AR)</div>
-                  </div>
-                  <div class="morph-card">
-                    <div class="morph-val">0.18</div>
-                    <div class="morph-lbl">ECCENTRICITY</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- WORKBENCH 6: ISRO Lunar Surface Spectral Mapping -->
-          <div class="workbench-card" data-category="vision">
-            <div class="wb-content">
-              <div class="wb-header">
-                <div class="wb-tag-row">
-                  <span class="badge badge-amber">ISRO CHANDRAYAAN-II</span>
-                  <span class="badge">13TH INTER-IIT TECH MEET</span>
-                </div>
-                <h3 class="wb-title">Lunar Surface Elemental Mapping Pipeline</h3>
-                <div class="wb-org">High Prep Event Lead | Oct 2024 – Dec 2024</div>
-              </div>
-
-              <div class="wb-body">
-                <p class="wb-desc">
-                  Built a high-resolution lunar surface elemental abundance mapping pipeline utilizing Chandrayaan-II X-ray Fluorescence (XRF) spectral data.
-                </p>
-                <ul class="wb-bullet-list">
-                  <li class="wb-bullet-item">
-                    <span class="wb-bullet-icon">◆</span>
-                    <span><strong>Solar Flare Isolation</strong>: Synchronized NASA timestamp logs to filter background quiescent periods and eliminate flare interference.</span>
-                  </li>
-                  <li class="wb-bullet-item">
-                    <span class="wb-bullet-icon">◆</span>
-                    <span><strong>Spatial Interpolation</strong>: Enhanced elemental spatial resolution across lunar coordinates for Mg, Al, Si, Ca, and Fe.</span>
-                  </li>
-                  <li class="wb-bullet-item">
-                    <span class="wb-bullet-icon">◆</span>
-                    <span><strong>Competition Standing</strong>: Ranked <strong>2nd in XRF Catalogue</strong> and <strong>6th Overall</strong> among 23 IITs nationwide.</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div>
-                <div class="wb-tech-stack">
-                  <span class="tech-chip">Python</span>
-                  <span class="tech-chip">XRF Spectral Analysis</span>
-                  <span class="tech-chip">NASA Planetary Data</span>
-                  <span class="tech-chip">NumPy</span>
-                  <span class="tech-chip">SciPy</span>
-                </div>
-                <div class="wb-actions">
-                  <a href="https://github.com/Safe-bet/ISRO-High-Prep-Inter-IIT-Tech-13.0" target="_blank" class="btn btn-secondary btn-sm">
-                    <span>GITHUB REPOSITORY</span>
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            <!-- Interactive Stage 6 -->
-            <div class="wb-interactive-stage">
-              <div class="stage-top-hud">
-                <span class="stage-title">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--accent-amber)" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  XRF EMISSION SPECTRAL FILTER
-                </span>
-                <span class="badge badge-amber">CHANDRAYAAN-II</span>
-              </div>
-
-              <div class="spectrum-viewport">
-                <canvas id="spectrumCanvas"></canvas>
-              </div>
-
-              <div class="spectrum-legend">
-                <div class="elem-badge"><span class="elem-dot" style="background:#6B9080;"></span> Mg (1.25 keV)</div>
-                <div class="elem-badge"><span class="elem-dot" style="background:#E07A5F;"></span> Al (1.49 keV)</div>
-                <div class="elem-badge"><span class="elem-dot" style="background:#D97706;"></span> Si (1.74 keV)</div>
-                <div class="elem-badge"><span class="elem-dot" style="background:#B45309;"></span> Ca (3.69 keV)</div>
-                <div class="elem-badge"><span class="elem-dot" style="background:#9A3412;"></span> Fe (6.40 keV)</div>
-              </div>
-
-              <div style="margin-top: 0.75rem;">
-                <button class="btn btn-sm btn-primary" id="toggleFlareFilterBtn">
-                  SOLAR BACKGROUND: ISOLATED
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- WORKBENCH 7: Face Reconstruction with Full-Portrait Container -->
-          <div class="workbench-card" data-category="vision">
-            <div class="wb-content">
-              <div class="wb-header">
-                <div class="wb-tag-row">
-                  <span class="badge badge-terracotta">COURSE RESEARCH PROJECT</span>
-                  <span class="badge">AUG 2024 – OCT 2024</span>
-                </div>
-                <h3 class="wb-title">Forensic Face Reconstruction & 3D Frontalization</h3>
-                <div class="wb-org">Prof. Koteshwar Rao | IIT Kanpur</div>
-              </div>
-
-              <div class="wb-body">
-                <p class="wb-desc">
-                  Reconstructed high-resolution frontal faces from low-quality, blurry CCTV surveillance footage to automate forensic sketch generation for law enforcement.
-                </p>
-                <ul class="wb-bullet-list">
-                  <li class="wb-bullet-item">
-                    <span class="wb-bullet-icon">◆</span>
-                    <span><strong>Blur Detection & Deblurring GANs</strong>: Trained custom YOLOv8 for blur classification and evaluated PSNR/SSIM improvements with GAN architectures.</span>
-                  </li>
-                  <li class="wb-bullet-item">
-                    <span class="wb-bullet-icon">◆</span>
-                    <span><strong>3D Frontalization</strong>: Applied landmark feature alignment and 3D yaw angle estimation to correct extreme profile angles.</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div>
-                <div class="wb-tech-stack">
-                  <span class="tech-chip">PyTorch</span>
-                  <span class="tech-chip">Deblurring GANs</span>
-                  <span class="tech-chip">OpenCV</span>
-                  <span class="tech-chip">YOLOv8</span>
-                  <span class="tech-chip">3D Landmarks</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Interactive Stage 7: Full Portrait Face Split Slider -->
-            <div class="wb-interactive-stage">
-              <div class="stage-top-hud">
-                <span class="stage-title">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--accent-terracotta)" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                  GAN FORENSIC SPLIT INSPECTOR
-                </span>
-                <span class="badge">DRAG SLIDER</span>
-              </div>
-
-              <div class="face-reconstruction-slider-box" id="faceSliderBox">
-                <!-- Base Low-Res CCTV Image (100% full view) -->
-                <div class="face-split-layer">
-                  <img src="assets/forensic_cctv_lowres.jpg" alt="Low Resolution CCTV Input" class="face-img">
-                  <div class="face-overlay-label" style="left: 12px;">CCTV LOW-RES (BLURRED 45° YAW)</div>
-                </div>
-
-                <!-- Overlay GAN Restored Image (100% full view) with clip-path -->
-                <div class="face-split-layer" id="faceAfterLayer" style="clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%);">
-                  <img src="assets/forensic_gan_restored.jpg" alt="High Resolution GAN Restored Face" class="face-img">
-                  <div class="face-overlay-label" style="right: 12px; background: rgba(74, 107, 93, 0.9); border-color: rgba(74, 107, 93, 0.4);">GAN RESTORED (0° FRONTAL)</div>
-                </div>
-
-                <!-- Draggable Handle -->
-                <div class="slider-handle-line" id="faceSliderHandle" style="left: 50%;">
-                  <div class="slider-handle-thumb">⇄</div>
-                </div>
-              </div>
-
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.75rem; font-family:var(--font-mono); font-size:0.7rem; color:var(--text-secondary);">
-                <span>PSNR: <strong id="facePsnrVal" class="text-sage">25.5 dB</strong></span>
-                <span>YAW ANGLE: <strong id="faceYawVal" class="text-terracotta">22°</strong></span>
-                <span>SSIM: <strong class="text-sage">0.94</strong></span>
-              </div>
-            </div>
-          </div>
-
+    <!-- ============================== JOURNEY: GIT LOG ============================== -->
+    <section class="section" id="journey" data-depth="1200" data-zone="MIDNIGHT ZONE">
+      <div class="wrap">
+        <header class="sec-head reveal">
+          <p class="kicker">1200 m · Journey</p>
+          <h2><code>git log --graph</code> of how I got here</h2>
+          <p class="sec-lead">Four branches — robotics, industry AI, research and open source — merging into one career. Click any commit to see its diff.</p>
+        </header>
+        <div class="term reveal">
+          <div class="term-bar"><i></i><i></i><i></i><span>suyash@iitk: ~/career</span></div>
+          <div class="term-cmd">$ git log --graph --decorate --all<span class="caret"></span></div>
+          <div class="branch-filter" id="branchFilter" role="group" aria-label="Filter by branch"></div>
+          <ol class="gitlog" id="gitlog"></ol>
         </div>
       </div>
     </section>
 
-    <!-- ====================================================================
-         SECTION 2.5: OPEN SOURCE CONTRIBUTIONS
-         ==================================================================== -->
-    <section id="opensource" class="dashboard-section" style="background: var(--bg-secondary); border-top: 1px solid var(--border-subtle);">
-      <div class="container">
-        <div class="section-header-hud">
-          <div>
-            <span class="section-prefix">// 02. CORE REPOSITORIES</span>
-            <h2 class="section-title">Open-Source Contributions</h2>
-          </div>
-          <p class="section-subtitle">
-            Direct upstream contributions to leading GPU compute libraries, marine robotics operating systems, and autonomous flight firmware.
-          </p>
-        </div>
-
-        <div class="opensource-grid-3col">
-          <!-- Card 1: NVIDIA CCCL -->
-          <div class="opensource-card">
-            <div>
-              <div class="os-header-row">
-                <span class="badge badge-sage">C++ / CUDA PR #10890</span>
-                <span class="badge">NVIDIA</span>
-              </div>
-              <h3 class="os-title">NVIDIA CUDA Core Compute Libraries (CCCL / CUB)</h3>
-              <div class="os-repo">github.com/NVIDIA/cccl</div>
-              <p class="os-desc">
-                Enforced explicit <code style="font-family:var(--font-mono); color:var(--accent-terracotta);">alignas(VectorT)</code> attributes on stack-allocated temporary buffers in <code style="font-family:var(--font-mono);">cub::DeviceFind::FindIf</code> (<code style="font-family:var(--font-mono);">agent_find.cuh</code>), preventing hardware misaligned load exceptions across NVIDIA GPU compute architectures.
-              </p>
-            </div>
-            <div class="os-actions">
-              <a href="https://github.com/NVIDIA/cccl/pull/10890" target="_blank" class="btn btn-secondary btn-sm">
-                <span>VIEW PR #10890</span>
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
-              </a>
-            </div>
-          </div>
-
-          <!-- Card 2: BlueRobotics BlueOS -->
-          <div class="opensource-card">
-            <div>
-              <div class="os-header-row">
-                <span class="badge badge-terracotta">FASTAPI / DOCKER</span>
-                <span class="badge">BLUEROBOTICS</span>
-              </div>
-              <h3 class="os-title">BlueRobotics BlueOS Marine Vehicle OS</h3>
-              <div class="os-repo">github.com/bluerobotics/BlueOS</div>
-              <p class="os-desc">
-                Resolved container streaming crashes with existence pre-checks (PR #4186), refactored Kraken extension lifecycle to raise structured HTTP 404 exceptions (PR #4185), and added platform safety checks for non-Linux / STM32 serial interfaces (PR #4184).
-              </p>
-            </div>
-            <div class="os-actions">
-              <a href="https://github.com/bluerobotics/BlueOS/pull/4186" target="_blank" class="btn btn-secondary btn-sm">
-                <span>VIEW PRs #4186, #4185, #4184</span>
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
-              </a>
-            </div>
-          </div>
-
-          <!-- Card 3: ArduPilot -->
-          <div class="opensource-card">
-            <div>
-              <div class="os-header-row">
-                <span class="badge badge-amber">C++ / FLIGHT FIRMWARE</span>
-                <span class="badge">ARDUPILOT</span>
-              </div>
-              <h3 class="os-title">ArduPilot Autopilot System</h3>
-              <div class="os-repo">github.com/ArduPilot/ardupilot</div>
-              <p class="os-desc">
-                Standardized default return conditionals to IEEE-754 single-precision float (<code style="font-family:var(--font-mono); color:var(--accent-terracotta);">0.0f</code>) literals across gimbal control and vehicle telemetry logic, eliminating implicit conversion warnings across bare-metal compiler targets.
-              </p>
-            </div>
-            <div class="os-actions">
-              <a href="https://github.com/ArduPilot/ardupilot/pull/29624" target="_blank" class="btn btn-secondary btn-sm">
-                <span>VIEW PR #29624</span>
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
-              </a>
-            </div>
-          </div>
+    <!-- ============================== PERIODIC TABLE ============================== -->
+    <section class="section" id="elements" data-depth="2000" data-zone="ABYSSAL ZONE">
+      <div class="wrap">
+        <header class="sec-head reveal">
+          <p class="kicker">2000 m · Elements</p>
+          <h2>The periodic table of what I work with</h2>
+          <p class="sec-lead">A chemical engineer's skills page. Each element is a tool I use; its group says where it lives in the stack. Pick one to see which projects it shows up in.</p>
+        </header>
+        <div class="plegend reveal" id="plegend" role="group" aria-label="Highlight a group"></div>
+        <div class="ptable-wrap reveal">
+          <div class="ptable" id="ptable"></div>
+          <aside class="pdetail" id="pdetail" aria-live="polite"></aside>
         </div>
       </div>
     </section>
 
-    <!-- ====================================================================
-         SECTION 3: SCHOLASTIC ACHIEVEMENTS
-         ==================================================================== -->
-    <section id="scholastic" class="dashboard-section" style="background: var(--bg-secondary); border-top: 1px solid var(--border-subtle); border-bottom: 1px solid var(--border-subtle);">
-      <div class="container">
-        <div class="section-header-hud">
-          <div>
-            <span class="section-prefix">// 02. COMPETITIVE STANDINGS</span>
-            <h2 class="section-title">Scholastic Achievements</h2>
-          </div>
-          <p class="section-subtitle">
-            National competitive standings and research fellowships across premier academic bodies in India.
-          </p>
-        </div>
-
-        <div class="scholastic-grid">
-          <div class="scholastic-card">
-            <div>
-              <div class="sch-rank">Qualified</div>
-              <div class="sch-title">JEE Advanced (2023)</div>
-              <div class="sch-meta">National Level Examination among 1.8 Lakh candidates</div>
-            </div>
-            <div class="sch-desc">Qualified for admission into the Indian Institute of Technology (IIT) Kanpur.</div>
-          </div>
-
-          <div class="scholastic-card">
-            <div>
-              <div class="sch-rank">Qualified</div>
-              <div class="sch-title">JEE Main (2023)</div>
-              <div class="sch-meta">National Level Examination among 11.6 Lakh candidates</div>
-            </div>
-            <div class="sch-desc">Qualified national engineering entrance examination.</div>
-          </div>
-
-          <div class="scholastic-card">
-            <div>
-              <div class="sch-rank">AIR 1034</div>
-              <div class="sch-title">KVPY Fellowship (2022)</div>
-              <div class="sch-meta">Conducted by IISc Bangalore among 50,000+ students</div>
-            </div>
-            <div class="sch-desc">Awarded prestigious Kishore Vaigyanik Protsahan Yojana scientific research fellowship.</div>
-          </div>
-
-          <div class="scholastic-card">
-            <div>
-              <div class="sch-rank">NTSE Scholar</div>
-              <div class="sch-title">National Talent Search (2021)</div>
-              <div class="sch-meta">Selected in Top 2,000 students (State Rank 20)</div>
-            </div>
-            <div class="sch-desc">Awarded the prestigious title of NTSE Scholar by NCERT, Government of India.</div>
-          </div>
+    <!-- ============================== OPEN SOURCE ============================== -->
+    <section class="section" id="oss" data-depth="3000" data-zone="HADAL ZONE">
+      <div class="wrap">
+        <header class="sec-head reveal">
+          <p class="kicker">3000 m · Open source</p>
+          <h2>Merged upstream</h2>
+          <p class="sec-lead">Real diffs from the robotics and GPU stacks I build on.</p>
+        </header>
+        <div class="oss-grid">
+          <article class="oss reveal">
+            <header><span class="org-badge">NVIDIA / cccl</span><a href="https://github.com/NVIDIA/cccl/pull/10890" target="_blank" rel="noopener">#10890 ↗</a></header>
+            <h4>Align CUB's DeviceFind buffer to the vector type</h4>
+            <pre class="diff"><code><span class="ctx">// cub/agent/agent_find.cuh</span>
+<span class="del">- alignas(InputT) unsigned char input_bytes[...];</span>
+<span class="add">+ alignas(VectorT) unsigned char input_bytes[...];</span>
+<span class="ctx">  auto* vec_items = reinterpret_cast&lt;VectorT*&gt;(...);</span></code></pre>
+            <p>Vectorized loads read through a buffer aligned only to the element type, which is misaligned on GPU. Fixes #10840.</p>
+          </article>
+          <article class="oss reveal">
+            <header><span class="org-badge">bluerobotics / BlueOS</span><a href="https://github.com/bluerobotics/BlueOS/pull/4186" target="_blank" rel="noopener">#4184 · #4185 · #4186 ↗</a></header>
+            <h4>Kraken and flight-controller hardening</h4>
+            <pre class="diff"><code><span class="ctx"># kraken/api/v2/routers/container.py</span>
+<span class="add">+ await ContainerManager.get_running_container_by_name(name)</span>
+<span class="ctx">  stream = ContainerManager.get_container_log_by_name(name)</span></code></pre>
+            <p>Missing containers return a clean 404 instead of a mid-stream 500; restarting an uninstalled extension raises <code>ExtensionNotFound</code>; non-Linux flight controllers get an empty serial list.</p>
+          </article>
+          <article class="oss reveal">
+            <header><span class="org-badge">ArduPilot / ardupilot</span><a href="https://github.com/ArduPilot/ardupilot/pull/29624" target="_blank" rel="noopener">#29624 ↗</a></header>
+            <h4>Remove an int-vs-float ternary in SITL</h4>
+            <pre class="diff"><code><span class="ctx">// libraries/AP_HAL_SITL/SITL_State.cpp</span>
+<span class="del">- input.wind.turbulence = _sitl?_sitl-&gt;wind_turbulance:0;</span>
+<span class="add">+ input.wind.turbulence = _sitl-&gt;wind_turbulance;</span></code></pre>
+            <p>Dropped an integer-literal default that forced an implicit float conversion.</p>
+          </article>
         </div>
       </div>
     </section>
 
-    <!-- ====================================================================
-         SECTION 4: LEADERSHIP & CAMPUS IMPACT (3 DEDICATED CARDS)
-         ==================================================================== -->
-    <section id="leadership" class="dashboard-section">
-      <div class="container">
-        <div class="section-header-hud">
-          <div>
-            <span class="section-prefix">// 03. EXECUTIVE LEADERSHIP</span>
-            <h2 class="section-title">Leadership & Campus Impact</h2>
+    <!-- ============================== LEADERSHIP + HONORS ============================== -->
+    <section class="section" id="lead" data-depth="3600" data-zone="HADAL ZONE">
+      <div class="wrap lead-grid">
+        <div class="lead-card reveal">
+          <p class="kicker">Leadership</p>
+          <h3>Team Head, AUV-IITK</h3>
+          <p class="org">Science &amp; Technology Council · Apr 2025 – Apr 2026</p>
+          <p>Led 30+ undergraduate engineers across 6 divisions to research, build and deploy autonomous underwater vehicles.</p>
+          <div class="lead-stats">
+            <div><b data-count="70" data-prefix="₹" data-suffix="L">0</b><span>alumni funding (₹20L + ₹50L)</span></div>
+            <div><b data-count="40" data-prefix="₹" data-suffix="L+">0</b><span>inventory managed</span></div>
+            <div><b data-count="30" data-suffix="+">0</b><span>engineers led</span></div>
           </div>
-          <p class="section-subtitle">
-            Leading multidisciplinary robotics teams, directing institute festival budgets, and spearheading developer communities at IIT Kanpur.
-          </p>
         </div>
-
-        <div class="leadership-grid-3col">
-          <!-- Card 1: AUV IITK Leadership -->
-          <div class="leadership-card">
-            <div>
-              <div class="lead-role">Team Head — AUV IITK</div>
-              <div class="lead-org">Science & Technology Council, IIT Kanpur (Apr 2025 – Apr 2026)</div>
-              <p class="text-secondary" style="font-size: 0.88rem; line-height: 1.6;">
-                Spearheading 30+ undergraduate engineers to conduct autonomous underwater robotics research and engineer competition-grade vehicles for SAUVC Singapore.
-              </p>
-            </div>
-
-            <div class="lead-stats-row">
-              <div class="lead-stat-col">
-                <div class="lead-stat-num">₹70L+</div>
-                <div class="lead-stat-label">Alumni Funding</div>
-              </div>
-              <div class="lead-stat-col">
-                <div class="lead-stat-num">30+</div>
-                <div class="lead-stat-label">Engineers Led</div>
-              </div>
-            </div>
-
-            <p style="font-size: 0.82rem; color: var(--text-tertiary);">
-              Secured major sponsorships via technical showcases and procured ₹1L+ workstation hardware.
-            </p>
-          </div>
-
-          <!-- Card 2: Pragaman Festival -->
-          <div class="leadership-card">
-            <div>
-              <div class="lead-role">Overall Coordinator — Pragaman</div>
-              <div class="lead-org">Academics & Career Council (AnC), IIT Kanpur (Aug 2026 – Present)</div>
-              <p class="text-secondary" style="font-size: 0.88rem; line-height: 1.6;">
-                Overseeing the institute-wide establishment and operations of IIT Kanpur's flagship academic and career festival, structuring 4 core verticals.
-              </p>
-            </div>
-
-            <div class="lead-stats-row">
-              <div class="lead-stat-col">
-                <div class="lead-stat-num">₹25L+</div>
-                <div class="lead-stat-label">Target Budget</div>
-              </div>
-              <div class="lead-stat-col">
-                <div class="lead-stat-num">4</div>
-                <div class="lead-stat-label">Key Verticals</div>
-              </div>
-            </div>
-
-            <p style="font-size: 0.82rem; color: var(--text-tertiary);">
-              Directing marketing, corporate outreach, academic symposia, and career development initiatives.
-            </p>
-          </div>
-
-          <!-- Card 3: Programming Club Secretary -->
-          <div class="leadership-card">
-            <div>
-              <div class="lead-role">Secretary — Programming Club</div>
-              <div class="lead-org">Science & Technology Council, IIT Kanpur (Apr 2024 – Apr 2025)</div>
-              <p class="text-secondary" style="font-size: 0.88rem; line-height: 1.6;">
-                Curated comprehensive learning roadmaps in Computer Vision and Deep Learning; organized institute-wide hackathons and mentored 100+ student developers.
-              </p>
-            </div>
-
-            <div class="lead-stats-row">
-              <div class="lead-stat-col">
-                <div class="lead-stat-num">2nd</div>
-                <div class="lead-stat-label">Takneek '24 (CV)</div>
-              </div>
-              <div class="lead-stat-col">
-                <div class="lead-stat-num">100+</div>
-                <div class="lead-stat-label">Students Mentored</div>
-              </div>
-            </div>
-
-            <p style="font-size: 0.82rem; color: var(--text-tertiary);">
-              Won 2nd place in Computer Vision & Robotics at Takneek '24, IIT Kanpur's inter-hall technical championship.
-            </p>
-          </div>
+        <div class="lead-card reveal">
+          <p class="kicker">Honors</p>
+          <ul class="honors">
+            <li><div><b>JEE Advanced</b> qualified, 2023</div><span>1.8 lakh candidates</span></li>
+            <li><div><b>JEE Main</b> top 0.5%, 2023</div><span>11.6 lakh candidates</span></li>
+            <li><div><b>KVPY-SA</b> AIR 1034, 2022</div><span>IISc Bangalore</span></li>
+            <li><div><b>NTSE Scholar</b>, 2021</div><span>state rank 20 in Stage 1</span></li>
+          </ul>
+          <p class="org">B.Tech Chemical Engineering, minor in Cognitive Science · IIT Kanpur · 2027 · CPI 7.7</p>
         </div>
       </div>
     </section>
 
-    <!-- ====================================================================
-         SECTION 5: TECHNICAL MATRIX & COURSEWORK
-         ==================================================================== -->
-    <section id="skills" class="dashboard-section" style="background: var(--bg-secondary); border-top: 1px solid var(--border-subtle);">
-      <div class="container">
-        <div class="section-header-hud">
-          <div>
-            <span class="section-prefix">// 04. PROFICIENCY & DOMAINS</span>
-            <h2 class="section-title">Technical Matrix & Coursework</h2>
-          </div>
-          <p class="section-subtitle">
-            Core programming languages, frameworks, system infrastructures, and foundational coursework.
-          </p>
-        </div>
-
-        <div class="skills-container-grid">
-          <!-- Systems & Deep Learning Card -->
-          <div class="skill-category-card">
-            <div class="skill-cat-header">
-              <span>SYSTEMS & PROGRAMMING LANGUAGES</span>
-              <span class="badge">CORE</span>
-            </div>
-            <div class="skill-chip-grid" style="margin-bottom: 1.5rem;">
-              <span class="skill-badge-lg">C</span>
-              <span class="skill-badge-lg">C++</span>
-              <span class="skill-badge-lg">Python</span>
-              <span class="skill-badge-lg">SQL</span>
-              <span class="skill-badge-lg">MATLAB</span>
-              <span class="skill-badge-lg">LaTeX</span>
-            </div>
-
-            <div class="skill-cat-header">
-              <span>AI, DEEP LEARNING & COMPUTER VISION</span>
-              <span class="badge badge-terracotta">SPECIALIZATION</span>
-            </div>
-            <div class="skill-chip-grid" style="margin-bottom: 1.5rem;">
-              <span class="skill-badge-lg">PyTorch</span>
-              <span class="skill-badge-lg">TensorFlow</span>
-              <span class="skill-badge-lg">YOLOv11</span>
-              <span class="skill-badge-lg">SAM2</span>
-              <span class="skill-badge-lg">HuggingFace</span>
-              <span class="skill-badge-lg">OpenCV</span>
-              <span class="skill-badge-lg">Ray (Distributed)</span>
-              <span class="skill-badge-lg">Deblurring GANs</span>
-              <span class="skill-badge-lg">Grad-CAM</span>
-            </div>
-
-            <div class="skill-cat-header">
-              <span>ROBOTICS & INFRASTRUCTURE</span>
-              <span class="badge badge-sage">SYSTEMS</span>
-            </div>
-            <div class="skill-chip-grid">
-              <span class="skill-badge-lg">ROS</span>
-              <span class="skill-badge-lg">NVIDIA Jetson Orin</span>
-              <span class="skill-badge-lg">Extended Kalman Filter</span>
-              <span class="skill-badge-lg">Cascaded PID</span>
-              <span class="skill-badge-lg">Docker</span>
-              <span class="skill-badge-lg">Linux</span>
-              <span class="skill-badge-lg">GCP</span>
-              <span class="skill-badge-lg">Databricks</span>
-              <span class="skill-badge-lg">Git</span>
-            </div>
-          </div>
-
-          <!-- Relevant Academic Coursework Card -->
-          <div class="skill-category-card">
-            <div class="skill-cat-header">
-              <span>RELEVANT ACADEMIC COURSEWORK (* ONGOING)</span>
-              <span class="badge">IIT KANPUR</span>
-            </div>
-            
-            <div class="coursework-table-grid">
-              <div class="course-chip"><span>Fundamentals of Computing</span></div>
-              <div class="course-chip ongoing"><span>Introd. to Cognitive Science*</span> <span class="badge badge-amber" style="font-size:0.6rem;">*</span></div>
-              <div class="course-chip ongoing"><span>Introd. to Machine Learning*</span> <span class="badge badge-amber" style="font-size:0.6rem;">*</span></div>
-              <div class="course-chip ongoing"><span>ML for Chemical Engineers*</span> <span class="badge badge-amber" style="font-size:0.6rem;">*</span></div>
-              <div class="course-chip"><span>Applied Cognitive Science</span></div>
-              <div class="course-chip"><span>Linear Algebra</span></div>
-              <div class="course-chip"><span>Numerical Methods</span></div>
-              <div class="course-chip"><span>Single Variable Calculus</span></div>
-              <div class="course-chip"><span>Several Variable Calculus</span></div>
-              <div class="course-chip"><span>Partial Differential Eqns.</span></div>
-              <div class="course-chip"><span>Ordinary Differential Eqns.</span></div>
-              <div class="course-chip"><span>Energy, Climate & Sustainability</span></div>
-              <div class="course-chip"><span>Heat Transfer</span></div>
-              <div class="course-chip"><span>Chemical Process Industries</span></div>
-              <div class="course-chip"><span>Fluid Mechanics</span></div>
-              <div class="course-chip"><span>Chemical Thermodynamics</span></div>
-              <div class="course-chip"><span>Mass Transfer</span></div>
-              <div class="course-chip ongoing"><span>Neurobiology*</span> <span class="badge badge-amber" style="font-size:0.6rem;">*</span></div>
-              <div class="course-chip"><span>Introd. to Electronics</span></div>
-              <div class="course-chip"><span>Chemical Reaction Eng.</span></div>
-            </div>
-          </div>
+    <!-- ============================== CONTACT / SEABED ============================== -->
+    <section class="section contact" id="contact" data-depth="4000" data-zone="SEABED">
+      <div class="wrap">
+        <p class="kicker reveal">4000 m · Seabed</p>
+        <h2 class="contact-title reveal">You made it to the bottom.<br><span class="beam-text">Let's build something.</span></h2>
+        <p class="sec-lead reveal">Looking for robotics perception, autonomy and applied-ML roles for 2027.</p>
+        <div class="contact-row reveal">
+          <a class="btn btn-primary" href="mailto:k.suyashc@gmail.com">k.suyashc@gmail.com</a>
+          <a class="btn btn-ghost" href="https://www.linkedin.com/in/suyash-kumar-b062491bb/" target="_blank" rel="noopener">LinkedIn ↗</a>
+          <a class="btn btn-ghost" href="https://github.com/safe-bet" target="_blank" rel="noopener">GitHub ↗</a>
+          <a class="btn btn-ghost" href="https://www.kaggle.com/safebet1034" target="_blank" rel="noopener">Kaggle ↗</a>
+          <a class="btn btn-ghost" href="assets/Suyash_Kumar_Resume.pdf" target="_blank" rel="noopener">Résumé (PDF) ↗</a>
         </div>
       </div>
-    </section>
-
-    <!-- ====================================================================
-         SECTION 6: CONTACT & ACTION COMMAND CENTER
-         ==================================================================== -->
-    <section id="contact" class="footer-cta-section">
-      <div class="container">
-        <div class="footer-action-box">
-          <span class="badge badge-live" style="margin-bottom: 1.25rem;">OPEN FOR HIGH-IMPACT OPPORTUNITIES</span>
-          <h2 class="cta-headline">Let's Build Intelligent Systems.</h2>
-          <p class="cta-subtext">
-            Seeking software engineering, distributed AI systems, autonomous robotics, and applied deep learning roles. Let's discuss technical challenges.
-          </p>
-
-          <div class="cta-btn-group">
-            <a href="mailto:k.suyashc@gmail.com" class="btn btn-primary">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-              <span>SEND EMAIL (k.suyashc@gmail.com)</span>
-            </a>
-            <a href="tel:+919807199316" class="btn btn-secondary">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-              <span>+91 9807199316</span>
-            </a>
-            <a href="assets/Suyash_Kumar_Resume.pdf" target="_blank" class="btn btn-outline-terracotta">
-              <span>DOWNLOAD VERIFIED RESUME</span>
-            </a>
-          </div>
-        </div>
-
-        <!-- Footer Bottom Bar -->
-        <div class="footer-bottom-grid">
-          <div>
-            <span>© 2026 SUYASH KUMAR. ALL RIGHTS RESERVED. // IIT KANPUR</span>
-          </div>
-
-          <div class="footer-social-links">
-            <a href="https://github.com/safe-bet" target="_blank" class="footer-social-link">GitHub</a>
-            <a href="https://www.linkedin.com/in/suyash-kumar-b062491bb/" target="_blank" class="footer-social-link">LinkedIn</a>
-            <a href="https://www.kaggle.com/safebet1034" target="_blank" class="footer-social-link">Kaggle</a>
-            <a href="mailto:k.suyashc@gmail.com" class="footer-social-link">Email</a>
-          </div>
-        </div>
-      </div>
+      <footer class="foot">© 2026 Suyash Kumar · Hand-built, no framework · ATAL 3-D model by Team AUV-IITK</footer>
     </section>
   </main>
 
-  <!-- ====================================================================
-       DEVELOPER COMMAND PALETTE & CLI MODAL (HIGH CONTRAST & INTUITIVE)
-       ==================================================================== -->
-  <div class="cmd-modal-backdrop" id="cmdModalBackdrop">
-    <div class="cmd-palette-box">
-      <!-- Input Header -->
-      <div class="cmd-input-row">
-        <span class="cmd-prompt-symbol">></span>
-        <input type="text" id="cmdPaletteInput" class="cmd-input" placeholder="Type a command or click a chip below (skills, honeywell, lenek, auv, resume)..." autocomplete="off" spellcheck="false">
-        <button class="cmd-esc-hint" id="cmdEscBtn">ESC</button>
-      </div>
-
-      <!-- Quick One-Click Suggestion Chips -->
-      <div class="cmd-quick-chips-row">
-        <span style="font-family:var(--font-mono); font-size:0.65rem; color:#78716C; margin-right:4px;">QUICK RUN:</span>
-        <button class="cmd-chip-btn" onclick="DeveloperTerminal.executeCommand('skills')">Skills</button>
-        <button class="cmd-chip-btn" onclick="DeveloperTerminal.executeCommand('honeywell')">Honeywell</button>
-        <button class="cmd-chip-btn" onclick="DeveloperTerminal.executeCommand('lenek')">LENEK Tech</button>
-        <button class="cmd-chip-btn" onclick="DeveloperTerminal.executeCommand('auv')">ATAL AUV</button>
-        <button class="cmd-chip-btn" onclick="DeveloperTerminal.executeCommand('isro')">ISRO</button>
-        <button class="cmd-chip-btn" onclick="DeveloperTerminal.executeCommand('scholastic')">Honors</button>
-        <button class="cmd-chip-btn" onclick="DeveloperTerminal.executeCommand('leadership')">Leadership</button>
-        <button class="cmd-chip-btn" onclick="DeveloperTerminal.executeCommand('resume')">Resume PDF</button>
-        <button class="cmd-chip-btn" onclick="DeveloperTerminal.executeCommand('contact')">Contact</button>
-      </div>
-
-      <!-- Results / Suggestion List -->
-      <div class="cmd-results-list" id="cmdResultsList"></div>
-
-      <!-- Terminal Output Window (High Contrast) -->
-      <div class="cmd-terminal-output" id="cmdTerminalOutput">
-        <div class="text-muted">Welcome to Suyash Kumar CLI v3.2. Type a command or click any quick chip above to run.</div>
-      </div>
-
-      <!-- Footer -->
-      <div class="cmd-footer-bar">
-        <span>Navigation: [↑/↓] History | [↵] Execute | [ESC] Close</span>
-        <span>SUYASH.KUMAR // v3.2</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Floating Always-Visible Social & Channels Dock -->
-  <div class="floating-social-dock" id="floatingDock">
-    <a href="https://github.com/safe-bet" target="_blank" class="dock-link-btn" title="GitHub Profile">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
-      <span>GitHub</span>
-    </a>
-    <div class="dock-divider"></div>
-    <a href="https://www.linkedin.com/in/suyash-kumar-b062491bb/" target="_blank" class="dock-link-btn" title="LinkedIn Profile">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
-      <span>LinkedIn</span>
-    </a>
-    <div class="dock-divider"></div>
-    <a href="https://www.kaggle.com/safebet1034" target="_blank" class="dock-link-btn" title="Kaggle Profile">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4v16M20 4l-9 8 9 8M11 12l-4-4"></path></svg>
-      <span>Kaggle</span>
-    </a>
-    <div class="dock-divider"></div>
-    <a href="mailto:k.suyashc@gmail.com" class="dock-link-btn" title="Send Email">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-      <span>Email</span>
-    </a>
-    <div class="dock-divider"></div>
-    <a href="assets/Suyash_Kumar_Resume.pdf" target="_blank" class="dock-link-btn" style="color:var(--accent-terracotta);" title="Resume PDF">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-      <span>Resume</span>
-    </a>
-  </div>
-
-  <!-- JavaScript Modules -->
-  <script src="js/telemetry.js"></script>
-  <script src="js/interactive-demos.js"></script>
-  <script src="js/terminal.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/ocean.js"></script>
+  <script src="js/projects.js"></script>
+  <script src="js/journey.js"></script>
+  <script src="js/main.js"></script>
 </body>
 </html>
