@@ -136,9 +136,39 @@
   }
   requestAnimationFrame(torchLoop);
 
-  /* ---------- depth gauge ---------- */
+  /* ---------- depth gauge, dive readouts, zone banners ---------- */
+  // Sections carry real depths (m). `depth` is a 0..1 *visual* depth so the art keeps
+  // its pacing even though the metres run out to the Challenger Deep.
+  const MAXM = 10935;
+  const VIS = [[0, 0], [80, .02], [150, .05], [450, .15], [850, .225], [1600, .3], [4300, .5], [6500, .75], [8800, .9], [MAXM, 1]];
+  const pw = (tab, m) => { for (let i = 1; i < tab.length; i++) if (m <= tab[i][0]) { const [a, va] = tab[i - 1], [b, vb] = tab[i]; return va + (vb - va) * (m - a) / (b - a); } return tab[tab.length - 1][1]; };
+  const TEMP = [[0, 27], [60, 25], [200, 15], [500, 8], [1000, 4.5], [2000, 3], [4000, 1.8], [6000, 1.4], [MAXM, 2.4]];
+  const ZONES = {
+    'SUNLIGHT ZONE': ['Epipelagic · 0–200 m', 'Enough light for photosynthesis. Most ocean life lives here.'],
+    'TWILIGHT ZONE': ['Mesopelagic · 200–1,000 m', 'Under 1% of surface light. Animals start making their own.'],
+    'MIDNIGHT ZONE': ['Bathypelagic · 1,000–4,000 m', 'No sunlight at all. The only light is bioluminescence.'],
+    'ABYSSAL ZONE': ['Abyssopelagic · 4,000–6,000 m', 'Near-freezing water, over 400 times surface pressure.'],
+    'HADAL ZONE': ['Hadalpelagic · 6,000–11,000 m', 'The ocean trenches. Deeper than Everest is tall.'],
+    'CHALLENGER DEEP': ['Mariana Trench · 10,935 m', 'The deepest known point on Earth: about 1,086 atm.']
+  };
   const secs = [...document.querySelectorAll('[data-depth]')];
-  const fill = document.getElementById('gaugeFill'), read = document.getElementById('gaugeDepth'), zone = document.getElementById('gaugeZone');
+  const $ = id => document.getElementById(id);
+  const fill = $('gaugeFill'), read = $('gaugeDepth'), zone = $('gaugeZone');
+  const ds = { d: $('dsDepth'), p: $('dsPres'), t: $('dsTemp'), l: $('dsLight') };
+  const vig = $('vignette'), zb = $('zoneBanner');
+  window.DIVE.meters = 0;
+  const seen = new Set(['SURFACE']); let zbTimer, booted = false, maxZone = 0;
+  const zoneOrder = ['SURFACE', ...Object.keys(ZONES)];
+  function banner(z) {
+    if (!zb || !ZONES[z] || reduced) return;
+    const gm = document.getElementById('game'), gr = gm && gm.getBoundingClientRect();   // never over the game
+    if (gr && gr.top < innerHeight * .7 && gr.bottom > innerHeight * .3) return;
+    $('zbKick').textContent = 'Entering'; $('zbName').textContent = z.toLowerCase().replace(/(^|\s)\S/g, c => c.toUpperCase());
+    $('zbFact').textContent = ZONES[z][0] + ' — ' + ZONES[z][1];
+    zb.classList.remove('on'); void zb.offsetWidth; zb.classList.add('on');
+    clearTimeout(zbTimer); zbTimer = setTimeout(() => zb.classList.remove('on'), 2600);
+  }
+  const fmtLight = m => { const l = 100 * Math.exp(-m / 43); return l >= 1 ? Math.round(l) + '%' : l >= .001 ? l.toPrecision(1) + '%' : '0%'; };
   function onScroll() {
     const y = scrollY + innerHeight * .4;
     let m = 0, z = secs[0].dataset.zone;
@@ -147,11 +177,27 @@
       const ta = a.offsetTop, da = +a.dataset.depth;
       if (y >= ta) { z = a.dataset.zone; m = da; if (b) { const tb = b.offsetTop, db = +b.dataset.depth; if (y < tb) m = da + (db - da) * (y - ta) / (tb - ta); } }
     }
-    if (scrollY + innerHeight >= document.documentElement.scrollHeight - 4) { m = 4000; z = 'SEABED'; }
-    depth = Math.min(1, m / 4000);
-    read.textContent = String(Math.round(m)).padStart(4, '0');
+    if (scrollY + innerHeight >= document.documentElement.scrollHeight - 4) { m = MAXM; z = 'CHALLENGER DEEP'; }
+    depth = Math.min(1, pw(VIS, m));
+    window.DIVE.meters = m;
+    const mr = Math.round(m);
+    read.textContent = mr >= 10000 ? String(mr) : String(mr).padStart(4, '0');
     fill.style.height = depth * 100 + '%';
     if (zone.textContent !== z) zone.textContent = z;
+    if (ds.d) {
+      ds.d.textContent = mr.toLocaleString('en-US') + ' m';
+      ds.p.textContent = Math.round(1 + m * .09924).toLocaleString('en-US') + ' atm';
+      ds.t.textContent = pw(TEMP, m).toFixed(1) + ' °C';
+      ds.l.textContent = fmtLight(m);
+    }
+    if (vig) vig.style.opacity = Math.min(1, Math.pow(depth, .8) * 1.05).toFixed(3);
+    document.documentElement.style.setProperty('--depth', depth.toFixed(3));
+    // banner only when descending into a zone for the first time
+    const zi = zoneOrder.indexOf(z);
+    if (!booted && performance.now() > 1500) booted = true;             // ignore the initial hash jump
+    if (!booted) for (let i = 0; i <= zi; i++) seen.add(zoneOrder[i]);
+    else if (zi > maxZone && !seen.has(z)) { seen.add(z); banner(z); }
+    if (zi > maxZone) maxZone = zi;
   }
   addEventListener('scroll', onScroll, { passive: true });
   addEventListener('resize', onScroll);

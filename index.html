@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles/site.css?v=3">
+  <link rel="stylesheet" href="styles/site.css?v=8">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -38,6 +38,14 @@
     <div class="gauge-read"><span id="gaugeDepth">0000</span><small>m</small></div>
     <div class="gauge-zone" id="gaugeZone">SURFACE</div>
   </aside>
+  <div class="dive-stats" aria-hidden="true">
+    <span><i>DEPTH</i><b id="dsDepth">0 m</b></span>
+    <span><i>PRESSURE</i><b id="dsPres">1 atm</b></span>
+    <span><i>TEMP</i><b id="dsTemp">27 °C</b></span>
+    <span><i>LIGHT</i><b id="dsLight">100%</b></span>
+  </div>
+  <div class="vignette" id="vignette" aria-hidden="true"></div>
+  <div class="zone-banner" id="zoneBanner" aria-hidden="true"><small id="zbKick"></small><strong id="zbName"></strong><span id="zbFact"></span></div>
 
   <header class="nav" id="nav">
     <a href="#top" class="brand" aria-label="Suyash Kumar, home">
@@ -136,10 +144,10 @@
     </section>
 
     <!-- ============================== NOW: ARMATRIX ============================== -->
-    <section class="section" id="now" data-depth="200" data-zone="SUNLIGHT ZONE">
+    <section class="section" id="now" data-depth="150" data-zone="SUNLIGHT ZONE">
       <div class="wrap">
         <header class="sec-head reveal">
-          <p class="kicker">0200 m · Now</p>
+          <p class="kicker">0150 m · Now</p>
           <h2>Vision Intern, <span class="hl">Armatrix</span></h2>
           <p class="sec-lead">I'm building <strong>SeamFinder</strong>: mark a weld seam on the CAD model, point a depth camera at the real part, and the welding arm gets exact torch poses — even when the part isn't quite where the drawing says it is.</p>
         </header>
@@ -174,10 +182,10 @@
     </section>
 
     <!-- ============================== SELECTED WORK ============================== -->
-    <section class="section" id="work" data-depth="600" data-zone="TWILIGHT ZONE">
+    <section class="section" id="work" data-depth="450" data-zone="TWILIGHT ZONE">
       <div class="wrap">
         <header class="sec-head reveal">
-          <p class="kicker">0600 m · Selected work</p>
+          <p class="kicker">0450 m · Selected work</p>
           <h2>Robots, vision and the GPUs behind them</h2>
           <p class="sec-lead">Each project runs a small live visual of what the system actually does. Most of them respond to clicks.</p>
         </header>
@@ -354,12 +362,12 @@
     </section>
 
     <!-- ============================== GAME: PILOT ATAL ============================== -->
-    <section class="section" id="sim" data-depth="900" data-zone="TWILIGHT ZONE">
+    <section class="section" id="sim" data-depth="850" data-zone="TWILIGHT ZONE">
       <div class="wrap">
         <header class="sec-head reveal">
-          <p class="kicker">0900 m · Play</p>
+          <p class="kicker">0850 m · Play</p>
           <h2>Pilot ATAL through <span class="hl">SAUVC</span></h2>
-          <p class="sec-lead">The real competition tasks: pass the gate, knock down the flare, drop a marker in the bucket, touch the buoy, then surface over the pinger. It's dark down there, so ATAL's lamp is all you get. Race the autopilot, which flies a simplified version of the cascaded-PID + detection loop.</p>
+          <p class="sec-lead">The real competition tasks: pass the gate, ram the flare down, drop a marker in the bucket, touch the buoy, then surface over the pinger. It's dark, the current is gusty, jellyfish drift through the pool, and full thrust drains the battery. Race the autopilot, which flies a simplified version of the cascaded-PID + detection loop and steers around the jellyfish on its own.</p>
         </header>
         <div class="game reveal" id="game">
           <div class="viz-bar">
@@ -373,7 +381,9 @@
             <div class="game-over" id="gameOver">
               <p class="kicker" id="goKick">Mission brief</p>
               <h3 id="goTitle">Five tasks. One lamp.</h3>
-              <p id="goText">Beat the autopilot's time. Every bump costs 2 s.</p>
+              <p id="goText">Beat the autopilot's time. Dodge the jellyfish, watch your battery, and every hit costs 3 s. Two markers, a narrow bucket.</p>
+              <p class="go-rank" id="goRank"></p>
+              <form class="go-save" id="goSave" hidden><input id="goName" maxlength="14" placeholder="Your callsign" autocomplete="off" aria-label="Callsign for the leaderboard"><button class="btn btn-primary" type="submit">Save</button></form>
               <div class="game-btns">
                 <button class="btn btn-primary" id="goStart">Start dive</button>
                 <button class="btn btn-ghost" id="goWatch">Watch autopilot</button>
@@ -386,15 +396,19 @@
           <ol class="tasks" id="simTasks">
             <li data-t="gate">Gate</li><li data-t="flare">Flare</li><li data-t="bucket">Bucket</li><li data-t="buoy">Buoy</li><li data-t="surface">Surface</li>
           </ol>
+          <div class="board" id="simBoard">
+            <div class="board-head"><span>Leaderboard</span><small>top 10 · saved in this browser</small></div>
+            <ol class="board-list" id="boardList"></ol>
+          </div>
         </div>
       </div>
     </section>
 
     <!-- ============================== JOURNEY: GIT LOG ============================== -->
-    <section class="section" id="journey" data-depth="1200" data-zone="MIDNIGHT ZONE">
+    <section class="section" id="journey" data-depth="1600" data-zone="MIDNIGHT ZONE">
       <div class="wrap">
         <header class="sec-head reveal">
-          <p class="kicker">1200 m · Journey</p>
+          <p class="kicker">1,600 m · Journey</p>
           <h2><code>git log --graph</code> of how I got here</h2>
           <p class="sec-lead">Four branches — robotics, industry AI, research and open source — merging into one career. Click any commit to see its diff.</p>
         </header>
@@ -408,10 +422,10 @@
     </section>
 
     <!-- ============================== PERIODIC TABLE ============================== -->
-    <section class="section" id="elements" data-depth="2000" data-zone="ABYSSAL ZONE">
+    <section class="section" id="elements" data-depth="4300" data-zone="ABYSSAL ZONE">
       <div class="wrap">
         <header class="sec-head reveal">
-          <p class="kicker">2000 m · Elements</p>
+          <p class="kicker">4,300 m · Elements</p>
           <h2>The periodic table of what I work with</h2>
           <p class="sec-lead">A chemical engineer's skills page. Each element is a tool I use; its group says where it lives in the stack. Pick one to see which projects it shows up in.</p>
         </header>
@@ -424,10 +438,10 @@
     </section>
 
     <!-- ============================== OPEN SOURCE ============================== -->
-    <section class="section" id="oss" data-depth="3000" data-zone="HADAL ZONE">
+    <section class="section" id="oss" data-depth="6500" data-zone="HADAL ZONE">
       <div class="wrap">
         <header class="sec-head reveal">
-          <p class="kicker">3000 m · Open source</p>
+          <p class="kicker">6,500 m · Open source</p>
           <h2>Merged upstream</h2>
           <p class="sec-lead">Real diffs from the robotics and GPU stacks I build on.</p>
         </header>
@@ -462,7 +476,7 @@
     </section>
 
     <!-- ============================== LEADERSHIP + HONORS ============================== -->
-    <section class="section" id="lead" data-depth="3600" data-zone="HADAL ZONE">
+    <section class="section" id="lead" data-depth="8800" data-zone="HADAL ZONE">
       <div class="wrap lead-grid">
         <div class="lead-card reveal">
           <p class="kicker">Leadership</p>
@@ -489,10 +503,10 @@
     </section>
 
     <!-- ============================== CONTACT / SEABED ============================== -->
-    <section class="section contact" id="contact" data-depth="4000" data-zone="SEABED">
+    <section class="section contact" id="contact" data-depth="10935" data-zone="CHALLENGER DEEP">
       <div class="wrap">
-        <p class="kicker reveal">4000 m · Seabed</p>
-        <h2 class="contact-title reveal">You made it to the bottom.<br><span class="beam-text">Let's build something.</span></h2>
+        <p class="kicker reveal">10,935 m · Challenger Deep · 1,086 atm</p>
+        <h2 class="contact-title reveal">You made it to the deepest point on Earth.<br><span class="beam-text">Let's build something.</span></h2>
         <p class="sec-lead reveal">Joining Honeywell Forge as a Data Scientist II. Always up for a conversation about robot perception, autonomy, agentic AI or anything that has to work underwater.</p>
         <div class="contact-row reveal">
           <a class="btn btn-primary" href="mailto:k.suyashc@gmail.com">k.suyashc@gmail.com</a>
@@ -506,12 +520,12 @@
     </section>
   </main>
 
-  <script src="js/data.js?v=3"></script>
-  <script src="js/ocean.js?v=3"></script>
-  <script src="js/life.js?v=3"></script>
-  <script src="js/projects.js?v=3"></script>
-  <script src="js/game.js?v=3"></script>
-  <script src="js/journey.js?v=3"></script>
-  <script src="js/main.js?v=3"></script>
+  <script src="js/data.js?v=8"></script>
+  <script src="js/ocean.js?v=8"></script>
+  <script src="js/life.js?v=8"></script>
+  <script src="js/projects.js?v=8"></script>
+  <script src="js/game.js?v=8"></script>
+  <script src="js/journey.js?v=8"></script>
+  <script src="js/main.js?v=8"></script>
 </body>
 </html>

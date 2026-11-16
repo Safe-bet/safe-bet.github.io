@@ -123,7 +123,7 @@
   document.querySelectorAll('main section[data-depth]').forEach(sec => {
     const m = +sec.dataset.depth; if (!m || sec.id === 'lead') return;
     const r = document.createElement('div'); r.className = 'depth-rule'; r.setAttribute('aria-hidden', 'true');
-    r.innerHTML = `<span>${String(m).padStart(4, '0')} m · ${sec.dataset.zone}</span>`;
+    r.innerHTML = `<span>${m.toLocaleString('en-US')} m · ${sec.dataset.zone} · ${Math.round(1 + m * .09924).toLocaleString('en-US')} atm</span>`;
     sec.prepend(r);
   });
 
