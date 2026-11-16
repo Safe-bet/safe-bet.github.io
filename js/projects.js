@@ -500,4 +500,137 @@
       ctx.textAlign = 'right'; ctx.fillText('keV →', w - 10, h - 6); ctx.textAlign = 'left';
     });
   })();
+  /* =================================================================
+     7. Agentic ingestion — sources → agent → drift guard → Delta Lake,
+        with Phi-4 profiling, Claude Opus governance, HITL and self-healing
+     ================================================================= */
+  (() => {
+    const cv = document.getElementById('ingestCanvas'); if (!cv) return;
+    const S = stage(cv), ctx = S.ctx;
+    const logEl = document.getElementById('ingLog'), chip = document.getElementById('ingState'), rowsEl = document.getElementById('ingRows');
+    const N = {
+      kafka: [.12, .2, 'Kafka', 'telemetry stream'], pg: [.12, .5, 'Postgres', 'orders CDC'], es: [.12, .8, 'Elasticsearch', 'logs index'],
+      ing: [.31, .5, 'Ingest agent', 'config-driven OOP'], guard: [.5, .5, 'Drift guard', 'schema + casing'],
+      phi: [.69, .2, 'Phi-4', 'profile · merge'], opus: [.69, .8, 'Claude Opus', 'governor'],
+      delta: [.88, .5, 'Delta Lake', 'Databricks'], human: [.88, .84, 'Human', 'HITL review'], audit: [.88, .16, 'Audit table', 'every decision']
+    };
+    const state = {}; Object.keys(N).forEach(k => state[k] = { glow: 0, err: 0, c: '#46e3ff' });
+    const P = k => [N[k][0] * S.w, N[k][1] * S.h];
+    const edges = [['kafka', 'ing'], ['pg', 'ing'], ['es', 'ing'], ['ing', 'guard'], ['guard', 'delta'], ['guard', 'phi'], ['phi', 'opus'], ['opus', 'guard'], ['delta', 'opus'], ['opus', 'delta'], ['opus', 'human'], ['human', 'opus'], ['delta', 'audit']];
+    const packets = [], pulses = []; let rows = 0, spawn = 0;
+    const log = (cls, txt) => {
+      const t = new Date().toTimeString().slice(0, 8);
+      const lines = logEl.innerHTML.split('\n').filter(Boolean).slice(-5);
+      lines.push(`<span class="${cls}">${t}  ${txt}</span>`); logEl.innerHTML = lines.join('\n');
+    };
+    const setChip = (t, ok) => { chip.textContent = t; chip.classList.toggle('ok', !!ok); };
+
+    // scripted scenes: [from, to, colour, logClass, logText, nodeEffects]
+    const C = { a: '#a78bfa', w: '#fbbf24', ok: '#4ade80', e: '#f87171', h: '#ffc061' };
+    const scenes = {
+      drift: () => [
+        ['kafka', 'ing', C.w, 'w', "drift on telemetry_v2: +struct device.fw, 'Col A' vs 'col a'", { chip: 'DRIFT DETECTED' }],
+        ['ing', 'guard', C.w, 'w', "case collision → conflict-rename col a → a2"],
+        ['guard', 'phi', C.a, 'a', 'Phi-4 · profiled: null 0.4%, card 41k → concept firmware_version'],
+        ['phi', 'opus', C.a, 'a', 'Phi-4 · proposes struct-enlarge union (row-exclusive ✓)'],
+        ['opus', 'guard', C.ok, 'ok', 'Opus · transformation approved'],
+        ['guard', 'delta', C.ok, 'ok', 'merged into delta.telemetry · schema v14'],
+        ['delta', 'audit', C.ok, 'ok', 'audit row #1842 · reason: case-collision + struct-evolution', { chip: 'STREAMING', ok: 1 }]
+      ],
+      fail: () => [
+        ['delta', 'opus', C.e, 'e', 'job ingest_es failed: executor lost (timeout 120 s)', { chip: 'JOB FAILED', err: 'delta' }],
+        ['opus', 'opus', C.a, 'a', 'Opus · root cause: shuffle spill on 50k-row batches'],
+        ['opus', 'delta', C.a, 'a', 'Opus · tune spark.network.timeout 120→300 s, batch 50k→20k'],
+        ['opus', 'delta', C.ok, 'ok', 'rerun #1 succeeded · Jira DATA-1427 + email sent', { chip: 'SELF-HEALED', ok: 1, clear: 'delta' }]
+      ],
+      hitl: () => [
+        ['guard', 'phi', C.a, 'a', 'merge candidates user_id ~ userid · cosine 0.81'],
+        ['phi', 'opus', C.a, 'a', 'Phi-4 · type-cast union? confidence low'],
+        ['opus', 'human', C.h, 'h', 'Opus · ambiguous → escalated to human review', { chip: 'HITL' }],
+        ['human', 'opus', C.ok, 'ok', 'human approved: type-cast union int→string'],
+        ['opus', 'guard', C.ok, 'ok', 'Opus · applied; rule cached for next time', { chip: 'STREAMING', ok: 1 }]
+      ]
+    };
+    let queue = [], busy = false, idle = 0, cycle = 0;
+    const run = name => { queue.push(...scenes[name]()); };
+    document.getElementById('ingDrift').addEventListener('click', () => run('drift'));
+    document.getElementById('ingFail').addEventListener('click', () => run('fail'));
+    const next = () => {
+      const st = queue.shift(); if (!st) { busy = false; return; }
+      busy = true; const [a, b, col, cls, txt, fx] = st;
+      if (fx && fx.chip) setChip(fx.chip, fx.ok);
+      if (fx && fx.err) state[fx.err].err = 1;
+      pulses.push({ a, b, col, t: 0, dur: a === b ? .8 : .9, done: () => {
+        log(cls, txt); state[b].glow = 1; state[b].c = col;
+        if (fx && fx.clear) state[fx.clear].err = 0;
+        setTimeout(next, 650);
+      } });
+    };
+    log('ok', 'pipeline up · 3 sources bound · writing to Delta'); setChip('STREAMING', 1);
+
+    const rr = (x, y, w, h, r) => { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); };
+    const lerp = (a, b, k) => [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k];
+
+    loop(S, (dt) => {
+      const { w, h } = S;
+      // auto-play scenes when idle
+      if (!busy && !queue.length) { idle += dt; if (idle > 3.5) { idle = 0; run(['drift', 'fail', 'drift', 'hitl'][cycle++ % 4]); next(); } }
+      else if (!busy && queue.length) next();
+      // background packets: source → agent → guard → delta
+      const flowing = !state.delta.err;
+      spawn += dt * (flowing ? 5 : 1.5);
+      while (spawn > 1) { spawn--; packets.push({ path: [['kafka', 'pg', 'es'][Math.random() * 3 | 0], 'ing', 'guard', 'delta'], seg: 0, k: 0, sp: 1.6 + Math.random() * .6 }); }
+      ctx.clearRect(0, 0, w, h);
+      // edges
+      ctx.lineWidth = 1;
+      for (const [a, b] of edges) {
+        if (a === b) continue;
+        const [x1, y1] = P(a), [x2, y2] = P(b);
+        ctx.strokeStyle = (a === 'opus' || b === 'opus' || b === 'phi' || b === 'human' || b === 'audit') ? 'rgba(167,139,250,.16)' : 'rgba(120,190,255,.16)';
+        ctx.setLineDash(b === 'phi' || a === 'phi' || b === 'human' || a === 'human' || b === 'audit' ? [3, 5] : []);
+        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+      }
+      ctx.setLineDash([]);
+      // packets
+      for (let i = packets.length - 1; i >= 0; i--) {
+        const pk = packets[i]; const a = P(pk.path[pk.seg]), b = P(pk.path[pk.seg + 1]);
+        if (pk.path[pk.seg + 1] === 'delta' && state.delta.err) { /* queue up while delta is down */ pk.k = Math.min(pk.k + dt * pk.sp * .2, .7); }
+        else pk.k += dt * pk.sp;
+        if (pk.k >= 1) { pk.seg++; pk.k = 0; if (pk.seg >= pk.path.length - 1) { packets.splice(i, 1); rows += 1000 + (Math.random() * 400 | 0); continue; } }
+        const [x, y] = lerp(a, b, pk.k);
+        ctx.fillStyle = 'rgba(70,227,255,.85)'; ctx.fillRect(x - 2, y - 2, 4, 4);
+      }
+      if (packets.length > 160) packets.splice(0, packets.length - 160);
+      rowsEl.textContent = `${rows.toLocaleString('en-US')} rows → delta`;
+      // scripted pulses
+      for (let i = pulses.length - 1; i >= 0; i--) {
+        const pu = pulses[i]; pu.t += dt / pu.dur;
+        const a = P(pu.a), b = P(pu.b);
+        if (pu.a === pu.b) { // thinking ring
+          ctx.strokeStyle = pu.col; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(a[0], a[1], 26 + pu.t * 24, 0, 6.283); ctx.globalAlpha = 1 - pu.t; ctx.stroke(); ctx.globalAlpha = 1;
+        } else {
+          const [x, y] = lerp(a, b, Math.min(1, pu.t));
+          ctx.strokeStyle = pu.col; ctx.lineWidth = 2; ctx.globalAlpha = .55; ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(x, y); ctx.stroke(); ctx.globalAlpha = 1;
+          ctx.fillStyle = pu.col; ctx.shadowColor = pu.col; ctx.shadowBlur = 14; ctx.beginPath(); ctx.arc(x, y, 5, 0, 6.283); ctx.fill(); ctx.shadowBlur = 0;
+        }
+        if (pu.t >= 1) { pulses.splice(i, 1); pu.done(); }
+      }
+      // nodes
+      const small = w < 520;
+      for (const k of Object.keys(N)) {
+        const [nx, ny, title, sub] = N[k], x = nx * w, y = ny * h, st = state[k];
+        st.glow = Math.max(0, st.glow - dt * .8);
+        const bw = Math.min(small ? 78 : 112, w * .21), bh = small ? 30 : 38;
+        const col = st.err ? '#f87171' : (k === 'opus' || k === 'phi') ? '#a78bfa' : k === 'human' ? '#ffc061' : '#46e3ff';
+        ctx.fillStyle = '#0a1a2e'; ctx.strokeStyle = col; ctx.lineWidth = 1.3 + st.glow * 1.5;
+        if (st.glow > .05 || st.err) { ctx.shadowColor = st.err ? '#f87171' : st.c; ctx.shadowBlur = 18 * Math.max(st.glow, st.err ? .7 + .3 * Math.sin(performance.now() / 120) : 0); }
+        rr(x - bw / 2, y - bh / 2, bw, bh, 8); ctx.fill(); ctx.stroke(); ctx.shadowBlur = 0;
+        ctx.textAlign = 'center'; ctx.fillStyle = '#e8f2ff'; ctx.font = mono(small ? 9 : 11);
+        ctx.fillText(title, x, y - (small ? 1 : 2));
+        ctx.fillStyle = 'rgba(169,189,211,.8)'; ctx.font = mono(small ? 7.5 : 9);
+        ctx.fillText(sub, x, y + (small ? 10 : 12));
+        ctx.textAlign = 'left';
+      }
+    });
+  })();
 })();

@@ -49,7 +49,7 @@
     for (let i = 0; i < n; i++) { const a = Math.random() * 6.28; fish.push({ x: cx + Math.cos(a) * 80 * Math.random(), y: cy + Math.sin(a) * 60 * Math.random(), vx: -1 + Math.random() * .4, vy: (Math.random() - .5) * .4, s: .8 + Math.random() * .5 }); }
   };
   /* ---------- jellyfish ---------- */
-  const jellies = Array.from({ length: 7 }, (_, i) => ({ x: Math.random(), y: Math.random(), s: 14 + Math.random() * 18, ph: Math.random() * 6.28, c: i % 3 === 0 ? '167,139,250' : '70,227,255' }));
+  const jellies = Array.from({ length: innerWidth < 700 ? 4 : 7 }, (_, i) => ({ x: Math.random(), y: Math.random(), s: 14 + Math.random() * 18, ph: Math.random() * 6.28, c: i % 3 === 0 ? '167,139,250' : '70,227,255' }));
   /* ---------- seabed ---------- */
   let ridge = [], kelp = [], rocks = [];
   const buildBed = () => {
@@ -191,6 +191,7 @@
         let da = want - auv.ang; while (da > Math.PI) da -= 6.283; while (da < -Math.PI) da += 6.283;
         auv.ang += da * (reduced ? 1 : .06 * dt);
         g.clearRect(0, 0, hw, hh);
+        g.globalAlpha = hw < 700 ? .5 : 1;
         // headlight cone onto the torch spot
         const nx = auv.x + Math.cos(auv.ang) * 48, ny = auv.y + Math.sin(auv.ang) * 48;
         const L = Math.hypot(sx - nx, sy - ny), half = D.torch.r * .7;

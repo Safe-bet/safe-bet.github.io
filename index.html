@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Suyash Kumar — AI & Robotics Engineer</title>
-  <meta name="description" content="Suyash Kumar — AI and robotics engineer at IIT Kanpur. Vision Intern at Armatrix, ex-Honeywell Forge AI, former Team Head of AUV-IITK (ATAL AUV, SAUVC '25).">
+  <meta name="description" content="Suyash Kumar — AI and robotics engineer at IIT Kanpur. Incoming Data Scientist II at Honeywell Forge, Vision Intern at Armatrix, former Team Head of AUV-IITK (ATAL AUV, SAUVC '25).">
   <meta name="theme-color" content="#020812">
   <meta property="og:title" content="Suyash Kumar — AI & Robotics Engineer">
   <meta property="og:description" content="Robots that see in the dark: underwater autonomy, 3-D vision for robotic welding, and GPU-scale AI.">
@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles/site.css">
+  <link rel="stylesheet" href="styles/site.css?v=3">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -49,6 +49,7 @@
         <li><a href="#about">About</a></li>
         <li><a href="#now">Now</a></li>
         <li><a href="#work">Work</a></li>
+        <li><a href="#sim">Play</a></li>
         <li><a href="#journey">Journey</a></li>
         <li><a href="#elements">Elements</a></li>
         <li><a href="#oss">Open source</a></li>
@@ -101,15 +102,15 @@
       <canvas id="heroSub" aria-hidden="true"></canvas>
 
       <div class="hero-inner">
-        <p class="eyebrow"><span class="dot"></span> Vision Intern @ Armatrix · IIT Kanpur '27</p>
+        <p class="eyebrow"><span class="dot"></span> Incoming Data Scientist II @ Honeywell Forge · Vision Intern @ Armatrix</p>
         <h1 class="hero-title"><span class="ln"><span>I build robots that</span></span><span class="ln"><span class="beam-text">see in the dark.</span></span></h1>
-        <p class="slot" aria-label="Focus areas: underwater autonomy, 3-D vision for welding, GPU-scale inference, medical imaging">
+        <p class="slot" aria-label="Focus areas: underwater autonomy, 3-D vision for welding, agentic data pipelines, GPU-scale inference">
           <span class="slot-k">Now tuning</span>
-          <span class="slot-win"><span class="slot-reel" id="slotReel"><span>underwater autonomy</span><span>3-D vision for welding</span><span>GPU-scale inference</span><span>medical imaging AI</span><span>underwater autonomy</span></span></span>
+          <span class="slot-win"><span class="slot-reel" id="slotReel"><span>underwater autonomy</span><span>3-D vision for welding</span><span>agentic data pipelines</span><span>GPU-scale inference</span><span>underwater autonomy</span></span></span>
         </p>
         <p class="hero-lead">
           AI + robotics engineer. Underwater autonomy and stereo perception on AUV-IITK's <strong>ATAL</strong>,
-          3-D vision for robotic welding at <strong>Armatrix</strong>, and multi-GPU inference at <strong>Honeywell Forge</strong>.
+          3-D vision for robotic welding at <strong>Armatrix</strong>, and agentic data systems and multi-GPU inference at <strong>Honeywell Forge</strong>, where I'm joining as a Data Scientist II.
         </p>
         <div class="hero-cta">
           <a class="btn btn-primary" href="#work">See the work</a>
@@ -130,7 +131,7 @@
     <section class="manifesto" id="about" data-depth="80" data-zone="SUNLIGHT ZONE" aria-label="About">
       <div class="wrap">
         <p class="kicker">0080 m · About</p>
-        <p class="lit" id="lit">I'm a Chemical Engineering student at IIT Kanpur who fell for robots. I led a 30-person team that put <em>ATAL</em> in the water at SAUVC Singapore, scaled LLM inference across <em>NVIDIA Thor</em> GPUs at Honeywell, and now I'm teaching a welding arm to find its own seams at <em>Armatrix</em>. I like problems where the water is murky, the depth is noisy, and the answer still has to run in real time.</p>
+        <p class="lit" id="lit">I'm a Chemical Engineering student at IIT Kanpur who fell for robots. I led a 30-person team that put <em>ATAL</em> in the water at SAUVC Singapore, scaled LLM inference across <em>NVIDIA Thor</em> GPUs at Honeywell, built a self-healing agentic data pipeline there, and now I'm teaching a welding arm to find its own seams at <em>Armatrix</em> before joining <em>Honeywell Forge</em> as a Data Scientist II. I like problems where the water is murky, the depth is noisy, and the answer still has to run in real time.</p>
       </div>
     </section>
 
@@ -162,6 +163,13 @@
             <div class="tags"><span>RealSense D435</span><span>Point clouds</span><span>ICP</span><span>Hand-eye calibration</span><span>ChArUco</span><span>FastAPI</span><span>three.js</span><span>C++</span></div>
           </div>
         </article>
+
+        <a class="next-card reveal" href="#ingest">
+          <span class="next-k">Next ▸</span>
+          <span class="next-t">Data Scientist II, <b>Honeywell Forge</b></span>
+          <span class="next-m">Returning to the Forge AI team full-time — agentic data systems and AI at industrial scale.</span>
+          <span class="next-cta">See my Forge work ↓</span>
+        </a>
       </div>
     </section>
 
@@ -178,9 +186,10 @@
           <li><a href="#now" data-prev="seamCanvas"><span class="ix-n">01</span><span class="ix-t">SeamFinder</span><span class="ix-m">Armatrix · 3-D vision for welding</span><span class="ix-y">Now</span></a></li>
           <li><a href="#atal" data-prev="atalCanvas"><span class="ix-n">02</span><span class="ix-t">ATAL AUV</span><span class="ix-m">AUV-IITK · perception + 6-DoF control</span><span class="ix-y">2024–</span></a></li>
           <li><a href="#thor" data-prev="thorCanvas"><span class="ix-n">03</span><span class="ix-t">3× Thor inference</span><span class="ix-m">Honeywell Forge · Ray, Qwen-32B</span><span class="ix-y">2026</span></a></li>
-          <li><a href="#flow" data-img="assets/surge/surge_annotated_s2.jpg"><span class="ix-n">04</span><span class="ix-t">Particle flow</span><span class="ix-m">IIT Kanpur research · YOLOv11 + SAM2</span><span class="ix-y">2025–</span></a></li>
-          <li><a href="#xray" data-img="assets/xray/xray_cardiomegaly.jpg"><span class="ix-n">05</span><span class="ix-t">Chest X-ray AI</span><span class="ix-m">LENEK · Grad-CAM</span><span class="ix-y">2025</span></a></li>
-          <li><a href="#oss" data-img=""><span class="ix-n">06</span><span class="ix-t">Upstream PRs</span><span class="ix-m">NVIDIA CCCL · BlueOS · ArduPilot</span><span class="ix-y">5 merged</span></a></li>
+          <li><a href="#ingest" data-prev="ingestCanvas"><span class="ix-n">04</span><span class="ix-t">Agentic ingestion</span><span class="ix-m">Honeywell Forge · Phi-4 + Claude Opus</span><span class="ix-y">2026</span></a></li>
+          <li><a href="#flow" data-img="assets/surge/surge_annotated_s2.jpg"><span class="ix-n">05</span><span class="ix-t">Particle flow</span><span class="ix-m">IIT Kanpur research · YOLOv11 + SAM2</span><span class="ix-y">2025–</span></a></li>
+          <li><a href="#xray" data-img="assets/xray/xray_cardiomegaly.jpg"><span class="ix-n">06</span><span class="ix-t">Chest X-ray AI</span><span class="ix-m">LENEK · Grad-CAM</span><span class="ix-y">2025</span></a></li>
+          <li><a href="#oss" data-img=""><span class="ix-n">07</span><span class="ix-t">Upstream PRs</span><span class="ix-m">NVIDIA CCCL · BlueOS · ArduPilot</span><span class="ix-y">5 merged</span></a></li>
         </ol>
         <div class="ix-preview" id="ixPreview" aria-hidden="true"><img alt=""></div>
 
@@ -226,20 +235,45 @@
             <div class="viz-foot"><span class="muted">Click a GPU to kill or revive it</span><span class="readout" id="thorRps">0 req/s</span></div>
           </div>
           <div class="case-body">
-            <p class="org">Honeywell Forge AI · Bengaluru · May – Jul 2026</p>
+            <p class="org">Honeywell Forge AI · AI Intern · Bengaluru · May – Jul 2026</p>
             <h3>Parallel LLM inference on edge GPUs</h3>
             <ul class="points">
               <li><b>Cluster.</b> 3-node Ray cluster over three NVIDIA Thor GPUs serving Qwen-32B.</li>
               <li><b>Finding.</b> One model instance per GPU scaled near-linearly (~3×); tensor-parallel sharding lost to inter-GPU latency for a model that fits on one GPU.</li>
               <li><b>Router.</b> Custom Ray router tracking live GPU load, queue depth and memory headroom; killed a worker under load to prove zero-downtime failover and re-integration.</li>
-              <li><b>Also built</b> a self-healing data-ingestion agent: Kafka / Postgres / Elasticsearch → Delta Lake on Databricks, schema-drift handling, and Claude Opus supervising reruns with human-in-the-loop escalation.</li>
             </ul>
-            <div class="tags"><span>Ray</span><span>NVIDIA Thor</span><span>Qwen-32B</span><span>PyTorch</span><span>Databricks</span><span>Delta Lake</span></div>
+            <div class="tags"><span>Ray</span><span>NVIDIA Thor</span><span>Qwen-32B</span><span>PyTorch</span><span>Tensor parallelism</span><span>Failover</span></div>
+          </div>
+        </article>
+
+        <!-- AGENTIC INGESTION -->
+        <article class="case reveal" id="ingest">
+          <div class="viz">
+            <div class="viz-bar"><span>forge · agentic ingestion → delta lake</span><span class="chip" id="ingState">STREAMING</span></div>
+            <canvas id="ingestCanvas" aria-label="Animation: Kafka, Postgres and Elasticsearch feed an ingestion agent; schema drift is caught, profiled by Phi-4, approved by Claude Opus and written to Delta Lake; failed jobs self-heal"></canvas>
+            <pre class="ing-log" id="ingLog" aria-live="polite"></pre>
+            <div class="viz-foot">
+              <span class="ing-btns"><button class="btn btn-sm btn-ghost" id="ingDrift">Inject schema drift</button><button class="btn btn-sm btn-ghost" id="ingFail">Fail a job</button></span>
+              <span class="readout" id="ingRows">0 rows</span>
+            </div>
+          </div>
+          <div class="case-body">
+            <p class="org">Honeywell Forge AI · AI Intern · Bengaluru · May – Jul 2026</p>
+            <h3>Self-healing agentic data ingestion</h3>
+            <ul class="points">
+              <li><b>One framework, any source.</b> Config-driven OOP pipeline for Kafka, Postgres and Elasticsearch into Delta Lake, shipped as wheels through CI/CD to Databricks jobs.</li>
+              <li><b>Schema drift, handled.</b> Struct evolution and Spark's case collisions (<code>Col A</code> vs <code>col a</code> → <code>a2</code>) resolved by conflict-renaming, with every decision written to Delta audit tables.</li>
+              <li><b>Metadata that writes itself.</b> Column profiling (null rates, cardinality, distributions, samples) prompts Phi-4 to name canonical concepts and business domains into a master metadata table.</li>
+              <li><b>Safe merges.</b> Candidate columns clustered by sentence embeddings + cosine similarity; Phi-4 picks simple, struct-enlarge or type-cast unions with row-exclusivity checks.</li>
+              <li><b>Agents with a supervisor.</b> Claude Opus governs every transformation, escalates ambiguous cases to a human, diagnoses failures, auto-tunes timeouts and buffers, reruns jobs and files Jira / email alerts.</li>
+            </ul>
+            <p class="result">Downstream pipelines fully decoupled from source formats; drift reconciliation and recovery ran with zero manual intervention.</p>
+            <div class="tags"><span>Python</span><span>PySpark</span><span>Databricks</span><span>Delta Lake</span><span>Kafka</span><span>Phi-4</span><span>Claude Opus</span><span>Embeddings</span></div>
           </div>
         </article>
 
         <!-- PARTICLE FLOW -->
-        <article class="case reveal" id="flow">
+        <article class="case case-flip reveal" id="flow">
           <div class="viz">
             <div class="viz-bar"><span>yolov11 + sam2 · chute</span>
               <div class="seg" role="group" aria-label="Material" id="flowTabs">
@@ -268,7 +302,7 @@
         </article>
 
         <!-- LENEK -->
-        <article class="case case-flip reveal" id="xray">
+        <article class="case reveal" id="xray">
           <div class="viz">
             <div class="viz-bar"><span>chest x-ray · grad-cam</span>
               <div class="seg" role="group" aria-label="Finding" id="xrayTabs">
@@ -315,6 +349,43 @@
             <p>Flare-isolated XRF spectra, background estimation and 2-D spatial interpolation into a high-res lunar map. <b>2nd in XRF catalogue, 6th overall</b> of 23 IITs.</p>
             <a class="link" href="https://github.com/Safe-bet/ISRO-High-Prep-Inter-IIT-Tech-13.0" target="_blank" rel="noopener">Repository ↗</a>
           </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== GAME: PILOT ATAL ============================== -->
+    <section class="section" id="sim" data-depth="900" data-zone="TWILIGHT ZONE">
+      <div class="wrap">
+        <header class="sec-head reveal">
+          <p class="kicker">0900 m · Play</p>
+          <h2>Pilot ATAL through <span class="hl">SAUVC</span></h2>
+          <p class="sec-lead">The real competition tasks: pass the gate, knock down the flare, drop a marker in the bucket, touch the buoy, then surface over the pinger. It's dark down there, so ATAL's lamp is all you get. Race the autopilot, which flies a simplified version of the cascaded-PID + detection loop.</p>
+        </header>
+        <div class="game reveal" id="game">
+          <div class="viz-bar">
+            <span>sim · sauvc pool · 3 m</span>
+            <div class="seg" role="group" aria-label="Game mode">
+              <button class="on" data-gm="fly">Fly it yourself</button><button data-gm="auto">Watch autopilot</button>
+            </div>
+          </div>
+          <div class="game-stage">
+            <canvas id="simCanvas" tabindex="0" aria-label="AUV piloting game. Arrow keys or WASD to thrust, Space to drop a marker, R to restart."></canvas>
+            <div class="game-over" id="gameOver">
+              <p class="kicker" id="goKick">Mission brief</p>
+              <h3 id="goTitle">Five tasks. One lamp.</h3>
+              <p id="goText">Beat the autopilot's time. Every bump costs 2 s.</p>
+              <div class="game-btns">
+                <button class="btn btn-primary" id="goStart">Start dive</button>
+                <button class="btn btn-ghost" id="goWatch">Watch autopilot</button>
+              </div>
+              <p class="game-keys" id="goKeys"><span class="kbd">← → ↑ ↓</span> / <span class="kbd">WASD</span> thrust · <span class="kbd">Space</span> drop marker · <span class="kbd">R</span> restart</p>
+            </div>
+            <div class="stick" id="simStick" aria-hidden="true"><i></i></div>
+            <button class="drop-btn" id="simDrop" aria-label="Drop marker">DROP</button>
+          </div>
+          <ol class="tasks" id="simTasks">
+            <li data-t="gate">Gate</li><li data-t="flare">Flare</li><li data-t="bucket">Bucket</li><li data-t="buoy">Buoy</li><li data-t="surface">Surface</li>
+          </ol>
         </div>
       </div>
     </section>
@@ -422,7 +493,7 @@
       <div class="wrap">
         <p class="kicker reveal">4000 m · Seabed</p>
         <h2 class="contact-title reveal">You made it to the bottom.<br><span class="beam-text">Let's build something.</span></h2>
-        <p class="sec-lead reveal">Looking for robotics perception, autonomy and applied-ML roles for 2027.</p>
+        <p class="sec-lead reveal">Joining Honeywell Forge as a Data Scientist II. Always up for a conversation about robot perception, autonomy, agentic AI or anything that has to work underwater.</p>
         <div class="contact-row reveal">
           <a class="btn btn-primary" href="mailto:k.suyashc@gmail.com">k.suyashc@gmail.com</a>
           <a class="btn btn-ghost" href="https://www.linkedin.com/in/suyash-kumar-b062491bb/" target="_blank" rel="noopener">LinkedIn ↗</a>
@@ -435,11 +506,12 @@
     </section>
   </main>
 
-  <script src="js/data.js"></script>
-  <script src="js/ocean.js"></script>
-  <script src="js/life.js"></script>
-  <script src="js/projects.js"></script>
-  <script src="js/journey.js"></script>
-  <script src="js/main.js"></script>
+  <script src="js/data.js?v=3"></script>
+  <script src="js/ocean.js?v=3"></script>
+  <script src="js/life.js?v=3"></script>
+  <script src="js/projects.js?v=3"></script>
+  <script src="js/game.js?v=3"></script>
+  <script src="js/journey.js?v=3"></script>
+  <script src="js/main.js?v=3"></script>
 </body>
 </html>
