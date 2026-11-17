@@ -626,59 +626,126 @@
     });
   }
 
-  /* ---------------- music box (original tune, Web Audio) ---------------- */
+  /* ---------------- music: an original waltz, arranged live in Web Audio ----------------
+     Celesta melody, harp arpeggios, plucked bass, string pad, a wordless choir and
+     glockenspiel sparkles. The arrangement grows each time the 16-bar tune loops. */
   const sb = $('soundBtn');
-  let actx = null, master = null, timer = null, nextT = 0, idx = 0, playing = false;
-  // An original waltz in D minor, 3/4 at 100 bpm. [midi, beats]
   const MEL = [[74,1],[77,1],[81,1],[79,1.5],[77,.5],[76,1],[77,1],[74,1],[69,1],[70,2],[69,1],[67,1],[70,1],[74,1],[73,1.5],[76,.5],[79,1],[77,1],[76,1],[73,1],[74,3],
                [81,1],[79,.5],[77,.5],[76,1],[77,1],[74,2],[82,1],[81,.5],[79,.5],[77,1],[76,3],[74,1],[76,1],[77,1],[79,1],[81,1],[82,1],[81,1.5],[79,.5],[76,1],[74,3]];
-  const BASS = [50,46,50,43,43,45,45,50,50,50,43,45,50,43,45,50];
-  const CH = { 50: [62,65,69], 46: [62,65,70], 43: [62,67,70], 45: [61,64,67] };
+  // [bass root, chord tones] per bar: Dm Bb Dm Gm Gm A7 A7 Dm | Dm Dm Gm A Dm Gm A7 Dm
+  const CHORDS = [[50,[62,65,69]],[46,[58,62,65]],[50,[62,65,69]],[43,[55,58,62]],[43,[55,58,62]],[45,[57,61,64,67]],[45,[57,61,64,67]],[50,[62,65,69]],
+                  [50,[62,65,69]],[50,[62,65,69]],[43,[55,58,62]],[45,[57,61,64]],[50,[62,65,69]],[43,[55,58,62]],[45,[57,61,64,67]],[50,[62,65,69]]];
+  const MBAR = Array.from({ length: 16 }, () => []);
+  { let b = 0; for (const [m, len] of MEL) { const k = Math.floor(b / 3 + 1e-6); MBAR[k].push([m, b - k * 3, len]); b += len; } }
   const hz = m => 440 * Math.pow(2, (m - 69) / 12);
-  const BEAT = .6;
-  function bell(f, t, v, dur) {
-    const o = actx.createOscillator(), o2 = actx.createOscillator(), gn = actx.createGain(), g2 = actx.createGain();
-    o.type = 'sine'; o.frequency.value = f; o2.type = 'sine'; o2.frequency.value = f * 4.01;
-    gn.gain.setValueAtTime(0, t); gn.gain.linearRampToValueAtTime(v, t + .005); gn.gain.exponentialRampToValueAtTime(.0001, t + dur);
-    g2.gain.setValueAtTime(v * .25, t); g2.gain.exponentialRampToValueAtTime(.0001, t + .25);
-    o.connect(gn); o2.connect(g2); gn.connect(master); g2.connect(master);
-    o.start(t); o2.start(t); o.stop(t + dur + .05); o2.stop(t + .3);
-  }
-  // schedule by absolute beat so melody and bass stay locked
-  let beat0 = 0, melBeat = 0, bar = 0;
-  function schedule() {
-    const ahead = actx.currentTime + .25;
-    while (nextT < ahead) {
-      const [m, len] = MEL[idx];
-      bell(hz(m), nextT, .22, 1.6);
-      melBeat += len; nextT = beat0 + melBeat * BEAT; idx++;
-      if (idx >= MEL.length) { idx = 0; beat0 += melBeat * BEAT; melBeat = 0; nextT = beat0; }
+  const BEAT = .62, BAR = BEAT * 3;
+
+  function makeScore(ac, dest) {
+    // bus: voices → master → compressor → dest, with a reverb send and a dotted-eighth echo
+    const master = ac.createGain(); master.gain.value = 1;
+    const comp = ac.createDynamicsCompressor(); comp.threshold.value = -18; comp.ratio.value = 3; comp.attack.value = .01; comp.release.value = .3;
+    master.connect(comp); comp.connect(dest);
+    const verb = ac.createConvolver(), len = Math.floor(ac.sampleRate * 2.2), buf = ac.createBuffer(2, len, ac.sampleRate);
+    for (let c = 0; c < 2; c++) { const d = buf.getChannelData(c); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3) * (i < 400 ? i / 400 : 1); }
+    verb.buffer = buf; const vret = ac.createGain(); vret.gain.value = .55; verb.connect(vret); vret.connect(comp);
+    const dly = ac.createDelay(2); dly.delayTime.value = BEAT * .75; const fb = ac.createGain(); fb.gain.value = .32; const dlp = ac.createBiquadFilter(); dlp.type = 'lowpass'; dlp.frequency.value = 2600;
+    dly.connect(dlp); dlp.connect(fb); fb.connect(dly); const dret = ac.createGain(); dret.gain.value = .5; dlp.connect(dret); dret.connect(comp);
+    // a few shared pan buses (pan, reverb send, echo send) instead of a panner per note
+    const buses = new Map();
+    const out = (node, pan, wet, echo = 0) => {
+      const key = `${Math.round(pan * 10)}|${Math.round(wet * 10)}|${Math.round(echo * 10)}`;
+      let p = buses.get(key);
+      if (!p) {
+        p = ac.createStereoPanner(); p.pan.value = Math.round(pan * 10) / 10; p.connect(master);
+        const sv = ac.createGain(); sv.gain.value = wet; p.connect(sv); sv.connect(verb);
+        if (echo) { const e = ac.createGain(); e.gain.value = echo; p.connect(e); e.connect(dly); }
+        buses.set(key, p);
+      }
+      node.connect(p);
+    };
+    const env = (t, v, a, d) => { const g = ac.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + a); g.gain.exponentialRampToValueAtTime(.0001, t + a + d); return g; };
+    const osc = (type, f, t, stop, to, detune = 0) => { const o = ac.createOscillator(); o.type = type; o.frequency.value = f; o.detune.value = detune; o.connect(to); o.start(t); o.stop(stop); return o; };
+
+    function celesta(f, t, v, pan = .1, echo = .25) {
+      const g = env(t, v, .004, 2.4);
+      osc('sine', f, t, t + 2.5, g);
+      const h = ac.createGain(); h.gain.setValueAtTime(.28, t); h.gain.exponentialRampToValueAtTime(.001, t + .3); h.connect(g); osc('sine', f * 4.01, t, t + .35, h);
+      const h2 = ac.createGain(); h2.gain.setValueAtTime(.1, t); h2.gain.exponentialRampToValueAtTime(.001, t + .9); h2.connect(g); osc('sine', f * 2, t, t + 1, h2);
+      out(g, pan, .45, echo);
     }
-    while (barT < ahead) {
-      const b = BASS[bar % 16], c = CH[b];
-      bell(hz(b), barT, .16, 2); bell(hz(c[0]), barT + BEAT, .06, 1); bell(hz(c[1]), barT + BEAT * 2, .06, 1);
-      bar++; barT += BEAT * 3;
+    function harp(f, t, v, pan) {
+      const g = env(t, v, .003, 1.8), lp = ac.createBiquadFilter(); lp.type = 'lowpass';
+      lp.frequency.setValueAtTime(Math.min(9000, f * 9), t); lp.frequency.exponentialRampToValueAtTime(Math.max(300, f * 1.5), t + .6); lp.connect(g);
+      osc('triangle', f, t, t + 1.9, lp); const o2 = ac.createGain(); o2.gain.value = .35; o2.connect(lp); osc('sine', f * 2, t, t + 1.9, o2);
+      out(g, pan, .5);
     }
+    function pluck(f, t, v) {
+      const g = env(t, v, .006, 1.1), lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 600; lp.connect(g);
+      osc('triangle', f, t, t + 1.2, lp); osc('sine', f, t, t + 1.2, lp);
+      out(g, 0, .2);
+    }
+    function pad(notes, t, dur, v, kind) {
+      const g = ac.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + dur * .35); g.gain.setValueAtTime(v, t + dur * .75); g.gain.linearRampToValueAtTime(0, t + dur + .5);
+      const lfo = ac.createOscillator(); lfo.frequency.value = kind === 'choir' ? 5.2 : 4.6; const ld = ac.createGain(); ld.gain.value = kind === 'choir' ? 9 : 5; lfo.connect(ld); lfo.start(t); lfo.stop(t + dur + .6);
+      const mix = ac.createGain(); mix.gain.value = 1 / notes.length;
+      let tail = mix;
+      if (kind === 'choir') {   // formant filters turn a buzzy tone into a soft "aah"
+        const sum = ac.createGain(); sum.gain.value = 1;
+        [[700, 1], [1150, .55], [2600, .22]].forEach(([fq, a]) => { const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = fq; bp.Q.value = 7; const ga = ac.createGain(); ga.gain.value = a * 2.2; mix.connect(bp); bp.connect(ga); ga.connect(sum); });
+        tail = sum;
+      } else { const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 1500; lp.Q.value = .5; mix.connect(lp); tail = lp; }
+      tail.connect(g);
+      notes.forEach((m, i) => (kind === 'choir' ? [0] : [-7, 7]).forEach(dt => { const o = osc('sawtooth', hz(m), t, t + dur + .6, mix, dt + (i - 1) * 2); ld.connect(o.detune); }));
+      out(g, kind === 'choir' ? -.45 : .4, kind === 'choir' ? .9 : .6);
+    }
+
+    let barN = 0, loopN = 0, barT = 0;
+    function bar(i, t) {
+      const [root, ch] = CHORDS[i], late = i >= 8, L = loopN;
+      pluck(hz(root - 12), t, .5);
+      if (L > 0 || i > 1) pluck(hz(root - 5), t + BEAT * 2, .18);
+      // harp: six rising eighths across the chord
+      const arp = [root, root + 7, ch[0], ch[1], ch[2], ch[0] + 12];
+      if (L > 0 || i >= 2) arp.forEach((m, k) => harp(hz(m), t + k * BEAT / 2, .11 - k * .008, -.7 + k * .28));
+      // strings from the second phrase, every bar after the first loop
+      if (late || L > 0) pad(ch.slice(0, 3).map(m => m - 12).concat(ch[0]), t, BAR, .085, 'strings');
+      // the choir joins on the repeat
+      if (L > 0 && (late || L > 1)) pad(ch.slice(0, 3), t, BAR, .06, 'choir');
+      // melody on celesta; on later loops a harp doubles it an octave down
+      for (const [m, st, len] of MBAR[i]) {
+        celesta(hz(m), t + st * BEAT, .2);
+        if (L > 1) harp(hz(m - 12), t + st * BEAT, .07, -.5);
+      }
+      // glockenspiel sparkles closing each phrase, and a shimmer at the top of each loop
+      if (i === 7 || i === 15) ch.concat(ch[0] + 12).forEach((m, k) => celesta(hz(m + 24), t + BEAT * 2 + k * .09, .05, .5 - k * .25, .4));
+      if (i === 0) [62, 65, 69, 72, 74, 77, 81, 86].forEach((m, k) => celesta(hz(m + 12), t + k * .05, .025, -.6 + k * .17, 0));
+    }
+    return {
+      master,
+      start(t) { barT = t; barN = 0; loopN = 0; },
+      until(t) { while (barT < t) { bar(barN % 16, barT); barN++; if (barN % 16 === 0) loopN++; barT += BAR; } },
+      dispose() { [comp, vret, dret].forEach(n => { try { n.disconnect(); } catch {} }); }
+    };
   }
-  let barT = 0;
+
+  let actx = null, gainOut = null, score = null, timer = null, playing = false;
   function startMusic() {
     if (!actx) {
       actx = new (window.AudioContext || window.webkitAudioContext)();
-      master = actx.createGain(); master.gain.value = 0;
-      const verb = actx.createConvolver(), len = actx.sampleRate * 2.4, buf = actx.createBuffer(2, len, actx.sampleRate);
-      for (let ch = 0; ch < 2; ch++) { const d = buf.getChannelData(ch); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.6); }
-      verb.buffer = buf; const wet = actx.createGain(); wet.gain.value = .35;
-      master.connect(actx.destination); master.connect(verb); verb.connect(wet); wet.connect(actx.destination);
+      gainOut = actx.createGain(); gainOut.gain.value = 0; gainOut.connect(actx.destination);
     }
     actx.resume();
-    beat0 = nextT = barT = actx.currentTime + .1; idx = 0; melBeat = 0; bar = 0;
-    master.gain.cancelScheduledValues(actx.currentTime); master.gain.setTargetAtTime(.3, actx.currentTime, .4);
-    clearInterval(timer); timer = setInterval(schedule, 60); playing = true;
+    const old = score; if (old) setTimeout(() => old.dispose(), 4000);
+    score = makeScore(actx, gainOut);           // fresh bus each start; the old one is released once its tails fade
+    score.start(actx.currentTime + .15);
+    gainOut.gain.cancelScheduledValues(actx.currentTime); gainOut.gain.setValueAtTime(gainOut.gain.value, actx.currentTime); gainOut.gain.setTargetAtTime(.32, actx.currentTime, .5);
+    clearInterval(timer); timer = setInterval(() => score.until(actx.currentTime + .5), 80); playing = true;
   }
   function stopMusic() {
     playing = false; clearInterval(timer);
-    if (actx) { master.gain.setTargetAtTime(0, actx.currentTime, .15); setTimeout(() => { if (!playing) actx.suspend(); }, 700); }
+    if (actx) { gainOut.gain.setTargetAtTime(0, actx.currentTime, .2); setTimeout(() => { if (!playing) actx.suspend(); }, 900); }
   }
+  if (/[?&]simdebug/.test(location.search)) window.HPScore = { makeScore, BAR };
   function setSound(on) { sb && sb.setAttribute('aria-pressed', on); sb && sb.setAttribute('aria-label', on ? 'Mute music' : 'Play music'); ls.set('hp_music', on ? 1 : 0); on ? startMusic() : stopMusic(); }
   sb && sb.addEventListener('click', () => setSound(sb.getAttribute('aria-pressed') !== 'true'));
   onTheme(t => { if (t !== 'hogwarts' && playing) { stopMusic(); sb.setAttribute('aria-pressed', 'false'); } });
