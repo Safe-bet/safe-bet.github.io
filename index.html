@@ -12,11 +12,35 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%23020812'/><circle cx='32' cy='32' r='18' fill='none' stroke='%2346e3ff' stroke-width='4'/><circle cx='32' cy='32' r='6' fill='%23ffc061'/></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles/site.css?v=8">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&family=Cinzel:wght@500;600;700&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;1,400&family=IM+Fell+English:ital@0;1&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/site.css?v=17">
+  <link rel="stylesheet" href="styles/hogwarts.css?v=17">
+  <script>try{if(localStorage.getItem('theme')==='hogwarts')document.documentElement.dataset.theme='hogwarts'}catch(e){}</script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
+
+  <!-- Hogwarts theme: acceptance letter intro -->
+  <div id="letter" class="hp-only" aria-hidden="true" hidden>
+    <div class="env">
+      <div class="env-back"></div>
+      <div class="env-paper">
+        <p class="lt-crest">S · K</p>
+        <p class="lt-to">Dear Visitor,</p>
+        <p>You are invited to tour the workshop of <b>Suyash Kumar</b>, robotics engineer of House <b class="gry">Gryffindor</b>.</p>
+        <p>Inside: robots that see in the dark, agents that mend their own pipelines, and a Quidditch pitch. Bring curiosity. Wands optional.</p>
+        <p class="lt-sign">Yours sincerely,<br><i>The Keeper of the Portfolio</i></p>
+      </div>
+      <div class="env-front"></div>
+      <div class="env-flap"></div>
+      <button type="button" class="env-seal" id="letterSeal" aria-label="Open the letter"><span>S</span></button>
+    </div>
+    <p class="letter-hint">Tap the seal</p>
+    <button type="button" class="intro-skip" id="letterSkip">Skip</button>
+  </div>
+  <div id="mapFold" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><b>Unfolding the map…</b></div>
+  <canvas id="magic" class="hp-only" aria-hidden="true"></canvas>
+  <aside class="stairs hp-only" id="stairs" aria-hidden="true"></aside>
 
   <!-- Pre-dive boot: sonar + systems check, then strips drain away -->
   <div id="intro" aria-hidden="true">
@@ -57,13 +81,23 @@
         <li><a href="#about">About</a></li>
         <li><a href="#now">Now</a></li>
         <li><a href="#work">Work</a></li>
-        <li><a href="#sim">Play</a></li>
-        <li><a href="#journey">Journey</a></li>
-        <li><a href="#elements">Elements</a></li>
+        <li><a href="#sim" data-hp="Quidditch">Play</a></li>
+        <li><a href="#journey" data-hp="Map">Journey</a></li>
+        <li><a href="#elements" data-hp="Wands">Elements</a></li>
         <li><a href="#oss">Open source</a></li>
-        <li><a href="#contact">Contact</a></li>
+        <li><a href="#contact" data-hp="Owl post">Contact</a></li>
       </ul>
     </nav>
+    <div class="nav-magic">
+      <span class="house-pts hp-only" id="housePts" title="Gryffindor house points"><i></i><b>0</b></span>
+      <button type="button" class="sound-btn hp-only" id="soundBtn" aria-pressed="false" aria-label="Play music"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 9v6h4l5 4V5L8 9z"/><path class="wave" d="M16 9.5a3.5 3.5 0 0 1 0 5M18.5 7a7 7 0 0 1 0 10"/><path class="mute" d="M16 9l5 6M21 9l-5 6"/></svg></button>
+      <button type="button" class="hat-btn" id="themeBtn" aria-label="Switch to the Gryffindor theme">
+        <svg class="hat-ico" viewBox="0 0 48 40" aria-hidden="true"><path d="M6 34c6-2 30-2 36 0-2 3-34 3-36 0z" fill="#5a3b22"/><path d="M12 33c3-7 5-12 9-20 2-4 4-9 9-11-1 4 0 6 1 9 2 7 4 15 6 22-8 2-17 2-25 0z" fill="#7a5233"/><path d="M15 26c6 1.5 13 1.5 19 0" stroke="#3a2412" stroke-width="2" fill="none"/><path d="M19 19q3 2 6 0M26 21q2-2 4 0" stroke="#2a180a" stroke-width="1.5" fill="none"/></svg>
+        <svg class="sub-ico" viewBox="0 0 48 40" aria-hidden="true"><rect x="6" y="16" width="34" height="12" rx="6" fill="#b9c7d4"/><rect x="18" y="16" width="4" height="12" fill="#e8772e"/><circle cx="40" cy="22" r="3" fill="#ffc061"/><rect x="4" y="13" width="5" height="4" fill="#2a3646"/><rect x="4" y="27" width="5" height="4" fill="#2a3646"/></svg>
+        <span class="hat-lbl"><span class="sea-only">Hogwarts</span><span class="hp-only">Dive</span></span>
+      </button>
+      <span class="hat-say" id="hatSay" aria-live="polite"></span>
+    </div>
     <a class="btn btn-sm btn-ghost nav-cv" href="assets/Suyash_Kumar_Resume.pdf" target="_blank" rel="noopener">Résumé ↗</a>
     <button class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false"><span></span><span></span></button>
   </header>
@@ -110,10 +144,10 @@
       <canvas id="heroSub" aria-hidden="true"></canvas>
 
       <div class="hero-inner">
-        <p class="eyebrow"><span class="dot"></span> Incoming Data Scientist II @ Honeywell Forge · Vision Intern @ Armatrix</p>
-        <h1 class="hero-title"><span class="ln"><span>I build robots that</span></span><span class="ln"><span class="beam-text">see in the dark.</span></span></h1>
+        <p class="eyebrow"><span class="dot"></span> <span data-hp="House Gryffindor · Incoming Data Scientist II @ Honeywell Forge · Vision Intern @ Armatrix">Incoming Data Scientist II @ Honeywell Forge · Vision Intern @ Armatrix</span></p>
+        <h1 class="hero-title"><span class="ln"><span>I build robots that</span></span><span class="ln"><span class="beam-text" data-hp="work like magic.">see in the dark.</span></span></h1>
         <p class="slot" aria-label="Focus areas: underwater autonomy, 3-D vision for welding, agentic data pipelines, GPU-scale inference">
-          <span class="slot-k">Now tuning</span>
+          <span class="slot-k" data-hp="Now brewing">Now tuning</span>
           <span class="slot-win"><span class="slot-reel" id="slotReel"><span>underwater autonomy</span><span>3-D vision for welding</span><span>agentic data pipelines</span><span>GPU-scale inference</span><span>underwater autonomy</span></span></span>
         </p>
         <p class="hero-lead">
@@ -122,7 +156,7 @@
         </p>
         <div class="hero-cta">
           <a class="btn btn-primary" href="#work">See the work</a>
-          <a class="btn btn-ghost" href="#journey"><code>git log</code> my journey</a>
+          <a class="btn btn-ghost" href="#journey" data-hp="Follow the map"><code>git log</code> my journey</a>
         </div>
         <p class="torch-hint" id="torchHint">ATAL follows your cursor — steer its lamp. Click anywhere to ping sonar.</p>
       </div>
@@ -138,7 +172,8 @@
     <!-- ============================== MANIFESTO (scroll-lit) ============================== -->
     <section class="manifesto" id="about" data-depth="80" data-zone="SUNLIGHT ZONE" aria-label="About">
       <div class="wrap">
-        <p class="kicker">0080 m · About</p>
+        <p data-hp="Floor 1 · Entrance hall · About" class="kicker">0080 m · About</p>
+        <figure class="portrait hp-only" data-who="headmaster"><canvas></canvas><figcaption>The Headmaster</figcaption></figure>
         <p class="lit" id="lit">I'm a Chemical Engineering student at IIT Kanpur who fell for robots. I led a 30-person team that put <em>ATAL</em> in the water at SAUVC Singapore, scaled LLM inference across <em>NVIDIA Thor</em> GPUs at Honeywell, built a self-healing agentic data pipeline there, and now I'm teaching a welding arm to find its own seams at <em>Armatrix</em> before joining <em>Honeywell Forge</em> as a Data Scientist II. I like problems where the water is murky, the depth is noisy, and the answer still has to run in real time.</p>
       </div>
     </section>
@@ -147,7 +182,7 @@
     <section class="section" id="now" data-depth="150" data-zone="SUNLIGHT ZONE">
       <div class="wrap">
         <header class="sec-head reveal">
-          <p class="kicker">0150 m · Now</p>
+          <p data-hp="Floor 2 · The workshop · Now" class="kicker">0150 m · Now</p>
           <h2>Vision Intern, <span class="hl">Armatrix</span></h2>
           <p class="sec-lead">I'm building <strong>SeamFinder</strong>: mark a weld seam on the CAD model, point a depth camera at the real part, and the welding arm gets exact torch poses — even when the part isn't quite where the drawing says it is.</p>
         </header>
@@ -185,11 +220,12 @@
     <section class="section" id="work" data-depth="450" data-zone="TWILIGHT ZONE">
       <div class="wrap">
         <header class="sec-head reveal">
-          <p class="kicker">0450 m · Selected work</p>
+          <p data-hp="Floor 3 · The library · Selected work" class="kicker">0450 m · Selected work</p>
           <h2>Robots, vision and the GPUs behind them</h2>
-          <p class="sec-lead">Each project runs a small live visual of what the system actually does. Most of them respond to clicks.</p>
+          <p class="sec-lead" data-hp="Each project runs as a moving picture, like the photos in a wizarding newspaper. Most of them respond to clicks.">Each project runs a small live visual of what the system actually does. Most of them respond to clicks.</p>
         </header>
 
+        <figure class="portrait hp-only portrait-l" data-who="witch"><canvas></canvas><figcaption>The Potions Mistress</figcaption></figure>
         <ol class="index reveal" id="workIndex">
           <li><a href="#now" data-prev="seamCanvas"><span class="ix-n">01</span><span class="ix-t">SeamFinder</span><span class="ix-m">Armatrix · 3-D vision for welding</span><span class="ix-y">Now</span></a></li>
           <li><a href="#atal" data-prev="atalCanvas"><span class="ix-n">02</span><span class="ix-t">ATAL AUV</span><span class="ix-m">AUV-IITK · perception + 6-DoF control</span><span class="ix-y">2024–</span></a></li>
@@ -365,11 +401,11 @@
     <section class="section" id="sim" data-depth="850" data-zone="TWILIGHT ZONE">
       <div class="wrap">
         <header class="sec-head reveal">
-          <p class="kicker">0850 m · Play</p>
-          <h2>Pilot ATAL through <span class="hl">SAUVC</span></h2>
-          <p class="sec-lead">The real competition tasks: pass the gate, ram the flare down, drop a marker in the bucket, touch the buoy, then surface over the pinger. It's dark, the current is gusty, jellyfish drift through the pool, and full thrust drains the battery. Race the autopilot, which flies a simplified version of the cascaded-PID + detection loop and steers around the jellyfish on its own.</p>
+          <p data-hp="Floor 4 · Quidditch pitch · Play" class="kicker">0850 m · Play</p>
+          <h2 data-hp="Catch the &lt;span class=&quot;hl&quot;&gt;Golden Snitch&lt;/span&gt;">Pilot ATAL through <span class="hl">SAUVC</span></h2>
+          <p class="sec-lead" data-hp="Fly your broom through the five hoops in order, dodge two Bludgers that hunt you down, then chase the Golden Snitch until you catch it. Boost is limited and every hit costs 3 s. Your best times go on the house leaderboard.">The real competition tasks: pass the gate, ram the flare down, drop a marker in the bucket, touch the buoy, then surface over the pinger. It's dark, the current is gusty, jellyfish drift through the pool, and full thrust drains the battery. Race the autopilot, which flies a simplified version of the cascaded-PID + detection loop and steers around the jellyfish on its own.</p>
         </header>
-        <div class="game reveal" id="game">
+        <div class="game reveal sea-only" id="game">
           <div class="viz-bar">
             <span>sim · sauvc pool · 3 m</span>
             <div class="seg" role="group" aria-label="Game mode">
@@ -401,6 +437,28 @@
             <ol class="board-list" id="boardList"></ol>
           </div>
         </div>
+        <div class="game qgame hp-only reveal" id="qgame">
+          <div class="viz-bar"><span>quidditch pitch · seeker trials</span><span class="chip" id="qState">ON THE GROUND</span></div>
+          <div class="game-stage">
+            <canvas id="qCanvas" tabindex="0" aria-label="Quidditch game. Arrow keys or WASD to fly, Space or Shift to boost, R to restart."></canvas>
+            <div class="game-over" id="qOver">
+              <p class="kicker" id="qKick">Seeker trials</p>
+              <h3 id="qTitle">Five hoops. One Snitch.</h3>
+              <p id="qText">Fly through the hoops in order, dodge the Bludgers, then catch the Golden Snitch. Boost is limited and every hit costs 3 s.</p>
+              <p class="go-rank" id="qRank"></p>
+              <form class="go-save" id="qSave" hidden><input id="qName" maxlength="14" placeholder="Seeker name" autocomplete="off" aria-label="Name for the leaderboard"><button class="btn btn-primary" type="submit">Save</button></form>
+              <div class="game-btns"><button class="btn btn-primary" id="qStart">Mount broom</button></div>
+              <p class="game-keys"><span class="kbd">← → ↑ ↓</span> / <span class="kbd">WASD</span> fly · <span class="kbd">Space</span> boost · <span class="kbd">R</span> restart</p>
+            </div>
+            <div class="stick" id="qStick" aria-hidden="true"><i></i></div>
+            <button class="drop-btn" id="qBoost" aria-label="Boost">BOOST</button>
+          </div>
+          <ol class="tasks" id="qTasks"><li data-t="0">Hoop</li><li data-t="1">Hoop</li><li data-t="2">Hoop</li><li data-t="3">Hoop</li><li data-t="4">Hoop</li><li data-t="snitch">Snitch</li></ol>
+          <div class="board">
+            <div class="board-head"><span>House leaderboard</span><small>top 10 · saved in this browser</small></div>
+            <ol class="board-list" id="qBoardList"></ol>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -408,10 +466,11 @@
     <section class="section" id="journey" data-depth="1600" data-zone="MIDNIGHT ZONE">
       <div class="wrap">
         <header class="sec-head reveal">
-          <p class="kicker">1,600 m · Journey</p>
-          <h2><code>git log --graph</code> of how I got here</h2>
-          <p class="sec-lead">Four branches — robotics, industry AI, research and open source — merging into one career. Click any commit to see its diff.</p>
+          <p data-hp="Floor 5 · The map room · Journey" class="kicker">1,600 m · Journey</p>
+          <h2 data-hp="The map of how I got here"><code>git log --graph</code> of how I got here</h2>
+          <p class="sec-lead" data-hp="Footprints walk my path through robotics, industry AI, research and open source. Click any milestone to read the entry.">Four branches — robotics, industry AI, research and open source — merging into one career. Click any commit to see its diff.</p>
         </header>
+        <figure class="portrait hp-only" data-who="ghost"><canvas></canvas><figcaption>The Grey Knight</figcaption></figure>
         <div class="term reveal">
           <div class="term-bar"><i></i><i></i><i></i><span>suyash@iitk: ~/career</span></div>
           <div class="term-cmd">$ git log --graph --decorate --all<span class="caret"></span></div>
@@ -425,9 +484,9 @@
     <section class="section" id="elements" data-depth="4300" data-zone="ABYSSAL ZONE">
       <div class="wrap">
         <header class="sec-head reveal">
-          <p class="kicker">4,300 m · Elements</p>
-          <h2>The periodic table of what I work with</h2>
-          <p class="sec-lead">A chemical engineer's skills page. Each element is a tool I use; its group says where it lives in the stack. Pick one to see which projects it shows up in.</p>
+          <p data-hp="Floor 6 · The wand shop · Skills" class="kicker">4,300 m · Elements</p>
+          <h2 data-hp="The wand shop of what I work with">The periodic table of what I work with</h2>
+          <p class="sec-lead" data-hp="Every box holds a tool I use, and its shelf says where it lives in the stack. Pull one out to see which projects it shows up in.">A chemical engineer's skills page. Each element is a tool I use; its group says where it lives in the stack. Pick one to see which projects it shows up in.</p>
         </header>
         <div class="plegend reveal" id="plegend" role="group" aria-label="Highlight a group"></div>
         <div class="ptable-wrap reveal">
@@ -441,9 +500,9 @@
     <section class="section" id="oss" data-depth="6500" data-zone="HADAL ZONE">
       <div class="wrap">
         <header class="sec-head reveal">
-          <p class="kicker">6,500 m · Open source</p>
+          <p data-hp="Floor 7 · Restricted section · Open source" class="kicker">6,500 m · Open source</p>
           <h2>Merged upstream</h2>
-          <p class="sec-lead">Real diffs from the robotics and GPU stacks I build on.</p>
+          <p class="sec-lead" data-hp="Real diffs from the robotics and GPU stacks I build on, filed in the restricted section.">Real diffs from the robotics and GPU stacks I build on.</p>
         </header>
         <div class="oss-grid">
           <article class="oss reveal">
@@ -479,7 +538,7 @@
     <section class="section" id="lead" data-depth="8800" data-zone="HADAL ZONE">
       <div class="wrap lead-grid">
         <div class="lead-card reveal">
-          <p class="kicker">Leadership</p>
+          <p class="kicker" data-hp="Floor 8 · Trophy room · Leadership">Leadership</p>
           <h3>Team Head, AUV-IITK</h3>
           <p class="org">Science &amp; Technology Council · Apr 2025 – Apr 2026</p>
           <p>Led 30+ undergraduate engineers across 6 divisions to research, build and deploy autonomous underwater vehicles.</p>
@@ -505,9 +564,20 @@
     <!-- ============================== CONTACT / SEABED ============================== -->
     <section class="section contact" id="contact" data-depth="10935" data-zone="CHALLENGER DEEP">
       <div class="wrap">
-        <p class="kicker reveal">10,935 m · Challenger Deep · 1,086 atm</p>
-        <h2 class="contact-title reveal">You made it to the deepest point on Earth.<br><span class="beam-text">Let's build something.</span></h2>
-        <p class="sec-lead reveal">Joining Honeywell Forge as a Data Scientist II. Always up for a conversation about robot perception, autonomy, agentic AI or anything that has to work underwater.</p>
+        <p data-hp="Floor 9 · The owlery · Contact" class="kicker reveal">10,935 m · Challenger Deep · 1,086 atm</p>
+        <h2 class="contact-title reveal" data-hp="You found the owlery.&lt;br&gt;&lt;span class=&quot;beam-text&quot;&gt;Send me an owl.&lt;/span&gt;">You made it to the deepest point on Earth.<br><span class="beam-text">Let's build something.</span></h2>
+        <p class="sec-lead reveal" data-hp="Joining Honeywell Forge as a Data Scientist II. Write a note and an owl will carry it to my inbox, or use the links below.">Joining Honeywell Forge as a Data Scientist II. Always up for a conversation about robot perception, autonomy, agentic AI or anything that has to work underwater.</p>
+        <form class="owlpost hp-only reveal" id="owlPost">
+          <div class="op-paper">
+            <p class="op-to">To: Suyash Kumar, the owlery</p>
+            <label>Your name<input id="opName" maxlength="60" autocomplete="name" placeholder="Your name"></label>
+            <label>Your message<textarea id="opMsg" rows="4" maxlength="1500" placeholder="I'd love to talk about robot perception…"></textarea></label>
+            <p class="op-err" id="opErr" aria-live="polite"></p>
+            <button class="btn btn-primary" type="submit">Send owl</button>
+            <p class="op-note">Opens your email app with the note ready to send.</p>
+          </div>
+          <div class="op-owl" id="opOwl" aria-hidden="true"></div>
+        </form>
         <div class="contact-row reveal">
           <a class="btn btn-primary" href="mailto:k.suyashc@gmail.com">k.suyashc@gmail.com</a>
           <a class="btn btn-ghost" href="https://www.linkedin.com/in/suyash-kumar-b062491bb/" target="_blank" rel="noopener">LinkedIn ↗</a>
@@ -516,16 +586,18 @@
           <a class="btn btn-ghost" href="assets/Suyash_Kumar_Resume.pdf" target="_blank" rel="noopener">Résumé (PDF) ↗</a>
         </div>
       </div>
-      <footer class="foot">© 2026 Suyash Kumar · Hand-built, no framework · ATAL 3-D model by Team AUV-IITK</footer>
+      <footer class="foot"><span class="sea-only">© 2026 Suyash Kumar · Hand-built, no framework · ATAL 3-D model by Team AUV-IITK</span><span class="hp-only">© 2026 Suyash Kumar · Hand-built, no framework · An unofficial fan theme with original art and music, not affiliated with Warner Bros. or the Wizarding World</span></footer>
     </section>
   </main>
 
-  <script src="js/data.js?v=8"></script>
-  <script src="js/ocean.js?v=8"></script>
-  <script src="js/life.js?v=8"></script>
-  <script src="js/projects.js?v=8"></script>
-  <script src="js/game.js?v=8"></script>
-  <script src="js/journey.js?v=8"></script>
-  <script src="js/main.js?v=8"></script>
+  <script src="js/data.js?v=17"></script>
+  <script src="js/ocean.js?v=17"></script>
+  <script src="js/life.js?v=17"></script>
+  <script src="js/projects.js?v=17"></script>
+  <script src="js/game.js?v=17"></script>
+  <script src="js/journey.js?v=17"></script>
+  <script src="js/main.js?v=17"></script>
+  <script src="js/hogwarts.js?v=17"></script>
+  <script src="js/quidditch.js?v=17"></script>
 </body>
 </html>

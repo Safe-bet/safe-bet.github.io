@@ -84,6 +84,7 @@
   function frame(now) {
     const dt = Math.min(50, now - last) / 16.67; last = now; t += dt;
     const dy = Math.max(-40, Math.min(40, scrollY - lastScroll)); lastScroll = scrollY;
+    if (document.documentElement.dataset.theme === 'hogwarts') { requestAnimationFrame(frame); return; }
     const d = D.depth;
     ctx.clearRect(0, 0, W, H);
 
@@ -334,7 +335,7 @@
     new IntersectionObserver(es => { visible = es[0].isIntersecting; }).observe(hero);
     const step = (now) => {
       const dt = Math.min(50, now - lt) / 16.67; lt = now; tt += dt;
-      if (visible && D.torch.on) {
+      if (visible && D.torch.on && !(document.documentElement.dataset.theme === 'hogwarts')) {
         const r = hero.getBoundingClientRect();
         const sx = D.torch.x - r.left, sy = D.torch.y - r.top;
         const dist = hw < 700 ? 150 : 270;

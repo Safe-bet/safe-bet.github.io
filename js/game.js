@@ -494,7 +494,7 @@
   new IntersectionObserver(es => { running = es[0].isIntersecting; last = performance.now(); }, { rootMargin: '200px' }).observe(cv);
   function frame(now) {
     requestAnimationFrame(frame);
-    if (!running) return;
+    if (!running || document.documentElement.dataset.theme === 'hogwarts') return;
     const dts = Math.max(0, Math.min(.05, (now - last) / 1000)); last = now; const dt = dts * 60;
     S.t += dts; S.msgT -= dts; S.bumpCd -= dts; S.stingCd -= dts; shake *= .85;
     const actor = S.actor;

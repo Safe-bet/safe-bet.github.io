@@ -1,0 +1,339 @@
+/* =====================================================================
+   Second theme: Gryffindor on parchment.
+   Active when <html data-theme="hogwarts">. Original art only; an
+   unofficial fan theme.
+   ===================================================================== */
+
+/* theme-only visibility */
+html:not([data-theme="hogwarts"]) .hp-only { display: none !important; }
+html[data-theme="hogwarts"] .sea-only { display: none !important; }
+
+/* ---------- shared bits used by both themes ---------- */
+.nav-magic { display: flex; align-items: center; gap: .45rem; margin-left: .6rem; position: relative; }
+.hat-btn { display: inline-flex; align-items: center; gap: .35rem; height: 34px; padding: 0 .7rem 0 .35rem; border-radius: 999px; border: 1px solid var(--line-2); background: transparent; cursor: pointer; color: var(--ink); font: 500 .78rem var(--f-body); transition: border-color .2s, transform .2s; }
+.hat-btn:hover { border-color: var(--torch); }
+.hat-btn svg { width: 30px; height: 25px; }
+.hat-btn .sub-ico { display: none; }
+html[data-theme="hogwarts"] .hat-btn .hat-ico { display: none; }
+html[data-theme="hogwarts"] .hat-btn .sub-ico { display: block; }
+.hat-btn.talk .hat-ico { animation: hat-talk .32s ease-in-out 5; transform-origin: 50% 90%; }
+@keyframes hat-talk { 50% { transform: scaleY(1.12) rotate(-4deg); } }
+.hat-say { position: absolute; top: calc(100% + 12px); right: 0; white-space: nowrap; font: italic 500 1rem 'IM Fell English', Georgia, serif; color: #2b1a0e; background: #f6ead0; border: 1px solid #b08a5a; border-radius: 12px; padding: .5rem .85rem; box-shadow: 0 10px 30px rgba(0,0,0,.35); opacity: 0; transform: translateY(-6px); pointer-events: none; transition: opacity .25s, transform .25s; z-index: 80; }
+.hat-say.on { opacity: 1; transform: none; }
+.hat-say b { color: #7f0909; font: 700 1.05rem 'Cinzel', serif; letter-spacing: .04em; }
+.hat-say::before { content: ''; position: absolute; top: -7px; right: 44px; width: 12px; height: 12px; background: inherit; border-left: 1px solid #b08a5a; border-top: 1px solid #b08a5a; transform: rotate(45deg); }
+
+/* map-unfold transition: parchment panels fold open over the page, then away */
+#mapFold { position: fixed; inset: 0; z-index: 400; display: grid; grid-template-columns: repeat(5, 1fr); pointer-events: none; perspective: 1400px; visibility: hidden; }
+#mapFold i { display: block; background: #eedfba; transform-origin: left center; transform: rotateY(-92deg); box-shadow: inset -18px 0 30px rgba(90,55,20,.25);
+  background-image: radial-gradient(circle at 30% 20%, rgba(150,100,40,.18), transparent 40%), radial-gradient(circle at 70% 80%, rgba(150,100,40,.15), transparent 45%),
+  repeating-linear-gradient(0deg, transparent 0 46px, rgba(110,70,30,.12) 46px 47px); }
+#mapFold i:nth-child(even) { transform-origin: right center; transform: rotateY(92deg); box-shadow: inset 18px 0 30px rgba(90,55,20,.25); }
+#mapFold b { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font: italic 400 clamp(1.3rem, 3vw, 2rem) 'IM Fell English', serif; color: #4a2c12; opacity: 0; transition: opacity .25s; }
+#mapFold.open { visibility: visible; }
+#mapFold.open i { transform: none; transition: transform .5s cubic-bezier(.3,.7,.2,1); }
+#mapFold.open i:nth-child(2) { transition-delay: .07s; } #mapFold.open i:nth-child(3) { transition-delay: .14s; } #mapFold.open i:nth-child(4) { transition-delay: .21s; } #mapFold.open i:nth-child(5) { transition-delay: .28s; }
+#mapFold.open b { opacity: 1; transition-delay: .4s; }
+#mapFold.closing { visibility: visible; }
+#mapFold.closing i { transition: transform .45s cubic-bezier(.6,0,.8,.4); }
+#mapFold.closing i:nth-child(4) { transition-delay: .06s; } #mapFold.closing i:nth-child(3) { transition-delay: .12s; } #mapFold.closing i:nth-child(2) { transition-delay: .18s; } #mapFold.closing i:nth-child(1) { transition-delay: .24s; }
+
+/* ===================================================================== */
+html[data-theme="hogwarts"] {
+  --abyss: #efe2c1;
+  --deep: #e6d4a8;
+  --panel: rgba(250, 243, 224, .86);
+  --panel-solid: #f6ead0;
+  --line: rgba(92, 52, 20, .16);
+  --line-2: rgba(92, 52, 20, .32);
+  --ink: #2b1a0e;
+  --ink-2: #4f3826;
+  --ink-3: #85674c;
+  --bio: #7f0909;
+  --bio-soft: rgba(127, 9, 9, .08);
+  --torch: #a67c00;
+  --torch-soft: rgba(211, 166, 37, .16);
+  --gold: #d3a625;
+  --scarlet: #7f0909;
+  --ok: #2f6b2a;
+  --warn: #9a6a00;
+  --bad: #9b1c1c;
+  --violet: #5b3a8a;
+  --f-display: 'Cinzel', Georgia, serif;
+  --f-body: 'Crimson Pro', Georgia, serif;
+  --f-mono: 'IM Fell English', Georgia, serif;
+  --f-code: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  color-scheme: light;
+}
+html[data-theme="hogwarts"] body {
+  font-size: 18px; color: var(--ink);
+  background-color: #ecdcb6;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .22 0 0 0 0 .08 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse at 15% 10%, rgba(255,250,235,.7), transparent 45%),
+    radial-gradient(ellipse at 85% 60%, rgba(160,110,50,.16), transparent 50%),
+    radial-gradient(ellipse at 40% 95%, rgba(140,90,40,.18), transparent 50%),
+    radial-gradient(ellipse at center, transparent 55%, rgba(110,70,30,.28) 100%);
+  background-attachment: fixed;
+}
+html[data-theme="hogwarts"] h1, html[data-theme="hogwarts"] h2, html[data-theme="hogwarts"] h3, html[data-theme="hogwarts"] h4 { letter-spacing: .01em; }
+html[data-theme="hogwarts"] code, html[data-theme="hogwarts"] pre, html[data-theme="hogwarts"] .diff, html[data-theme="hogwarts"] .ing-log, html[data-theme="hogwarts"] .c-diff-inner { font-family: var(--f-code); }
+html[data-theme="hogwarts"] code { color: #7f0909; }
+html[data-theme="hogwarts"] :focus-visible { outline-color: var(--gold); }
+html[data-theme="hogwarts"] ::selection { background: rgba(211,166,37,.4); }
+html[data-theme="hogwarts"] #ocean, html[data-theme="hogwarts"] #life, html[data-theme="hogwarts"] #heroSub,
+html[data-theme="hogwarts"] .gauge, html[data-theme="hogwarts"] .dive-stats, html[data-theme="hogwarts"] .vignette, html[data-theme="hogwarts"] #intro { display: none !important; }
+
+#magic { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; }
+
+/* buttons, chips */
+html[data-theme="hogwarts"] .btn { font-family: 'Cinzel', serif; font-weight: 600; letter-spacing: .03em; }
+html[data-theme="hogwarts"] .btn-primary { background: var(--scarlet); color: #fbecc8; border: 1px solid #5c0505; box-shadow: inset 0 0 0 2px rgba(211,166,37,.55); }
+html[data-theme="hogwarts"] .btn-primary:hover { box-shadow: inset 0 0 0 2px var(--gold), 0 8px 24px rgba(127,9,9,.3); }
+html[data-theme="hogwarts"] .btn-ghost { background: rgba(255,250,235,.5); border-color: rgba(92,52,20,.4); color: var(--ink); }
+html[data-theme="hogwarts"] .btn-ghost:hover { border-color: var(--scarlet); background: rgba(127,9,9,.06); }
+html[data-theme="hogwarts"] .chip { border-color: rgba(92,52,20,.35); color: var(--scarlet); background: rgba(255,250,235,.6); }
+html[data-theme="hogwarts"] .tags span { border-color: rgba(92,52,20,.3); background: rgba(255,250,235,.55); color: var(--ink-2); font-family: 'IM Fell English', serif; font-size: .82rem; }
+html[data-theme="hogwarts"] .kbd { background: rgba(255,250,235,.7); }
+
+/* nav */
+html[data-theme="hogwarts"] .nav { background: rgba(246, 234, 208, .72); border-color: rgba(92,52,20,.25); box-shadow: 0 6px 24px rgba(80,50,20,.12); }
+html[data-theme="hogwarts"] .nav.scrolled { background: rgba(246, 234, 208, .94); }
+html[data-theme="hogwarts"] .brand { font-family: 'Cinzel', serif; font-weight: 700; }
+html[data-theme="hogwarts"] .brand-mark { border-color: var(--gold); background: var(--scarlet); }
+html[data-theme="hogwarts"] .brand-mark::after { background: var(--gold); box-shadow: none; inset: 5px; }
+html[data-theme="hogwarts"] .nav-links a { font-size: .98rem; }
+html[data-theme="hogwarts"] .nav-links a:hover, html[data-theme="hogwarts"] .nav-links a.active { background: rgba(127,9,9,.07); }
+.house-pts { display: inline-flex; align-items: center; gap: .35rem; height: 34px; padding: 0 .65rem; border-radius: 999px; border: 1px solid rgba(127,9,9,.35); background: rgba(127,9,9,.06); font: 700 .82rem 'Cinzel', serif; color: var(--scarlet); }
+.house-pts i { width: 10px; height: 14px; background: linear-gradient(160deg, #e03030, #7f0909); clip-path: polygon(50% 0, 100% 35%, 50% 100%, 0 35%); }
+.house-pts.bump { animation: pts-bump .5s; }
+@keyframes pts-bump { 40% { transform: scale(1.18); background: rgba(211,166,37,.35); } }
+.pts-float { position: fixed; z-index: 90; font: 700 .9rem 'Cinzel', serif; color: var(--scarlet); pointer-events: none; animation: pts-up 1.2s ease-out forwards; }
+@keyframes pts-up { to { transform: translateY(-38px); opacity: 0; } }
+.sound-btn { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line-2); background: transparent; display: grid; place-items: center; cursor: pointer; color: var(--ink); }
+.sound-btn svg { width: 18px; height: 18px; }
+.sound-btn .wave { display: none; } .sound-btn[aria-pressed="true"] .wave { display: block; } .sound-btn[aria-pressed="true"] .mute { display: none; }
+.sound-btn[aria-pressed="true"] { border-color: var(--gold); color: var(--scarlet); }
+@media (max-width: 880px) {
+  html[data-theme="hogwarts"] .nav nav { background: #f3e5c4; box-shadow: 0 20px 60px rgba(80,50,20,.3); }
+  .nav-magic { margin-left: auto; }
+  .nav-magic + .nav-cv { margin-left: .4rem; }
+  .hat-lbl { display: none; }
+  .hat-btn { padding: 0 .35rem; }
+}
+@media (max-width: 520px) { .house-pts { padding: 0 .45rem; } .nav-cv { display: none; } .nav-magic { gap: .3rem; } }
+@media (max-width: 480px) { .house-pts { display: none; } }
+
+/* ---------- hero: Lumos ---------- */
+html[data-theme="hogwarts"] .hero-hidden { color: #6b2a10; }
+html[data-theme="hogwarts"] .auv-blueprint { filter: none; opacity: .85; }
+html[data-theme="hogwarts"] .auv-blueprint g[stroke] { stroke: #6b2a10; }
+html[data-theme="hogwarts"] .auv-blueprint g[stroke="#ffc061"] { stroke: #a67c00; }
+html[data-theme="hogwarts"] .auv-blueprint text { fill: #5a2410; font-family: 'IM Fell English', serif; font-style: italic; font-size: 16px; }
+html[data-theme="hogwarts"] .auv-blueprint pattern path { stroke: rgba(110,60,20,.12); }
+html[data-theme="hogwarts"] .hidden-tags span { font: italic 400 1rem 'IM Fell English', serif; color: #7f0909; border-color: rgba(127,9,9,.4); background: rgba(255,248,225,.5); }
+html[data-theme="hogwarts"] .torch { background: radial-gradient(circle var(--beam, 220px) at var(--mx, 70%) var(--my, 45%), rgba(255,236,170,.55) 0%, rgba(255,220,140,.18) 40%, rgba(80,50,20,0) 62%, rgba(70,40,15,.16) 100%); }
+html[data-theme="hogwarts"] .eyebrow { font-family: 'IM Fell English', serif; font-size: .95rem; letter-spacing: .04em; color: var(--scarlet); text-transform: none; }
+html[data-theme="hogwarts"] .eyebrow { background: rgba(250,243,224,.75); border-color: rgba(127,9,9,.3); }
+html[data-theme="hogwarts"] .eyebrow .dot { background: var(--gold); box-shadow: 0 0 0 4px rgba(211,166,37,.25); }
+html[data-theme="hogwarts"] .hero-title { font-weight: 700; font-size: clamp(2.5rem, 6.6vw, 5.6rem); }
+html[data-theme="hogwarts"] .beam-text { background: linear-gradient(100deg, #7f0909 0%, #a8231a 35%, #c08a12 70%, #7f0909 100%); -webkit-background-clip: text; background-clip: text; color: transparent; background-size: 200% 100%; animation: gilt 6s linear infinite; }
+@keyframes gilt { to { background-position: -200% 0; } }
+html[data-theme="hogwarts"] .hero-lead { font-size: clamp(1.1rem, 1.8vw, 1.3rem); }
+html[data-theme="hogwarts"] .torch-hint { font: italic 400 1rem 'IM Fell English', serif; color: #7f0909; }
+html[data-theme="hogwarts"] .slot-k { color: var(--scarlet); }
+html[data-theme="hogwarts"] .stats { background: rgba(250,243,224,.75); border-color: rgba(92,52,20,.3); box-shadow: 0 0 0 4px rgba(250,243,224,.5), 0 0 0 5px rgba(92,52,20,.25); }
+html[data-theme="hogwarts"] .stats dd { color: var(--scarlet); font-family: 'Cinzel', serif; }
+
+/* ---------- section scaffolding ---------- */
+html[data-theme="hogwarts"] .kicker { font-family: 'IM Fell English', serif; font-size: .95rem; letter-spacing: .06em; text-transform: none; color: var(--scarlet); }
+html[data-theme="hogwarts"] .kicker::before { content: '❦ '; color: var(--gold); }
+html[data-theme="hogwarts"] .sec-head h2, html[data-theme="hogwarts"] .contact-title { font-weight: 700; }
+html[data-theme="hogwarts"] .hl { color: var(--scarlet); }
+html[data-theme="hogwarts"] .depth-rule::before, html[data-theme="hogwarts"] .depth-rule::after { background: none; border-top: 1px solid rgba(92,52,20,.3); height: 4px; border-bottom: 1px solid rgba(92,52,20,.18); }
+html[data-theme="hogwarts"] .depth-rule span { font-family: 'IM Fell English', serif; font-size: .82rem; letter-spacing: .08em; color: var(--ink-3); }
+html[data-theme="hogwarts"] .lit .w { color: rgba(43,26,14,.22); }
+html[data-theme="hogwarts"] .lit .w.on { color: var(--ink); }
+html[data-theme="hogwarts"] .lit .w.em.on { color: var(--scarlet); }
+html[data-theme="hogwarts"] .lit { font-family: 'Crimson Pro', serif; }
+html[data-theme="hogwarts"] .glare::before { background: radial-gradient(420px circle at var(--gx, 50%) var(--gy, 50%), rgba(255,236,170,.35), transparent 45%); }
+html[data-theme="hogwarts"] .ping { border-color: var(--gold); border-radius: 0; transform: rotate(45deg); }
+
+/* ---------- panels on parchment ---------- */
+html[data-theme="hogwarts"] .viz, html[data-theme="hogwarts"] .game, html[data-theme="hogwarts"] .term, html[data-theme="hogwarts"] .mini,
+html[data-theme="hogwarts"] .oss, html[data-theme="hogwarts"] .lead-card, html[data-theme="hogwarts"] .pdetail, html[data-theme="hogwarts"] .next-card {
+  background: var(--panel); border-color: rgba(92,52,20,.35); box-shadow: 0 14px 40px rgba(80,50,20,.18); backdrop-filter: none;
+}
+html[data-theme="hogwarts"] .viz-bar { color: var(--ink-3); border-color: var(--line-2); font-family: 'IM Fell English', serif; }
+html[data-theme="hogwarts"] .viz canvas, html[data-theme="hogwarts"] .mini-canvas, html[data-theme="hogwarts"] .scan, html[data-theme="hogwarts"] .compare, html[data-theme="hogwarts"] .atal-stage {
+  filter: grayscale(.8) sepia(.55) contrast(1.12) brightness(1.04);
+}
+html[data-theme="hogwarts"] .ing-log { background: #f3e7c9; color: #4f3826; border-color: var(--line-2); }
+html[data-theme="hogwarts"] .result { border-left-color: var(--gold); color: var(--ink); }
+html[data-theme="hogwarts"] .points li::before { background: var(--scarlet); box-shadow: none; border-radius: 0; transform: rotate(45deg); width: 5px; height: 5px; }
+html[data-theme="hogwarts"] .index { border-color: rgba(92,52,20,.35); }
+html[data-theme="hogwarts"] .index a { border-color: rgba(92,52,20,.2); }
+html[data-theme="hogwarts"] .index .ix-t { font-family: 'Cinzel', serif; }
+html[data-theme="hogwarts"] .index .ix-n, html[data-theme="hogwarts"] .index .ix-m, html[data-theme="hogwarts"] .index .ix-y { font-family: 'IM Fell English', serif; }
+html[data-theme="hogwarts"] .ix-preview { border: 6px solid #2b1a0e; box-shadow: 0 0 0 2px var(--gold), 0 30px 70px rgba(60,35,10,.4); }
+html[data-theme="hogwarts"] .ix-preview img { filter: grayscale(.8) sepia(.6); }
+
+/* ---------- projects as newspaper front pages ---------- */
+html[data-theme="hogwarts"] .case { position: relative; padding: 5.6rem clamp(1rem, 2.5vw, 2rem) clamp(1rem, 2.5vw, 2rem); background: #f4ead2; border: 1px solid rgba(60,35,15,.45); box-shadow: 0 0 0 6px #f4ead2, 0 0 0 7px rgba(60,35,15,.3), 0 24px 60px rgba(80,50,20,.22); border-radius: 2px; align-items: start; }
+html[data-theme="hogwarts"] .case::before { content: 'The Workshop Gazette'; position: absolute; left: 0; right: 0; top: .7rem; text-align: center; font: 400 clamp(1.6rem, 3.6vw, 2.5rem)/1 'UnifrakturMaguntia', 'Cinzel', serif; color: #1f140b; }
+html[data-theme="hogwarts"] .case::after { content: attr(data-issue); position: absolute; left: clamp(1rem, 2.5vw, 2rem); right: clamp(1rem, 2.5vw, 2rem); top: 3.35rem; padding: .2rem 0; border-top: 3px double rgba(31,20,11,.7); border-bottom: 1px solid rgba(31,20,11,.6); font: italic 400 .8rem 'IM Fell English', serif; color: #3a2a1a; text-align: center; }
+html[data-theme="hogwarts"] .case .viz { border: 1px solid #2b1a0e; border-radius: 0; box-shadow: none; background: #e9dcbc; }
+html[data-theme="hogwarts"] .case .viz-bar { border-bottom: 1px solid #2b1a0e; }
+html[data-theme="hogwarts"] .case-body h3 { font: 700 clamp(1.5rem, 2.6vw, 2.1rem)/1.08 'Cinzel', serif; text-transform: uppercase; letter-spacing: .01em; }
+html[data-theme="hogwarts"] .case-body .points { display: block; columns: 2 240px; column-gap: 1.6rem; column-rule: 1px solid rgba(60,35,15,.25); }
+html[data-theme="hogwarts"] .case-body .points li { break-inside: avoid; margin-bottom: .7rem; text-align: justify; hyphens: auto; color: #3a2718; }
+html[data-theme="hogwarts"] .case-body .points li:first-child::first-letter { font: 700 2.4em/.8 'Cinzel', serif; float: left; margin: .05em .08em 0 -.2rem; color: var(--scarlet); }
+html[data-theme="hogwarts"] .case-body .points li:first-child::before { display: none; }
+html[data-theme="hogwarts"] .case-body .points li:first-child { padding-left: 0; }
+html[data-theme="hogwarts"] .case-body .org { font-family: 'IM Fell English', serif; font-style: italic; font-size: .9rem; }
+html[data-theme="hogwarts"] .case .viz canvas { animation: photo-flicker 7s infinite; }
+@keyframes photo-flicker { 0%, 100% { opacity: 1; } 48% { opacity: .96; } 50% { opacity: .9; } 52% { opacity: .97; } }
+
+/* ---------- map trail (journey) ---------- */
+html[data-theme="hogwarts"] .term { position: relative; background: #efe0bb; border: 1px solid rgba(92,52,20,.5); border-radius: 4px;
+  background-image: radial-gradient(circle at 20% 15%, rgba(160,110,50,.18), transparent 35%), radial-gradient(circle at 80% 70%, rgba(160,110,50,.16), transparent 40%); }
+html[data-theme="hogwarts"] .term-bar, html[data-theme="hogwarts"] .term-cmd { display: none; }
+html[data-theme="hogwarts"] .term::before { content: 'The Map of Suyash Kumar'; display: block; padding: 1.1rem 1.1rem .2rem; text-align: center; font: 700 clamp(1.1rem, 2.4vw, 1.5rem) 'Cinzel', serif; color: #4a2c12; letter-spacing: .08em; }
+html[data-theme="hogwarts"] .branch-filter { justify-content: center; padding-top: .8rem; }
+html[data-theme="hogwarts"] .bf, html[data-theme="hogwarts"] .pl { font-family: 'IM Fell English', serif; font-size: .88rem; }
+html[data-theme="hogwarts"] .c-row { font: 400 1.02rem 'IM Fell English', serif; }
+html[data-theme="hogwarts"] .c-hash { color: #8a6a3a; font-style: italic; }
+html[data-theme="hogwarts"] .c-row:hover .c-msg { color: var(--scarlet); }
+html[data-theme="hogwarts"] .graph .ln { opacity: .55; background-image: repeating-linear-gradient(180deg, currentColor 0 6px, transparent 6px 11px) !important; background-color: transparent !important; }
+html[data-theme="hogwarts"] .graph .nd { background: #efe0bb; }
+html[data-theme="hogwarts"] .graph svg path { stroke-dasharray: 6 5; opacity: .6; }
+html[data-theme="hogwarts"] .c-diff-inner { background: rgba(255,250,235,.6); border-color: rgba(92,52,20,.3); }
+html[data-theme="hogwarts"] .c-diff .add { color: #2f6b2a; }
+html[data-theme="hogwarts"] .ref { font-family: 'IM Fell English', serif; }
+.trail { position: absolute; left: 0; top: 0; pointer-events: none; z-index: 3; }
+
+/* ---------- wand shop (skills) ---------- */
+html[data-theme="hogwarts"] .ptable-wrap { padding: 1.1rem; background: linear-gradient(#4a2e18, #3a2312); border-radius: 6px; box-shadow: inset 0 0 0 3px #2a1809, 0 20px 50px rgba(60,35,10,.35); }
+html[data-theme="hogwarts"] .ptable { gap: 10px 6px; background: repeating-linear-gradient(180deg, transparent 0, transparent calc((100% - 40px) / 5), #2a1809 calc((100% - 40px) / 5), #2a1809 calc((100% - 40px) / 5 + 10px)); }
+html[data-theme="hogwarts"] .el { aspect-ratio: .8; border-radius: 2px; border: 1px solid rgba(0,0,0,.45); padding: 7px 6px 6px;
+  background: linear-gradient(90deg, rgba(0,0,0,.18), transparent 20%, transparent 80%, rgba(0,0,0,.2)), color-mix(in srgb, var(--c) 35%, #d9c49a);
+  box-shadow: inset 0 6px 0 rgba(255,255,255,.18), inset 0 -3px 0 rgba(0,0,0,.25); transform-origin: 50% 100%; }
+html[data-theme="hogwarts"] .ptable.in .el { opacity: 1; transform: none; }
+html[data-theme="hogwarts"] .el::after { content: ''; position: absolute; left: 50%; top: 8px; width: 4px; height: 0; margin-left: -2px; border-radius: 2px; background: linear-gradient(#f8f0dc, #6b4426 25%, #4a2e18); transition: height .35s var(--ease), top .35s var(--ease); }
+html[data-theme="hogwarts"] .el:hover, html[data-theme="hogwarts"] .el.sel { transform: translateY(-8px) scale(1.08); z-index: 3; box-shadow: inset 0 6px 0 rgba(255,255,255,.2), 0 12px 22px rgba(0,0,0,.55); background: linear-gradient(90deg, rgba(0,0,0,.12), transparent 20%, transparent 80%, rgba(0,0,0,.14)), color-mix(in srgb, var(--c) 45%, #eedcb2); }
+html[data-theme="hogwarts"] .el:hover::after, html[data-theme="hogwarts"] .el.sel::after { top: -26px; height: 34px; }
+html[data-theme="hogwarts"] .el .n { color: rgba(31,20,11,.6); font-family: 'IM Fell English', serif; font-size: .66rem; }
+html[data-theme="hogwarts"] .el .s { color: #1f140b; font-family: 'Cinzel', serif; }
+html[data-theme="hogwarts"] .el .nm { color: rgba(31,20,11,.75); font-family: 'IM Fell English', serif; font-size: .62rem; }
+html[data-theme="hogwarts"] .el.fade { opacity: .35 !important; }
+html[data-theme="hogwarts"] .pdetail { background: #f6ead0; border-radius: 2px; border: 1px dashed rgba(92,52,20,.55); color: var(--ink); }
+html[data-theme="hogwarts"] .pdetail::before { content: 'Wand receipt'; display: block; font: 700 .8rem 'Cinzel', serif; letter-spacing: .18em; text-transform: uppercase; color: var(--scarlet); border-bottom: 1px dashed rgba(92,52,20,.4); padding-bottom: .5rem; margin-bottom: .7rem; }
+html[data-theme="hogwarts"] .plegend .pl { background: rgba(255,250,235,.6); }
+@media (max-width: 1080px) { html[data-theme="hogwarts"] .ptable-wrap { padding: .7rem; } }
+
+/* ---------- open source, leadership ---------- */
+html[data-theme="hogwarts"] .oss { border-radius: 3px; }
+html[data-theme="hogwarts"] .oss header a { color: var(--scarlet); }
+html[data-theme="hogwarts"] .diff { background: #2b1a0e; color: #f1e3c2; border-radius: 3px; }
+html[data-theme="hogwarts"] .lead-card { border-radius: 4px; border-width: 2px; border-color: rgba(166,124,0,.55); }
+html[data-theme="hogwarts"] .lead-stats b { color: var(--scarlet); font-family: 'Cinzel', serif; }
+html[data-theme="hogwarts"] .honors b { color: var(--scarlet); }
+
+/* ---------- staircase progress ---------- */
+.stairs { position: fixed; right: 18px; top: 50%; transform: translateY(-50%); z-index: 40; width: 74px; pointer-events: none; display: flex; flex-direction: column-reverse; gap: 0; }
+.stairs .fl { position: relative; height: 34px; }
+.stairs .fl .land { position: absolute; right: 0; bottom: 0; width: 26px; height: 5px; background: #5a3b22; border-radius: 1px; }
+.stairs .fl .flight { position: absolute; right: 13px; bottom: 4px; width: 40px; height: 4px; background: repeating-linear-gradient(90deg, #7a5233 0 5px, #4a2e18 5px 6px); transform-origin: 100% 50%; transform: rotate(var(--a, -36deg)); transition: transform .9s cubic-bezier(.4,1.4,.5,1); }
+.stairs .fl.swing .flight { --a: -14deg; }
+.stairs .fl b { position: absolute; right: 32px; bottom: -5px; font: 600 .62rem 'Cinzel', serif; color: rgba(43,26,14,.45); white-space: nowrap; transition: color .3s; }
+.stairs .fl.on .land { background: var(--scarlet); box-shadow: 0 0 0 2px var(--gold); }
+.stairs .fl.on b { color: var(--scarlet); }
+.stairs .fl.on::after { content: ''; position: absolute; right: 9px; bottom: 7px; width: 8px; height: 14px; border-radius: 4px 4px 2px 2px; background: var(--scarlet); box-shadow: 0 -5px 0 -1px #e8c9a0; }
+.stairs-name { font: 600 .66rem 'Cinzel', serif; letter-spacing: .08em; color: var(--scarlet); text-align: right; margin-top: .4rem; }
+@media (max-width: 1400px) { .stairs { display: none !important; } }
+html[data-theme="hogwarts"] .zone-banner small { color: var(--scarlet); font-family: 'IM Fell English', serif; letter-spacing: .3em; }
+html[data-theme="hogwarts"] .zone-banner strong { font-family: 'Cinzel', serif; color: #2b1a0e; text-shadow: 0 0 30px rgba(246,234,208,.95), 0 0 60px rgba(246,234,208,.9); }
+html[data-theme="hogwarts"] .zone-banner span { font-family: 'IM Fell English', serif; font-style: italic; color: #4f3826; text-shadow: 0 0 14px #f6ead0, 0 0 24px #f6ead0; }
+
+/* ---------- moving portraits ---------- */
+.portrait { position: absolute; right: max(12px, calc((100vw - var(--wrap)) / 2 - 190px)); top: 120px; width: 150px; margin: 0; z-index: 2; cursor: pointer; transform: rotate(2deg); }
+.portrait-l { right: auto; left: max(12px, calc((100vw - var(--wrap)) / 2 - 190px)); top: 60px; transform: rotate(-2.5deg); }
+.portrait canvas { display: block; width: 150px; height: 190px; border: 10px solid #8a5a1c; border-image: linear-gradient(135deg, #f1d07a, #8a5a1c 30%, #d3a625 55%, #6b4210 80%, #f1d07a) 1; box-shadow: 0 16px 34px rgba(60,35,10,.45), inset 0 0 0 2px #3a2312; background: #2b2018; }
+.portrait figcaption { margin: .35rem auto 0; width: max-content; font: 600 .66rem 'Cinzel', serif; letter-spacing: .08em; color: #3a2312; background: linear-gradient(#e8c46a, #b88a2a); padding: .15rem .5rem; border-radius: 2px; }
+.portrait .say { position: absolute; left: 50%; bottom: 100%; transform: translate(-50%, -6px); width: 210px; font: italic 400 .95rem/1.35 'IM Fell English', serif; color: #2b1a0e; background: #fbf2dc; border: 1px solid #b08a5a; border-radius: 10px; padding: .55rem .7rem; box-shadow: 0 10px 24px rgba(60,35,10,.3); opacity: 0; transition: opacity .3s; pointer-events: none; }
+.portrait .say.on { opacity: 1; }
+#about, #work, #journey { position: relative; }
+@media (max-width: 1500px) { .portrait { display: none !important; } }
+
+/* ---------- Quidditch game ---------- */
+#qCanvas { display: block; width: 100%; aspect-ratio: 16 / 8; background: #a9c4d8; outline: none; touch-action: pan-y; }
+.qgame.playing #qCanvas { touch-action: none; }
+@media (pointer: coarse) { #qCanvas { aspect-ratio: 4 / 5; } }
+html[data-theme="hogwarts"] .game { border-radius: 4px; }
+html[data-theme="hogwarts"] .game-over { background: radial-gradient(ellipse at center, rgba(246,234,208,.9), rgba(246,234,208,.62)); }
+html[data-theme="hogwarts"] .game-over h3 { font-family: 'Cinzel', serif; }
+html[data-theme="hogwarts"] .game-over p { color: var(--ink-2); }
+html[data-theme="hogwarts"] .tasks li { font-family: 'IM Fell English', serif; font-size: .85rem; }
+html[data-theme="hogwarts"] .tasks li.done { color: #fbecc8; background: var(--scarlet); border-color: var(--scarlet); }
+html[data-theme="hogwarts"] .tasks li.next { border-color: var(--gold); color: var(--ink); box-shadow: 0 0 0 2px rgba(211,166,37,.3); }
+html[data-theme="hogwarts"] .board-head { font-family: 'Cinzel', serif; letter-spacing: .1em; }
+html[data-theme="hogwarts"] .board-list li { font-family: 'IM Fell English', serif; font-size: .95rem; }
+html[data-theme="hogwarts"] .board-list .tm { color: var(--scarlet); }
+html[data-theme="hogwarts"] .board-list li.me { background: rgba(211,166,37,.18); }
+html[data-theme="hogwarts"] .go-save input { background: #fbf2dc; color: var(--ink); border-color: rgba(92,52,20,.4); font-family: 'IM Fell English', serif; }
+html[data-theme="hogwarts"] .go-rank { color: var(--scarlet) !important; font-family: 'IM Fell English', serif; }
+html[data-theme="hogwarts"] .stick { border-color: rgba(127,9,9,.5); background: rgba(127,9,9,.06); }
+html[data-theme="hogwarts"] .drop-btn { border-color: var(--gold); background: rgba(211,166,37,.25); color: var(--scarlet); font-family: 'Cinzel', serif; }
+html[data-theme="hogwarts"] .qgame.playing .stick { display: block; position: absolute; width: 96px; height: 96px; margin: -48px 0 0 -48px; border-radius: 50%; border: 1.5px solid rgba(127,9,9,.5); pointer-events: none; opacity: 0; transition: opacity .15s; }
+html[data-theme="hogwarts"] .qgame.playing .stick.on { opacity: 1; }
+
+/* ---------- owl post ---------- */
+.owlpost { position: relative; max-width: 520px; margin: 2.2rem auto 0; text-align: left; }
+.op-paper { position: relative; background: #fbf2dc; border: 1px solid rgba(92,52,20,.45); padding: 1.3rem 1.4rem 1.2rem; box-shadow: 0 16px 40px rgba(80,50,20,.22); transform-origin: 50% 0; transition: transform .7s cubic-bezier(.5,0,.3,1), opacity .5s; display: grid; gap: .7rem; }
+.op-to { font: 700 1rem 'Cinzel', serif; color: var(--scarlet); }
+.op-paper label { display: grid; gap: .25rem; font: italic 400 .95rem 'IM Fell English', serif; color: var(--ink-2); }
+.op-paper input, .op-paper textarea { font: 400 1.05rem 'Crimson Pro', serif; color: var(--ink); background: transparent; border: 0; border-bottom: 1px solid rgba(92,52,20,.4); padding: .3rem .1rem; resize: vertical; }
+.op-paper textarea { border: 1px solid rgba(92,52,20,.3); background-image: repeating-linear-gradient(transparent 0 27px, rgba(92,52,20,.15) 27px 28px); line-height: 28px; padding: 0 .4rem; }
+.op-paper input:focus, .op-paper textarea:focus { outline: none; border-color: var(--scarlet); }
+.op-paper .btn { justify-self: start; }
+.op-err { color: var(--bad); font-size: .9rem; min-height: 1em; }
+.op-note { font: italic 400 .85rem 'IM Fell English', serif; color: var(--ink-3); }
+.owlpost.sent .op-paper { transform: scale(.12) translateY(-40px) rotate(8deg); opacity: 0; }
+.op-owl { position: absolute; left: 50%; top: 0; width: 90px; height: 70px; margin-left: -45px; pointer-events: none; opacity: 0; }
+.owlpost.sent .op-owl { animation: owl-fly 2.2s cubic-bezier(.45,.05,.4,1) forwards; }
+@keyframes owl-fly { 0% { opacity: 0; transform: translate(-360px, 80px) scale(.6); } 25% { opacity: 1; transform: translate(0, 10px) scale(1); } 45% { transform: translate(0, 0) scale(1); } 100% { opacity: 1; transform: translate(520px, -420px) scale(.5); } }
+.op-sent-msg { text-align: center; font: italic 400 1.15rem 'IM Fell English', serif; color: var(--scarlet); margin-top: 1rem; }
+
+/* ---------- acceptance letter intro ---------- */
+#letter { position: fixed; inset: 0; z-index: 320; display: grid; place-items: center; background: radial-gradient(ellipse at center, #3a2312, #120a04); transition: opacity .8s; }
+#letter.gone { opacity: 0; pointer-events: none; }
+.env { position: relative; width: min(460px, 86vw); aspect-ratio: 1.5; perspective: 1200px; }
+.env-back { position: absolute; inset: 0; background: #e9d6a8; border-radius: 4px; box-shadow: 0 30px 80px rgba(0,0,0,.6); }
+.env-front { position: absolute; inset: 0; z-index: 3; border-radius: 4px; background: linear-gradient(100deg, #e4cd98, #dac28a); clip-path: polygon(0 0, 50% 55%, 100% 0, 100% 100%, 0 100%); }
+.env-flap { position: absolute; left: 0; right: 0; top: 0; height: 62%; z-index: 4; transform-origin: 50% 0; background: #e6d09c; clip-path: polygon(0 0, 100% 0, 50% 100%); transition: transform .7s cubic-bezier(.5,0,.3,1) .25s, z-index 0s .6s; }
+.env-paper { position: absolute; left: 6%; right: 6%; top: 6%; height: 88%; z-index: 2; background: #fbf3dd; padding: 1rem 1.2rem; font: 400 clamp(.82rem, 2.4vw, 1rem)/1.45 'IM Fell English', serif; color: #2b1a0e; overflow: hidden; transition: transform .9s cubic-bezier(.3,.7,.2,1) .8s, height .6s .9s; box-shadow: 0 6px 20px rgba(0,0,0,.25); }
+.env-paper p + p { margin-top: .5rem; }
+.lt-crest { text-align: center; font: 700 .9rem 'Cinzel', serif; letter-spacing: .4em; color: #7f0909; }
+.lt-to { font-style: italic; }
+.gry { color: #7f0909; }
+.lt-sign { text-align: right; }
+.env-seal { position: absolute; left: 50%; top: 62%; z-index: 5; width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 50%; border: 0; cursor: pointer;
+  background: radial-gradient(circle at 35% 30%, #c0392b, #7f0909 55%, #4a0303); box-shadow: 0 4px 10px rgba(0,0,0,.45), inset 0 0 0 5px rgba(0,0,0,.18); display: grid; place-items: center; transition: transform .2s; }
+.env-seal span { font: 700 1.6rem 'Cinzel', serif; color: rgba(255,210,190,.55); }
+.env-seal:hover { transform: scale(1.06); }
+.letter-hint { position: absolute; left: 0; right: 0; bottom: 12%; text-align: center; font: italic 400 1.05rem 'IM Fell English', serif; color: #e9d6a8; opacity: .8; animation: hint-pulse 2s infinite; }
+@keyframes hint-pulse { 50% { opacity: .35; } }
+#letter .intro-skip { color: #e9d6a8; border-color: rgba(233,214,168,.4); }
+#letter.open .env-seal { animation: seal-crack .5s forwards; }
+@keyframes seal-crack { 30% { transform: scale(1.12) rotate(-6deg); } 100% { transform: scale(.4) translateY(30px) rotate(20deg); opacity: 0; } }
+#letter.open .env-flap { transform: rotateX(180deg); z-index: 1; }
+#letter.open .env-paper { transform: translateY(-40%); height: 120%; z-index: 4; }
+.env { transition: transform .9s cubic-bezier(.3,.7,.2,1) .8s; }
+#letter.open .env { transform: translateY(18%); }
+#letter.open .letter-hint { opacity: 0; animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  #mapFold { display: none; }
+  html[data-theme="hogwarts"] .beam-text { animation: none; }
+  .owlpost.sent .op-owl { animation: none; }
+}

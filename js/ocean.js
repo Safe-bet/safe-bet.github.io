@@ -36,6 +36,7 @@
   let t = 0, last = performance.now();
   function frame(now) {
     const dt = Math.min(50, now - last) / 16.67; last = now; t += dt;
+    if (document.documentElement.dataset.theme === 'hogwarts') { requestAnimationFrame(frame); return; }   // Hogwarts theme paints its own sky
     // water column colour
     const d = depth, e = Math.pow(d, .7);
     const g = ctx.createLinearGradient(0, 0, 0, H);
@@ -160,7 +161,7 @@
   const seen = new Set(['SURFACE']); let zbTimer, booted = false, maxZone = 0;
   const zoneOrder = ['SURFACE', ...Object.keys(ZONES)];
   function banner(z) {
-    if (!zb || !ZONES[z] || reduced) return;
+    if (!zb || !ZONES[z] || reduced || document.documentElement.dataset.theme === 'hogwarts') return;
     const gm = document.getElementById('game'), gr = gm && gm.getBoundingClientRect();   // never over the game
     if (gr && gr.top < innerHeight * .7 && gr.bottom > innerHeight * .3) return;
     $('zbKick').textContent = 'Entering'; $('zbName').textContent = z.toLowerCase().replace(/(^|\s)\S/g, c => c.toUpperCase());

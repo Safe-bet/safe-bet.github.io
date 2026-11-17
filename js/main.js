@@ -12,7 +12,7 @@
   let readyCbs = [];
   const whenReady = fn => document.body.classList.contains('ready') ? fn() : readyCbs.push(fn);
   const ready = () => { document.body.classList.add('ready'); readyCbs.forEach(f => f()); readyCbs = []; };
-  if (!intro || reduced || store.get('dove') || location.hash) {
+  if (!intro || reduced || store.get('dove') || location.hash || document.documentElement.dataset.theme === 'hogwarts') {
     intro && intro.remove(); ready();
   } else {
     document.documentElement.classList.add('locked');
