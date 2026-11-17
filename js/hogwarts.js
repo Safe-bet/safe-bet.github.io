@@ -235,19 +235,6 @@
     // wisps
     if (!reduced && Math.random() < .5) sparks.push({ x: bx + (Math.random() - .5) * 90 * s, y: by - Math.random() * 120 * s, vx: -.4 - Math.random() * .5, vy: -.3 - Math.random() * .4, l: 1, c: '170,210,255' });
   }
-  function wand(t) {
-    const T = window.DIVE && window.DIVE.torch; if (!T || !T.on) return;
-    const hero = $('top'), r = hero.getBoundingClientRect(); if (r.bottom < 0) return;
-    const tx = T.x, ty = T.y, hx = tx + 70, hy = ty + 96;
-    g.save(); g.lineCap = 'round';
-    g.strokeStyle = '#3a2312'; g.lineWidth = 6; g.beginPath(); g.moveTo(hx + 18, hy + 25); g.lineTo(hx, hy); g.stroke();
-    g.strokeStyle = '#5a3b22'; g.lineWidth = 3.5; g.beginPath(); g.moveTo(hx, hy); g.lineTo(tx, ty); g.stroke();
-    g.strokeStyle = '#8a6040'; g.lineWidth = 1; g.beginPath(); g.moveTo(hx - 1, hy - 2); g.lineTo(tx + 1, ty + 1); g.stroke();
-    const glow = g.createRadialGradient(tx, ty, 0, tx, ty, 26); glow.addColorStop(0, 'rgba(255,255,240,1)'); glow.addColorStop(.3, 'rgba(255,236,170,.75)'); glow.addColorStop(1, 'rgba(255,220,140,0)');
-    g.fillStyle = glow; g.beginPath(); g.arc(tx, ty, 26 + Math.sin(t * .01) * 3, 0, 6.283); g.fill();
-    g.restore();
-    if (!reduced && Math.random() < .55) sparks.push({ x: tx, y: ty, vx: (Math.random() - .5) * 1.6, vy: (Math.random() - .3) * 1.4, l: 1, c: '210,160,40' });
-  }
   let last = performance.now(), contactVis = false, heroVis = true;
   new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting && !contactVis && (stag.x < 0 || stag.x > 1)) stag.x = .08; contactVis = e.isIntersecting; }), { threshold: .25 }).observe($('contact'));
   function frame(now) {
@@ -299,7 +286,6 @@
       if (Math.random() < .5) sparks.push({ x: sn.x, y: sn.y, vx: (Math.random() - .5) * .5, vy: (Math.random() - .5) * .5, l: .8, c: '230,180,40' });
       if (sn.age > sn.ttl) FX.snitch = null;
     }
-    wand(now);
     for (let i = sparks.length - 1; i >= 0; i--) {
       const p = sparks[i]; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += .02 * dt; p.l -= .025 * dt;
       if (p.l <= 0) { sparks.splice(i, 1); continue; }

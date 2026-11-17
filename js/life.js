@@ -392,53 +392,86 @@
   }
   requestAnimationFrame(frame);
 
-  /* ---------- hero AUV steering the torch ---------- */
+  /* ---------- companion cursor: ATAL (ocean) or a wand (Gryffindor) follows you down the page ----------
+     Full strength in the hero, fading to a dim, dormant state through the lower half of the page,
+     and dozing when the cursor stops. On touch screens it lives in the hero only. */
   const hero = document.getElementById('top');
-  const hc = document.getElementById('heroSub');
-  if (hero && hc) {
-    const g = hc.getContext('2d');
-    let hw = 0, hh = 0;
-    const fit = () => { const r = hero.getBoundingClientRect(), d = Math.min(devicePixelRatio || 1, 2); hw = r.width; hh = r.height; hc.width = hw * d; hc.height = hh * d; g.setTransform(d, 0, 0, d, 0, 0); };
+  const pal = document.getElementById('pal');
+  if (hero && pal) {
+    const g = pal.getContext('2d');
+    const fine = matchMedia('(pointer: fine)').matches;
+    let pw = 0, ph = 0;
+    const fit = () => { const d = Math.min(devicePixelRatio || 1, 2); pw = innerWidth; ph = innerHeight; pal.width = pw * d; pal.height = ph * d; g.setTransform(d, 0, 0, d, 0, 0); };
     fit(); addEventListener('resize', fit);
-    const auv = { x: hw * .9, y: hh * .7, ang: Math.PI };
-    const trail = [];
-    let tt = 0, lt = performance.now(), visible = true;
-    new IntersectionObserver(es => { visible = es[0].isIntersecting; }).observe(hero);
-    const step = (now) => {
-      const dt = Math.min(50, now - lt) / 16.67; lt = now; tt += dt;
-      if (visible && D.torch.on && !(document.documentElement.dataset.theme === 'hogwarts')) {
-        const r = hero.getBoundingClientRect();
-        const sx = D.torch.x - r.left, sy = D.torch.y - r.top;
-        const dist = hw < 700 ? 150 : 270;
-        let vx = auv.x - sx, vy = auv.y - sy; const m = Math.hypot(vx, vy) || 1; vx /= m; vy /= m;
-        const tx = Math.max(60, Math.min(hw - 60, sx + vx * dist)), ty = Math.max(90, Math.min(hh - 60, sy + vy * dist));
-        const k = reduced ? 1 : .025 * dt;
-        auv.x += (tx - auv.x) * k; auv.y += (ty - auv.y) * k;
-        const want = Math.atan2(sy - auv.y, sx - auv.x);
-        let da = want - auv.ang; while (da > Math.PI) da -= 6.283; while (da < -Math.PI) da += 6.283;
-        auv.ang += da * (reduced ? 1 : .06 * dt);
-        g.clearRect(0, 0, hw, hh);
-        g.globalAlpha = hw < 700 ? .5 : 1;
-        // headlight cone onto the torch spot
-        const nx = auv.x + Math.cos(auv.ang) * 48, ny = auv.y + Math.sin(auv.ang) * 48;
-        const L = Math.hypot(sx - nx, sy - ny), half = D.torch.r * .7;
-        const px = -Math.sin(auv.ang), py = Math.cos(auv.ang);
-        g.save(); g.globalCompositeOperation = 'lighter';
-        const cg = g.createLinearGradient(nx, ny, sx, sy);
-        cg.addColorStop(0, 'rgba(255,222,165,.32)'); cg.addColorStop(1, 'rgba(255,222,165,.02)');
-        g.fillStyle = cg; g.beginPath(); g.moveTo(nx + px * 5, ny + py * 5);
-        const ex = nx + Math.cos(auv.ang) * L, ey = ny + Math.sin(auv.ang) * L;
-        g.lineTo(ex + px * half, ey + py * half); g.lineTo(ex - px * half, ey - py * half); g.lineTo(nx - px * 5, ny - py * 5); g.closePath(); g.fill();
-        g.restore();
-        // thruster bubbles
-        if (!reduced && Math.random() < .35) trail.push({ x: auv.x - Math.cos(auv.ang) * 58, y: auv.y - Math.sin(auv.ang) * 58, r: 1 + Math.random() * 2.5, l: 1 });
-        for (let i = trail.length - 1; i >= 0; i--) { const b = trail[i]; b.y -= .6 * dt; b.x += Math.sin(tt * .1 + i) * .3; b.l -= .012 * dt; if (b.l <= 0) { trail.splice(i, 1); continue; } g.strokeStyle = `rgba(210,240,255,${b.l * .5})`; g.beginPath(); g.arc(b.x, b.y, b.r, 0, 6.283); g.stroke(); }
-        // the vehicle (kept upright)
-        g.save(); g.translate(auv.x, auv.y); g.rotate(auv.ang); if (Math.cos(auv.ang) < 0) g.scale(1, -1);
-        drawAUV(g, tt, hw < 700 ? .75 : 1);
-        g.restore();
-      }
+    const auv = { x: innerWidth * .85, y: innerHeight * .7, ang: Math.PI, s: 1 };
+    const trail = [], glints = [];
+    let tt = 0, lt = performance.now(), lastMove = -1e9, alpha = 0, cursorSeen = false, px0 = 0, py0 = 0;
+    addEventListener('pointermove', e => { if (e.pointerType === 'mouse' || e.pointerType === 'pen') { lastMove = performance.now(); cursorSeen = true; } }, { passive: true });
+    const HP = () => document.documentElement.dataset.theme === 'hogwarts';
+
+    function drawWand(tx, ty, s, idle, t) {
+      const hx = tx + 70 * s, hy = ty + 96 * s;
+      g.save(); g.lineCap = 'round';
+      g.strokeStyle = '#3a2312'; g.lineWidth = 6 * s; g.beginPath(); g.moveTo(hx + 18 * s, hy + 25 * s); g.lineTo(hx, hy); g.stroke();
+      g.strokeStyle = '#5a3b22'; g.lineWidth = 3.5 * s; g.beginPath(); g.moveTo(hx, hy); g.lineTo(tx, ty); g.stroke();
+      g.strokeStyle = '#8a6040'; g.lineWidth = 1; g.beginPath(); g.moveTo(hx - 1, hy - 2); g.lineTo(tx + 1, ty + 1); g.stroke();
+      const r = (idle ? 16 : 26) * s + Math.sin(t * (idle ? .03 : .1)) * 3;
+      const glow = g.createRadialGradient(tx, ty, 0, tx, ty, r);
+      glow.addColorStop(0, 'rgba(255,255,240,1)'); glow.addColorStop(.3, `rgba(255,236,170,${idle ? .45 : .75})`); glow.addColorStop(1, 'rgba(255,220,140,0)');
+      g.fillStyle = glow; g.beginPath(); g.arc(tx, ty, r, 0, 6.283); g.fill();
+      g.restore();
+    }
+    function drawSub(sx, sy, inHero, idle, dt) {
+      const dist = inHero ? (pw < 700 ? 150 : 270) : 120, s = inHero ? (pw < 700 ? .75 : 1) : .62;
+      auv.s += (s - auv.s) * Math.min(1, .05 * dt);
+      let vx = auv.x - sx, vy = auv.y - sy; const m = Math.hypot(vx, vy) || 1; vx /= m; vy /= m;
+      const tx = Math.max(50, Math.min(pw - 50, sx + vx * dist)), ty = Math.max(70, Math.min(ph - 40, sy + vy * dist));
+      const k = reduced ? 1 : (idle ? .008 : .028) * dt;
+      auv.x += (tx - auv.x) * k; auv.y += (ty - auv.y) * k + (idle && !reduced ? Math.sin(tt * .03) * .15 : 0);
+      const want = Math.atan2(sy - auv.y, sx - auv.x);
+      let da = want - auv.ang; while (da > Math.PI) da -= 6.283; while (da < -Math.PI) da += 6.283;
+      auv.ang += da * (reduced ? 1 : .06 * dt);
+      // headlight cone onto the spot it is watching
+      const nx = auv.x + Math.cos(auv.ang) * 48 * auv.s, ny = auv.y + Math.sin(auv.ang) * 48 * auv.s;
+      const L = Math.hypot(sx - nx, sy - ny), half = inHero ? D.torch.r * .7 : 46, lamp = idle ? .1 : inHero ? .32 : .2;
+      const qx = -Math.sin(auv.ang), qy = Math.cos(auv.ang);
+      g.save(); g.globalCompositeOperation = 'lighter';
+      const cg = g.createLinearGradient(nx, ny, sx, sy);
+      cg.addColorStop(0, `rgba(255,222,165,${lamp})`); cg.addColorStop(1, 'rgba(255,222,165,.02)');
+      g.fillStyle = cg; g.beginPath(); g.moveTo(nx + qx * 5, ny + qy * 5);
+      const ex = nx + Math.cos(auv.ang) * L, ey = ny + Math.sin(auv.ang) * L;
+      g.lineTo(ex + qx * half, ey + qy * half); g.lineTo(ex - qx * half, ey - qy * half); g.lineTo(nx - qx * 5, ny - qy * 5); g.closePath(); g.fill();
+      g.restore();
+      // thruster bubbles (fewer when dozing)
+      if (!reduced && Math.random() < (idle ? .06 : .35)) trail.push({ x: auv.x - Math.cos(auv.ang) * 58 * auv.s, y: auv.y - Math.sin(auv.ang) * 58 * auv.s, r: (1 + Math.random() * 2.5) * auv.s, l: 1 });
+      for (let i = trail.length - 1; i >= 0; i--) { const b = trail[i]; b.y -= .6 * dt; b.x += Math.sin(tt * .1 + i) * .3; b.l -= .012 * dt; if (b.l <= 0) { trail.splice(i, 1); continue; } g.strokeStyle = `rgba(210,240,255,${b.l * .5})`; g.beginPath(); g.arc(b.x, b.y, b.r, 0, 6.283); g.stroke(); }
+      g.save(); g.translate(auv.x, auv.y); g.rotate(auv.ang); if (Math.cos(auv.ang) < 0) g.scale(1, -1);
+      drawAUV(g, idle ? tt * .2 : tt, auv.s);
+      g.restore();
+    }
+    const step = now => {
       requestAnimationFrame(step);
+      const dt = Math.min(50, now - lt) / 16.67; lt = now; tt += dt;
+      const hr = hero.getBoundingClientRect(), inHero = hr.bottom > ph * .45;
+      let sx, sy, show = true;
+      if (inHero && D.torch.on) { sx = D.torch.x; sy = D.torch.y; }
+      else if (fine && cursorSeen && mouse.x > -999) { sx = mouse.x; sy = mouse.y; }
+      else show = false;
+      const docH = document.documentElement.scrollHeight - ph, prog = docH > 0 ? scrollY / docH : 0;
+      const idle = !inHero && now - lastMove > 3500;
+      const want = !show ? 0 : inHero ? (pw < 700 ? .55 : 1) : (.85 - .55 * smooth(.08, .5, prog)) * (idle ? .45 : 1);
+      alpha += (want - alpha) * Math.min(1, .07 * dt);
+      g.clearRect(0, 0, pw, ph);
+      if (alpha < .02 || !show) { if (!show) { trail.length = 0; glints.length = 0; } return; }
+      g.globalAlpha = alpha;
+      if (HP()) {
+        const s = inHero ? 1 : .8;
+        // sparks trail the wand tip when it moves
+        const sp = Math.hypot(sx - px0, sy - py0); px0 = sx; py0 = sy;
+        if (!reduced && sp > 1.5 && glints.length < 120) for (let k = 0; k < Math.min(4, sp / 6); k++) glints.push({ x: sx, y: sy, vx: (Math.random() - .5) * 1.6, vy: (Math.random() - .3) * 1.4, l: 1 });
+        for (let i = glints.length - 1; i >= 0; i--) { const q = glints[i]; q.x += q.vx * dt; q.y += q.vy * dt; q.vy += .03 * dt; q.l -= .03 * dt; if (q.l <= 0) { glints.splice(i, 1); continue; } g.fillStyle = `rgba(210,160,40,${q.l})`; g.beginPath(); g.arc(q.x, q.y, 1.4 + q.l * 1.4, 0, 6.283); g.fill(); }
+        drawWand(sx, sy, s, idle, tt);
+      } else drawSub(sx, sy, inHero, idle, dt);
     };
     requestAnimationFrame(step);
   }

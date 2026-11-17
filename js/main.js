@@ -56,9 +56,10 @@
   /* ---------- counters ---------- */
   const run = el => {
     const to = parseFloat(el.dataset.count), dec = +el.dataset.dec || 0, pre = el.dataset.prefix || '', suf = el.dataset.suffix || '';
-    if (reduced) { el.textContent = pre + to.toFixed(dec) + suf; return; }
-    const t0 = performance.now(), dur = 1500;
-    const tick = t => { const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3); el.textContent = pre + (to * e).toFixed(dec) + suf; if (p < 1) requestAnimationFrame(tick); };
+    const fin = el.dataset.final;
+    if (reduced) { el.textContent = fin || pre + to.toFixed(dec) + suf; return; }
+    const t0 = performance.now(), dur = fin ? 1800 : 1500;
+    const tick = t => { const p = Math.min(1, (t - t0) / dur), e = fin ? p * p : 1 - Math.pow(1 - p, 3); el.textContent = p >= 1 && fin ? fin : pre + (to * e).toFixed(dec) + suf; if (p < 1) requestAnimationFrame(tick); };
     requestAnimationFrame(tick);
   };
   whenReady(() => {

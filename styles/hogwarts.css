@@ -81,7 +81,7 @@ html[data-theme="hogwarts"] code, html[data-theme="hogwarts"] pre, html[data-the
 html[data-theme="hogwarts"] code { color: #7f0909; }
 html[data-theme="hogwarts"] :focus-visible { outline-color: var(--gold); }
 html[data-theme="hogwarts"] ::selection { background: rgba(211,166,37,.4); }
-html[data-theme="hogwarts"] #ocean, html[data-theme="hogwarts"] #life, html[data-theme="hogwarts"] #heroSub,
+html[data-theme="hogwarts"] #ocean, html[data-theme="hogwarts"] #life,
 html[data-theme="hogwarts"] .gauge, html[data-theme="hogwarts"] .dive-stats, html[data-theme="hogwarts"] .vignette, html[data-theme="hogwarts"] #intro { display: none !important; }
 
 #magic { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; }
