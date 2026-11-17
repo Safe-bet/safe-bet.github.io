@@ -42,7 +42,7 @@
   }
 
   const hint = document.getElementById('torchHint');
-  if (hint && !fine) hint.textContent = 'ATAL is out exploring with its lamp. Tap anywhere to ping sonar.';
+  if (hint && !fine) hint.textContent = 'ATAL is out exploring with its lamp. Tap sea creatures on the way down to log them, and drag through deep water to light the plankton.';
 
   /* ---------- nav ---------- */
   addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 30), { passive: true });
@@ -103,7 +103,7 @@
   /* ---------- heading decode (sonar readout) ---------- */
   const glyphs = '01<>/[]{}#=+*~^ABCDEF';
   const decode = el => {
-    if (reduced) return;
+    if (reduced || document.documentElement.dataset.theme === 'hogwarts') return;   // the Gryffindor theme writes headings in with ink instead
     const nodes = []; const walk = n => n.childNodes.forEach(c => c.nodeType === 3 ? nodes.push([c, c.textContent]) : walk(c)); walk(el);
     const t0 = performance.now(), dur = 750;
     el.classList.add('decoding');

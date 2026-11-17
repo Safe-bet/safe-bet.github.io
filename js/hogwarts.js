@@ -157,6 +157,8 @@
   const cv = $('magic'), g = cv.getContext('2d');
   let W = 0, H = 0, DPR = 1;
   const candles = [], owls = [], sparks = [];
+  const FX = { flare: 0, patronus: null, snitch: null, px: -999, py: -999 };   // spell effects drawn on this canvas
+  addEventListener('pointermove', e => { FX.px = e.clientX; FX.py = e.clientY; }, { passive: true });
   function fit() {
     DPR = Math.min(devicePixelRatio || 1, 1.75); W = innerWidth; H = innerHeight;
     cv.width = W * DPR; cv.height = H * DPR; g.setTransform(DPR, 0, 0, DPR, 0, 0);
@@ -174,7 +176,7 @@
     const s = c.z, x = c.x * W + Math.sin(t * .0006 + c.ph) * 10;
     let y = ((c.y * H * 1.6 - sy * .25 * s) % (H * 1.6) + H * 1.6) % (H * 1.6) - H * .3 + Math.sin(t * .0011 + c.ph) * 8;
     const h = 34 * s, w = 7 * s;
-    const fl = 1 + .12 * Math.sin(t * .02 + c.fl) + .08 * Math.sin(t * .053 + c.fl * 2);
+    const fl = (1 + .12 * Math.sin(t * .02 + c.fl) + .08 * Math.sin(t * .053 + c.fl * 2)) * (1 + FX.flare * 1.4);
     // halo
     const hg = g.createRadialGradient(x, y - h / 2 - 6 * s, 0, x, y - h / 2 - 6 * s, 46 * s * fl);
     hg.addColorStop(0, 'rgba(255,214,120,.38)'); hg.addColorStop(1, 'rgba(255,214,120,0)');
@@ -210,12 +212,11 @@
   }
   // stag patronus, silvery blue, procedural
   const stag = { x: -.2, ph: 0 };
-  function drawStag(t, alpha) {
-    const s = Math.min(1.1, W / 900), bx = stag.x * W, by = H - 70 * s;
+  function drawStag(t, alpha, bx, by, s, gallop = 1) {
     g.save(); g.globalAlpha = alpha; g.translate(bx, by); g.scale(s, s);
     g.shadowColor = 'rgba(120,180,255,.9)'; g.shadowBlur = 22;
     g.strokeStyle = 'rgba(170,210,255,.9)'; g.fillStyle = 'rgba(190,220,255,.55)'; g.lineWidth = 3; g.lineCap = 'round';
-    const step = t * .006 + stag.ph;
+    const step = t * .006 * gallop + stag.ph;
     // legs
     const legs = [[-38, 0], [-30, Math.PI], [26, Math.PI], [34, 0]];
     for (const [lx, p] of legs) { const a = Math.sin(step + p) * .35; g.beginPath(); g.moveTo(lx, -40); g.lineTo(lx + Math.sin(a) * 20, -20); g.lineTo(lx + Math.sin(a) * 30 - 4, 0); g.stroke(); }
@@ -267,7 +268,37 @@
       if (o.x < -100 || o.x > W + 100) { owls.splice(i, 1); continue; }
       drawOwl(o, now);
     }
-    if (contactVis) { if (!reduced) stag.x += .0011 * dt; if (stag.x > 1.25) stag.x = -.25; drawStag(now, .9); }
+    if (contactVis && !FX.patronus) { if (!reduced) stag.x += .0011 * dt; if (stag.x > 1.25) stag.x = -.25; const ss = Math.min(1.1, W / 900); drawStag(now, .9, stag.x * W, H - 70 * ss, ss); }
+    // Expecto patronum: a big stag gallops across the screen
+    if (FX.patronus) {
+      const P = FX.patronus; P.x += P.v * dt;
+      const ss = Math.min(2.2, W / 520);
+      drawStag(now, Math.min(1, (W + 300 - P.x) / 300, (P.x + 300) / 300), P.x, H * .62 + Math.sin(now * .012) * 10, ss, 2.6);
+      for (let k = 0; k < 3; k++) sparks.push({ x: P.x - 60 * ss + Math.random() * 120 * ss, y: H * .62 - Math.random() * 150 * ss, vx: -1.5 - Math.random() * 2, vy: -.5 + Math.random(), l: 1, c: '170,210,255' });
+      if (P.x > W + 320) FX.patronus = null;
+    }
+    // Incendio: candles flare, embers rise
+    if (FX.flare > 0) { FX.flare = Math.max(0, FX.flare - .004 * dt); if (Math.random() < FX.flare) sparks.push({ x: Math.random() * W, y: H + 5, vx: (Math.random() - .5) * .6, vy: -2 - Math.random() * 2, l: 1.4, c: '255,140,40' }); }
+    // the Golden Snitch, flitting around the page
+    if (FX.snitch) {
+      const sn = FX.snitch; sn.age += dt / 60; sn.wing += dt * .9;
+      const dx = sn.x - FX.px, dy = sn.y - FX.py, d = Math.hypot(dx, dy) || 1;
+      if (sn.summoned && sn.age < 1.6) { sn.vx += (FX.px - sn.x) * .004 * dt; sn.vy += (FX.py - sn.y) * .004 * dt; }
+      else if (d < 160) { sn.vx += dx / d * .7 * dt; sn.vy += dy / d * .7 * dt; }
+      if (Math.random() < .04 * dt) { const a = Math.random() * 6.283; sn.vx += Math.cos(a) * 3; sn.vy += Math.sin(a) * 3; }
+      if (sn.x < 30) sn.vx += .4 * dt; if (sn.x > W - 30) sn.vx -= .4 * dt; if (sn.y < 80) sn.vy += .4 * dt; if (sn.y > H - 30) sn.vy -= .4 * dt;
+      const sp = Math.hypot(sn.vx, sn.vy), cap = 6.5; if (sp > cap) { sn.vx *= cap / sp; sn.vy *= cap / sp; }
+      sn.vx *= .985; sn.vy *= .985; sn.x += sn.vx * dt; sn.y += sn.vy * dt;
+      const f = Math.sin(sn.wing) * .9;
+      const gl = g.createRadialGradient(sn.x, sn.y, 0, sn.x, sn.y, 26); gl.addColorStop(0, 'rgba(255,225,110,.6)'); gl.addColorStop(1, 'rgba(255,225,110,0)');
+      g.fillStyle = gl; g.beginPath(); g.arc(sn.x, sn.y, 26, 0, 6.283); g.fill();
+      g.fillStyle = 'rgba(250,250,255,.92)'; g.strokeStyle = 'rgba(150,150,160,.8)'; g.lineWidth = .8;
+      [-1, 1].forEach(sd => { g.beginPath(); g.moveTo(sn.x + sd * 4, sn.y - 2); g.quadraticCurveTo(sn.x + sd * 16, sn.y - 13 * f - 5, sn.x + sd * 24, sn.y - 5 * f); g.quadraticCurveTo(sn.x + sd * 14, sn.y + 2, sn.x + sd * 4, sn.y + 2); g.fill(); g.stroke(); });
+      const g2 = g.createRadialGradient(sn.x - 2, sn.y - 2, 1, sn.x, sn.y, 6); g2.addColorStop(0, '#fff3b0'); g2.addColorStop(1, '#c79a1a');
+      g.fillStyle = g2; g.beginPath(); g.arc(sn.x, sn.y, 6, 0, 6.283); g.fill();
+      if (Math.random() < .5) sparks.push({ x: sn.x, y: sn.y, vx: (Math.random() - .5) * .5, vy: (Math.random() - .5) * .5, l: .8, c: '230,180,40' });
+      if (sn.age > sn.ttl) FX.snitch = null;
+    }
     wand(now);
     for (let i = sparks.length - 1; i >= 0; i--) {
       const p = sparks[i]; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += .02 * dt; p.l -= .025 * dt;
@@ -344,51 +375,234 @@
     requestAnimationFrame(loop);
   });
 
-  /* ---------------- map trail: footprints walk the journey ---------------- */
-  const term = document.querySelector('#journey .term');
-  if (term) {
-    const tc = document.createElement('canvas'); tc.className = 'trail hp-only'; term.appendChild(tc);
-    const tg = tc.getContext('2d'); let tv = false;
-    new IntersectionObserver(es => { tv = es[0].isIntersecting; }).observe(term);
-    const foot = (x, y, ang, left, a) => {
-      tg.save(); tg.translate(x, y); tg.rotate(ang + Math.PI / 2); tg.translate(left ? -4 : 4, 0);
-      tg.fillStyle = `rgba(74,44,18,${a})`;
-      tg.beginPath(); tg.ellipse(0, 2, 2.6, 4.2, 0, 0, 6.283); tg.fill();
-      tg.beginPath(); tg.ellipse(0, -4.5, 2, 2.4, 0, 0, 6.283); tg.fill();
-      tg.restore();
-    };
-    const loop = t => {
-      requestAnimationFrame(loop);
-      if (!tv || !isHP()) return;
-      const r = term.getBoundingClientRect(), d = Math.min(devicePixelRatio || 1, 2);
-      if (tc.width !== Math.round(r.width * d) || tc.height !== Math.round(r.height * d)) { tc.width = r.width * d; tc.height = r.height * d; tc.style.width = r.width + 'px'; tc.style.height = r.height + 'px'; }
-      tg.setTransform(d, 0, 0, d, 0, 0); tg.clearRect(0, 0, r.width, r.height);
-      const pts = [...term.querySelectorAll('.commit:not(.dim) .nd')].map(n => { const b = n.getBoundingClientRect(); return [b.left - r.left + b.width / 2, b.top - r.top + b.height / 2]; });
-      if (pts.length < 2) return;
-      const segs = []; let L = 0;
-      for (let i = 1; i < pts.length; i++) { const l = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); segs.push(l); L += l; }
-      const p = Math.max(0, Math.min(1, (innerHeight * .7 - r.top) / r.height));
-      const head = p * L, stride = 13;
-      let walked = 0, n = 0, hx = pts[0][0], hy = pts[0][1], ha = Math.PI / 2;
-      for (let i = 0; i < segs.length; i++) {
-        const [ax, ay] = pts[i], [bx, by] = pts[i + 1], ang = Math.atan2(by - ay, bx - ax);
-        for (let s = (stride - (walked % stride)) % stride; s < segs[i]; s += stride) {
-          const at = walked + s; if (at > head) break;
-          const fx = ax + (bx - ax) * s / segs[i], fy = ay + (by - ay) * s / segs[i];
-          const age = (head - at) / 260; foot(fx, fy, ang, n++ % 2 === 0, Math.max(.1, .8 - age));
-          hx = fx; hy = fy; ha = ang;
-        }
-        walked += segs[i]; if (walked > head) break;
-      }
-      // name tag following the newest footprint
-      tg.font = "italic 13px 'IM Fell English', serif";
-      const label = 'Suyash Kumar', w = tg.measureText(label).width + 14, lx = hx + 14, ly = hy - 10;
-      tg.fillStyle = 'rgba(251,242,220,.95)'; tg.strokeStyle = 'rgba(74,44,18,.7)'; tg.lineWidth = 1;
-      tg.beginPath(); tg.roundRect(lx, ly, w, 20, 3); tg.fill(); tg.stroke();
-      tg.fillStyle = '#4a2c12'; tg.fillText(label, lx + 7, ly + 14);
-    };
-    requestAnimationFrame(loop);
+  const mk = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+  const seen = (el, fn, th = .2) => new IntersectionObserver((es, o) => es.forEach(e => { if (e.isIntersecting) fn(o); }), { threshold: th }).observe(el);
+
+  /* ---------------- the library: projects as books on a shelf ---------------- */
+  const workIdx = $('workIndex');
+  if (workIdx) {
+    const shelf = mk('div', 'bookshelf hp-only');
+    const COL = ['#7f0909', '#1f4a34', '#23325e', '#6b4426', '#8a6a1a', '#4b2a6b', '#3a2a22'];
+    [...workIdx.querySelectorAll('a')].forEach((a, i) => {
+      const b = mk('a', 'book'); b.href = a.getAttribute('href');
+      b.style.setProperty('--bc', COL[i % COL.length]); b.style.setProperty('--bh', (84 + (i * 37) % 16) + '%'); b.style.setProperty('--i', i);
+      b.append(mk('span', 'bk-n', String(i + 1).padStart(2, '0')), mk('span', 'bk-t', a.querySelector('.ix-t').textContent), mk('span', 'bk-y', a.querySelector('.ix-y').textContent), mk('span', 'bk-tip', a.querySelector('.ix-m').textContent));
+      shelf.appendChild(b);
+    });
+    workIdx.after(shelf);
+    seen(shelf, o => { shelf.classList.add('in'); o.disconnect(); });
   }
+
+  /* ---------------- the map: footprints along a winding path of milestones ---------------- */
+  const mapEl = $('hpMap'), D = window.SITE;
+  const notes = [];
+  if (mapEl && D) {
+    const C = [...D.commits].reverse();                       // oldest first: the walk goes forward in time
+    const HOUSE = { main: ['#7f0909', 'Milestones'], robotics: ['#1d4e89', 'Robotics'], ai: ['#5b3a8a', 'Industry AI'], research: ['#2f6b2a', 'Research'], oss: ['#a0520a', 'Open source'] };
+    const legend = mk('div', 'mp-legend');
+    const keys = Object.keys(HOUSE);
+    const lbtn = keys.map(k => { const b = mk('button', 'mp-chip'); b.type = 'button'; b.style.setProperty('--c', HOUSE[k][0]); b.setAttribute('aria-pressed', 'false'); b.append(mk('i'), document.createTextNode(HOUSE[k][1])); b.dataset.b = k; legend.appendChild(b); return b; });
+    const title = mk('p', 'mp-title', 'The Map of Suyash Kumar');
+    const sub = mk('p', 'mp-sub', 'Scroll to walk the path. Tap a seal to read the entry.');
+    const field = mk('div', 'mp-field');
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(svgNS, 'svg'); svg.setAttribute('class', 'mp-svg');
+    const path = document.createElementNS(svgNS, 'path'); svg.appendChild(path);
+    const steps = mk('canvas', 'mp-steps');
+    field.append(svg, steps);
+    const nodes = C.map((c, i) => {
+      const n = mk('div', 'mp-node'); n.dataset.b = c.b; n.style.setProperty('--c', HOUSE[c.b] ? HOUSE[c.b][0] : '#7f0909');
+      const seal = mk('button', 'mp-seal'); seal.type = 'button'; seal.setAttribute('aria-expanded', 'false'); seal.setAttribute('aria-label', c.msg);
+      seal.textContent = (c.b === 'main' ? '✦' : c.b === 'robotics' ? '⚓' : c.b === 'ai' ? '✧' : c.b === 'research' ? '⚗' : '✎');
+      const lbl = mk('div', 'mp-lbl');
+      lbl.append(mk('i', null, c.date), mk('b', null, c.msg));
+      const note = mk('div', 'mp-note');
+      const ul = mk('ul'); (c.diff || []).forEach(d => ul.appendChild(mk('li', null, d))); note.appendChild(ul);
+      if (c.link) { const a = mk('a', null, c.link.startsWith('#') ? 'Read more ↓' : 'See the pull request ↗'); a.href = c.link; if (!c.link.startsWith('#')) { a.target = '_blank'; a.rel = 'noopener'; } note.appendChild(a); }
+      lbl.appendChild(note);
+      const toggle = () => { const o = n.classList.toggle('open'); seal.setAttribute('aria-expanded', o); requestAnimationFrame(layout); };
+      seal.addEventListener('click', toggle); lbl.querySelector('b').addEventListener('click', toggle);
+      n.append(seal, lbl); field.appendChild(n); notes.push(n);
+      return n;
+    });
+    // year markers
+    let lastYear = '';
+    const years = [];
+    C.forEach((c, i) => { const y = (c.date.match(/20\d\d/) || [c.date])[0]; if (y !== lastYear) { lastYear = y; const yb = mk('div', 'mp-year', /^20/.test(y) ? 'Year of ' + y : y); field.appendChild(yb); years.push([yb, i]); } });
+    mapEl.append(title, sub, legend, field);
+    lbtn.forEach(b => b.addEventListener('click', () => {
+      const on = b.getAttribute('aria-pressed') !== 'true';
+      lbtn.forEach(x => x.setAttribute('aria-pressed', on && x === b));
+      nodes.forEach(n => n.classList.toggle('dim', on && n.dataset.b !== b.dataset.b));
+    }));
+
+    let pts = [], samples = [], nodeLen = [], total = 1;
+    function layout() {
+      if (!isHP() || !mapEl.offsetWidth) return;
+      const w = field.clientWidth, wide = w > 700;
+      let y = 60; pts = [];
+      const yStart = new Set(years.map(v => v[1]));
+      nodes.forEach((n, i) => {
+        if (i && yStart.has(i)) y += 36;
+        const x = wide ? w / 2 + Math.sin(i * 1.15 + .4) * w * .26 : 30;
+        n.style.left = x + 'px'; n.style.top = y + 'px';
+        n.classList.toggle('right', !wide || x < w / 2);
+        pts.push([x, y]);
+        const lb = n.querySelector('.mp-lbl'), nt = n.querySelector('.mp-note');
+        y += Math.max(wide ? 96 : 86, lb.offsetHeight - nt.offsetHeight + (n.classList.contains('open') ? nt.scrollHeight : 0) + 28);
+      });
+      years.forEach(([yb, i]) => { yb.style.top = (pts[i][1] - 52) + 'px'; yb.style.left = wide ? (pts[i][0] < w / 2 ? pts[i][0] + 40 : pts[i][0] - 40 - yb.offsetWidth) + 'px' : '64px'; });
+      const H = y + 10;
+      field.style.height = H + 'px';
+      svg.setAttribute('viewBox', `0 0 ${w} ${H}`); svg.setAttribute('width', w); svg.setAttribute('height', H);
+      // smooth curve through the milestones (Catmull-Rom → Bézier)
+      let d = `M${pts[0][0]},${pts[0][1]}`;
+      for (let i = 0; i < pts.length - 1; i++) {
+        const p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2;
+        d += ` C${p1[0] + (p2[0] - p0[0]) / 6},${p1[1] + (p2[1] - p0[1]) / 6} ${p2[0] - (p3[0] - p1[0]) / 6},${p2[1] - (p3[1] - p1[1]) / 6} ${p2[0]},${p2[1]}`;
+      }
+      path.setAttribute('d', d);
+      total = path.getTotalLength(); samples = [];
+      for (let l = 0; l <= total; l += 6) { const p = path.getPointAtLength(l); samples.push([p.x, p.y, l]); }
+      nodeLen = pts.map(([x, yy]) => { let best = 0, bd = 1e9; for (const s of samples) { const q = (s[0] - x) ** 2 + (s[1] - yy) ** 2; if (q < bd) { bd = q; best = s[2]; } } return best; });
+      const dpr = Math.min(devicePixelRatio || 1, 2); steps.width = w * dpr; steps.height = H * dpr; steps.style.width = w + 'px'; steps.style.height = H + 'px';
+    }
+    addEventListener('resize', layout); onTheme(() => setTimeout(layout, 50));
+    if (document.fonts) document.fonts.ready.then(layout);
+    layout();
+    // footprints walk as you scroll; the newest carries a name tag
+    const sg = steps.getContext('2d'); let vis = false;
+    seen(mapEl, () => { vis = true; }, 0);
+    new IntersectionObserver(es => { vis = es[0].isIntersecting; }).observe(mapEl);
+    const foot = (x, y, ang, left, a) => {
+      sg.save(); sg.translate(x, y); sg.rotate(ang + Math.PI / 2); sg.translate(left ? -5 : 5, 0); sg.fillStyle = `rgba(74,44,18,${a})`;
+      sg.beginPath(); sg.ellipse(0, 2, 3, 5, 0, 0, 6.283); sg.fill(); sg.beginPath(); sg.ellipse(0, -5.5, 2.4, 2.8, 0, 0, 6.283); sg.fill(); sg.restore();
+    };
+    const walk = () => {
+      requestAnimationFrame(walk);
+      if (!vis || !isHP() || !samples.length) return;
+      const r = field.getBoundingClientRect(), dpr = steps.width / r.width;
+      const p = Math.max(0, Math.min(1, (innerHeight * .62 - r.top) / r.height)), head = p * total;
+      sg.setTransform(dpr, 0, 0, dpr, 0, 0); sg.clearRect(0, 0, r.width, r.height);
+      let n = 0, hx = samples[0][0], hy = samples[0][1];
+      for (let k = 1; k < samples.length - 1 && samples[k][2] < head; k += 3) {   // samples are 6 px apart → a step every 18 px
+        const [x0, y0, l] = samples[k], [x1, y1] = samples[k + 1];
+        foot(x0, y0, Math.atan2(y1 - y0, x1 - x0), n++ % 2 === 0, Math.max(.12, .85 - (head - l) / 900));
+        hx = x0; hy = y0;
+      }
+      nodes.forEach((nd, i) => nd.classList.toggle('reached', nodeLen[i] <= head + 4));
+      sg.font = "italic 14px 'IM Fell English', serif";
+      const label = 'Suyash Kumar', tw = sg.measureText(label).width + 16, lx = Math.min(r.width - tw - 4, hx + 14), ly = hy - 30;
+      sg.fillStyle = 'rgba(251,242,220,.96)'; sg.strokeStyle = 'rgba(74,44,18,.75)'; sg.lineWidth = 1;
+      sg.beginPath(); sg.roundRect(lx, ly, tw, 22, 3); sg.fill(); sg.stroke();
+      sg.fillStyle = '#4a2c12'; sg.fillText(label, lx + 8, ly + 15);
+    };
+    requestAnimationFrame(walk);
+  }
+
+  /* ---------------- the wand shop: letters fly out of the cabinet into their slots ---------------- */
+  const pt = $('ptable'), pwrap = document.querySelector('.ptable-wrap');
+  let summoned = false;
+  function summon() {
+    if (!pt || !isHP()) return;
+    const tiles = [...pt.querySelectorAll('.el')];
+    tiles.forEach(t => { if (!t.querySelector('.envl')) { const e = mk('span', 'envl hp-only'); e.setAttribute('aria-hidden', 'true'); t.appendChild(e); } });
+    if (reduced) return;
+    pt.getAnimations({ subtree: true }).forEach(a => a.cancel());
+    pwrap.classList.add('side'); void pwrap.offsetWidth;
+    requestAnimationFrame(() => requestAnimationFrame(() => pwrap.classList.remove('side')));
+    const wr = pt.getBoundingClientRect(), cx = wr.left + wr.width * .5, cy = wr.top + wr.height * .55;
+    tiles.forEach((el, i) => {
+      const r = el.getBoundingClientRect(), dx = cx - (r.left + r.width / 2), dy = cy - (r.top + r.height / 2), rz = (Math.random() - .5) * 70;
+      el.animate([
+        { transform: `translate3d(${dx}px, ${dy}px, -700px) rotateY(180deg) rotateZ(${rz}deg) scale(.5)` },   // starts inside the cabinet, behind the board (no opacity: that would flatten the 3-D flip)
+        { transform: `translate3d(${dx * .35 + (Math.random() - .5) * 120}px, ${dy * .35 - 170}px, 280px) rotateY(205deg) rotateZ(${-rz}deg) scale(1.2)`, offset: .55 },
+        { transform: 'translate3d(0, -10px, 60px) rotateY(150deg) scale(1.05)', offset: .82 },
+        { transform: 'translateZ(3px)' }
+      ], { duration: 1500, delay: 250 + i * 32, easing: 'cubic-bezier(.3,.55,.25,1)', fill: 'backwards' });
+    });
+  }
+  if (pt) {
+    seen(pt, () => { if (isHP() && !summoned) { summoned = true; summon(); } }, .15);
+    onTheme(t => { summoned = false; if (t === 'hogwarts') { const r = pt.getBoundingClientRect(); if (r.top < innerHeight && r.bottom > 0) { summoned = true; setTimeout(summon, 300); } } });
+    const ab = $('accioLetters'); ab && ab.addEventListener('click', summon);
+  }
+
+  /* ---------------- spells: type them anywhere, or use the spellbook ---------------- */
+  const SPELLS = [
+    ['lumos', 'Lumos', 'Light up the castle'],
+    ['nox', 'Nox', 'Lights out. Your wand still glows.'],
+    ['wingardiumleviosa', 'Wingardium Leviosa', 'Make the page float'],
+    ['expectopatronum', 'Expecto Patronum', 'Send a stag galloping across'],
+    ['accio', 'Accio Snitch', 'Summon the Golden Snitch, then catch it'],
+    ['alohomora', 'Alohomora', 'Unlock every door and diary entry'],
+    ['incendio', 'Incendio', 'Make the candles roar'],
+    ['finite', 'Finite', 'End all spells']
+  ];
+  const castEl = $('spellCast');
+  const castSeen = new Set(JSON.parse(ls.get('hp_spells') || '[]'));
+  let levT;
+  function burstAt(x, y, c = '211,166,37', n = 26) { for (let i = 0; i < n; i++) { const a = Math.random() * 6.283, v = 1 + Math.random() * 4; sparks.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, l: 1.2, c }); } }
+  function announce(text) { if (!castEl) return; castEl.textContent = text; castEl.classList.remove('on'); void castEl.offsetWidth; castEl.classList.add('on'); }
+  function cast(id, x = innerWidth / 2, y = innerHeight / 2) {
+    if (!isHP()) return;
+    const sp = SPELLS.find(s => s[0] === id); if (!sp) return;
+    announce(sp[1] + '!'); burstAt(x, y);
+    if (!castSeen.has(id)) { castSeen.add(id); ls.set('hp_spells', JSON.stringify([...castSeen])); award(5, x, y - 20); }
+    if (id === 'lumos') { root.classList.remove('hp-night'); FX.flare = .7; }
+    if (id === 'nox') root.classList.add('hp-night');
+    if (id === 'wingardiumleviosa') { document.body.classList.add('levitate'); clearTimeout(levT); levT = setTimeout(() => document.body.classList.remove('levitate'), 9000); }
+    if (id === 'expectopatronum') FX.patronus = { x: -300, v: reduced ? 40 : 7 };
+    if (id === 'accio') FX.snitch = { x: -30, y: innerHeight * .35, vx: 7, vy: 0, age: 0, ttl: 18, wing: 0, summoned: true };
+    if (id === 'alohomora') { notes.forEach(n => { n.classList.add('open'); n.querySelector('.mp-seal').setAttribute('aria-expanded', 'true'); }); $('oss') && $('oss').classList.add('unlocked'); dispatchEvent(new Event('resize')); }
+    if (id === 'incendio') FX.flare = 1;
+    if (id === 'finite') { root.classList.remove('hp-night'); document.body.classList.remove('levitate'); FX.patronus = null; FX.flare = 0; $('oss') && $('oss').classList.remove('unlocked'); }
+  }
+  // typed spells
+  let buf = '';
+  addEventListener('keydown', e => {
+    if (!isHP() || e.metaKey || e.ctrlKey || e.altKey || (e.target.closest && e.target.closest('input, textarea, select, [contenteditable]'))) return;
+    if (document.getElementById('qgame')?.classList.contains('playing')) return;
+    if (!/^[a-z]$/i.test(e.key)) return;
+    buf = (buf + e.key.toLowerCase()).slice(-24);
+    const hit = SPELLS.find(s => buf.endsWith(s[0]));
+    if (hit) { buf = ''; cast(hit[0], FX.px > 0 ? FX.px : innerWidth / 2, FX.py > 0 ? FX.py : innerHeight / 2); }
+  });
+  // the spellbook
+  const sbBtn = $('sbBtn'), sbPanel = $('sbPanel'), sbList = $('sbList');
+  if (sbBtn) {
+    SPELLS.forEach(([id, name, what]) => {
+      const li = mk('li'), b = mk('button', 'sb-spell'); b.type = 'button';
+      b.append(mk('b', null, name), mk('span', null, what));
+      b.addEventListener('click', e => { const r = b.getBoundingClientRect(); cast(id, r.left + r.width / 2, r.top); if (!fine) setOpen(false); });
+      li.appendChild(b); sbList.appendChild(li);
+    });
+    const setOpen = o => { sbPanel.hidden = !o; sbBtn.setAttribute('aria-expanded', o); };
+    sbBtn.addEventListener('click', () => setOpen(sbPanel.hidden));
+    addEventListener('pointerdown', e => { if (!sbPanel.hidden && !e.target.closest('#spellbook')) setOpen(false); });
+    addEventListener('keydown', e => { if (e.key === 'Escape') setOpen(false); });
+  }
+  // wand light in the dark (Nox): follows the pointer or the hero wand
+  const night = $('night');
+  const moveLight = (x, y) => { if (night) { night.style.setProperty('--wx', x + 'px'); night.style.setProperty('--wy', y + 'px'); } };
+  addEventListener('pointermove', e => moveLight(e.clientX, e.clientY), { passive: true });
+  addEventListener('pointerdown', e => moveLight(e.clientX, e.clientY), { passive: true });
+  // catching the Snitch
+  addEventListener('pointerdown', e => {
+    const sn = FX.snitch; if (!sn || !isHP()) return;
+    if (Math.hypot(e.clientX - sn.x, e.clientY - sn.y) < (fine ? 30 : 44)) {
+      FX.snitch = null; burstAt(e.clientX, e.clientY, '255,215,90', 40); announce('Snitch caught!'); award(150, e.clientX, e.clientY - 20);
+    }
+  }, true);
+  // the Snitch also turns up on its own now and then
+  let nextSnitch = performance.now() + 35000 + Math.random() * 20000;
+  setInterval(() => {
+    if (!isHP() || FX.snitch || document.hidden || reduced) return;
+    if (performance.now() > nextSnitch) { FX.snitch = { x: innerWidth + 30, y: innerHeight * (.25 + Math.random() * .4), vx: -5, vy: 0, age: 0, ttl: 14, wing: 0 }; nextSnitch = performance.now() + 75000 + Math.random() * 60000; }
+  }, 1000);
+  onTheme(t => { if (t !== 'hogwarts') { root.classList.remove('hp-night'); document.body.classList.remove('levitate'); FX.snitch = null; FX.patronus = null; } });
+  // the restricted section: hovering a chained book (or Alohomora) unlocks it
+  document.querySelectorAll('#oss .oss').forEach(b => b.addEventListener('click', () => b.classList.add('free')));
 
   /* ---------------- owl post ---------------- */
   const op = $('owlPost');

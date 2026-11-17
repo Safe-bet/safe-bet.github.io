@@ -547,3 +547,12 @@ html.locked { overflow: hidden; }
 .ing-log .a { color: var(--violet); } .ing-log .ok { color: var(--ok); } .ing-log .w { color: var(--warn); } .ing-log .e { color: var(--bad); } .ing-log .h { color: var(--torch); }
 .ing-btns { display: flex; gap: .4rem; flex-wrap: wrap; }
 @media (max-width: 880px) { .next-card { grid-template-columns: 1fr; margin-top: 0; } .next-k, .next-cta { grid-row: auto; grid-column: auto; } .next-m { grid-column: auto; } }
+
+/* ---------- field guide card (tap a creature) ---------- */
+.field-card { position: fixed; z-index: 70; width: min(300px, calc(100vw - 24px)); padding: .9rem 1rem 1rem; border-radius: 14px; border: 1px solid rgba(70,227,255,.35); background: rgba(2,12,24,.9); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 20px 50px rgba(0,0,0,.55), 0 0 30px rgba(70,227,255,.12); opacity: 0; transform: translateY(8px) scale(.97); transition: opacity .25s, transform .25s; pointer-events: none; }
+.field-card.on { opacity: 1; transform: none; pointer-events: auto; }
+.field-card .fc-k { font: 500 .62rem var(--f-mono); letter-spacing: .16em; text-transform: uppercase; color: var(--bio); }
+.field-card h4 { font-size: 1.15rem; margin: .25rem 0 .4rem; }
+.field-card p { color: var(--ink-2); font-size: .88rem; line-height: 1.5; }
+.field-card .fc-log { margin-top: .6rem; font: 500 .7rem var(--f-mono); color: var(--torch); }
+.ds-log b { color: var(--torch) !important; }

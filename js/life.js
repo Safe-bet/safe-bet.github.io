@@ -62,6 +62,51 @@
   const snails = Array.from({ length: 4 }, () => ({ x: R(), y: .25 + R() * .5, s: .8 + R() * .5, ph: R() * 6, dir: R() < .5 ? -1 : 1 }));
   const smoke = [];
 
+  /* ---------- field guide: tap a creature to log it ---------- */
+  const GUIDE = {
+    whale: ['Blue whale', 'Sunlight zone · 0–200 m', 'The largest animal known to have lived, up to about 30 m long, and it eats krill a few centimetres long.'],
+    fish: ['Baitfish school', 'Sunlight zone · 0–200 m', 'Hundreds of bodies turning as one make it hard for a predator to lock onto a single fish. Move your cursor through them.'],
+    lantern: ['Lanternfish', 'Twilight zone · 200–1,000 m', 'Among the most abundant vertebrates on Earth. Glowing photophores on the belly hide their silhouette from predators below.'],
+    siph: ['Siphonophore', 'Twilight zone · 200–1,000 m', 'Not one animal but a colony of specialised clones working as one. Some are longer than a blue whale.'],
+    angler: ['Anglerfish', 'Midnight zone · 1,000–4,000 m', 'The glowing lure is packed with bioluminescent bacteria. Prey swims toward the light, and the jaws are waiting.'],
+    jelly: ['Deep-sea jellyfish', 'Midnight zone and below', 'Many flash when attacked. One idea is a burglar alarm: the light draws in bigger predators to eat the attacker.'],
+    comb: ['Comb jelly', 'Abyssal zone · 4,000–6,000 m', 'The rainbow is not bioluminescence. Light diffracts off eight rows of beating cilia as it swims.'],
+    snail: ['Hadal snailfish', 'Hadal zone · 6,000–11,000 m', 'The deepest fish ever filmed, at 8,336 m in 2022. Soft, scaleless bodies cope with crushing pressure.'],
+    vent: ['Hydrothermal vent', 'Seabed', 'Bacteria turn the vent’s chemicals into food without sunlight. Tube worms host them inside their bodies instead of eating.'],
+    atal: ['ATAL, parked', 'Artistic licence', 'AUV-IITK’s vehicle is built for a few metres of pool water, not 11 km. Down here it is just keeping the lamp on for you.']
+  };
+  const GUIDE_N = Object.keys(GUIDE).filter(k => k !== 'atal').length;
+  const hits = [];
+  const plankton = [];
+  const logStore = { get() { try { return new Set(JSON.parse(localStorage.getItem('sea_log') || '[]')); } catch { return new Set(); } }, set(v) { try { localStorage.setItem('sea_log', JSON.stringify([...v])); } catch {} } };
+  let logged = logStore.get();
+  const logEl = document.getElementById('dsLog');
+  const showLog = () => { if (logEl) logEl.textContent = `${[...logged].filter(k => k !== 'atal').length}/${GUIDE_N}`; };
+  showLog();
+  const card = document.getElementById('fieldCard');
+  let cardT;
+  function openCard(id, x, y) {
+    if (!card) return;
+    const [name, zone, fact] = GUIDE[id], fresh = !logged.has(id);
+    if (fresh) { logged.add(id); logStore.set(logged); showLog(); }
+    const n = [...logged].filter(k => k !== 'atal').length;
+    card.innerHTML = `<p class="fc-k">${zone}</p><h4>${name}</h4><p>${fact}</p><p class="fc-log">${fresh && id !== 'atal' ? 'New specimen logged · ' : ''}${n}/${GUIDE_N} logged${n === GUIDE_N ? ' · field guide complete' : ''}</p>`;
+    card.hidden = false;
+    const w = Math.min(300, innerWidth - 24);
+    card.style.left = Math.max(12, Math.min(innerWidth - w - 12, x - w / 2)) + 'px';
+    card.style.top = (y > innerHeight * .55 ? Math.max(12, y - card.offsetHeight - 24) : y + 24) + 'px';
+    card.classList.remove('on'); void card.offsetWidth; card.classList.add('on');
+    clearTimeout(cardT); cardT = setTimeout(() => card.classList.remove('on'), 7000);
+  }
+  // disturbed plankton flashes blue: drag the cursor or a finger through deep water
+  let lpx = -1, lpy = -1;
+  addEventListener('pointermove', e => {
+    if (reduced || document.documentElement.dataset.theme === 'hogwarts' || D.depth < .1) return;
+    const d = Math.hypot(e.clientX - lpx, e.clientY - lpy); if (d < 6) return; lpx = e.clientX; lpy = e.clientY;
+    const n = Math.min(4, 1 + (d / 14) | 0);
+    for (let i = 0; i < n && plankton.length < 360; i++) plankton.push({ x: e.clientX + (Math.random() - .5) * 18, y: e.clientY + (Math.random() - .5) * 18, vx: (Math.random() - .5) * .6, vy: (Math.random() - .5) * .6, l: 1, r: .8 + Math.random() * 1.6 });
+  }, { passive: true });
+
   /* ---------- seabed ---------- */
   let ridge = [], kelp = [], rocks = [];
   const buildBed = () => {
@@ -85,6 +130,7 @@
     const dt = Math.min(50, now - last) / 16.67; last = now; t += dt;
     const dy = Math.max(-40, Math.min(40, scrollY - lastScroll)); lastScroll = scrollY;
     if (document.documentElement.dataset.theme === 'hogwarts') { requestAnimationFrame(frame); return; }
+    hits.length = 0;
     const d = D.depth;
     ctx.clearRect(0, 0, W, H);
 
@@ -106,6 +152,7 @@
       // pectoral fin
       ctx.beginPath(); ctx.moveTo(L * .22, L * .045); ctx.quadraticCurveTo(L * .3, L * .12, L * .36, L * .13); ctx.quadraticCurveTo(L * .3, L * .07, L * .28, L * .05); ctx.fill();
       ctx.restore();
+      if (wa > .3) { hits.push({ id: 'whale', x: x + L * .3, y, r: L * .12 + 16 }); hits.push({ id: 'whale', x: x + L * .65, y, r: L * .08 + 12 }); }
     }
 
     // --- lanternfish with photophores (twilight) ---
@@ -123,6 +170,7 @@
         for (let k = 0; k < 5; k++) { ctx.beginPath(); ctx.arc(5 - k * 3, 2.2, 1.1, 0, 6.283); ctx.fill(); }
         ctx.beginPath(); ctx.arc(6, -.5, 1.1, 0, 6.283); ctx.fill(); ctx.shadowBlur = 0;
         ctx.restore();
+        if (la > .3) hits.push({ id: 'lantern', x, y, r: 22 });
       }
     }
 
@@ -132,6 +180,7 @@
       if (!reduced) { siph.y -= (.00035 * dt + dy * .4 / H); siph.x += Math.sin(t * .004) * .0003 * dt; }
       if (siph.y < -.6) { siph.y = 1.15; siph.x = .15 + R() * .7; }
       const n = 26, hx = siph.x * W, hy = siph.y * H;
+      if (sa > .3) for (let k = 0; k < 4; k++) hits.push({ id: 'siph', x: hx, y: hy + k * 80 + 20, r: 46 });
       ctx.save(); ctx.globalCompositeOperation = 'lighter';
       for (let i = 0; i < n; i++) {
         const px = hx + Math.sin(t * .02 - i * .28) * (6 + i * 1.4), py = hy + i * 11;
@@ -170,6 +219,7 @@
         ctx.strokeStyle = `rgba(90,120,130,${aa})`; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.moveTo(8, -26); ctx.quadraticCurveTo(20, -58, lx, ly); ctx.stroke();
         ctx.fillStyle = `rgba(200,255,240,${aa})`; ctx.shadowColor = '#7fffd4'; ctx.shadowBlur = 18 * pulse; ctx.beginPath(); ctx.arc(lx, ly, 3.6, 0, 6.283); ctx.fill(); ctx.shadowBlur = 0;
         ctx.restore();
+        if (aa > .3) hits.push({ id: 'angler', x, y: y - 10 * s, r: 58 * s });
       }
     }
 
@@ -180,6 +230,7 @@
         if (!reduced) { c.y -= (.00018 * dt + dy * .35 / H); c.x += Math.sin(t * .005 + c.ph) * .0002 * dt; }
         if (c.y < -.1) { c.y = 1.1; c.x = R(); } if (c.y > 1.15) { c.y = -.08; c.x = R(); }
         const x = c.x * W, y = c.y * H, s = c.s;
+        if (ca > .3) hits.push({ id: 'comb', x, y, r: s + 14 });
         ctx.fillStyle = `rgba(200,230,255,${.08 * ca})`; ctx.strokeStyle = `rgba(200,230,255,${.25 * ca})`; ctx.lineWidth = 1;
         ctx.beginPath(); ctx.ellipse(x, y, s * .62, s, 0, 0, 6.283); ctx.fill(); ctx.stroke();
         for (let r = 0; r < 4; r++) {
@@ -201,6 +252,7 @@
         if (!reduced) { f.x += f.dir * .00022 * dt; f.y -= dy * .2 / H; }
         if (f.x < -.1) f.x = 1.1; if (f.x > 1.1) f.x = -.1; if (f.y < .05) f.y = .9; if (f.y > .95) f.y = .1;
         const x = f.x * W, y = f.y * H + Math.sin(t * .015 + f.ph) * 8, s = f.s * (small() ? .8 : 1.1), wv = Math.sin(t * .09 + f.ph);
+        if (ha > .3) hits.push({ id: 'snail', x: x - 8 * f.dir * s, y, r: 30 * s });
         ctx.save(); ctx.translate(x, y); ctx.scale(f.dir * s, s);
         ctx.fillStyle = `rgba(250,210,225,${.45 * ha})`; ctx.strokeStyle = `rgba(255,230,240,${.55 * ha})`; ctx.lineWidth = .8;
         ctx.beginPath(); ctx.moveTo(14, 0); ctx.bezierCurveTo(14, -9, 0, -10, -6, -6);
@@ -250,6 +302,7 @@
         if (!reduced) { j.y -= ((.12 + Math.max(0, p) * .5) * dt + dy * .35) / H; j.x += Math.sin(t * .006 + j.ph) * .0003 * dt; }
         if (j.y < -.15) { j.y = 1.12; j.x = Math.random(); } if (j.y > 1.2) { j.y = -.1; j.x = Math.random(); }
         const x = j.x * W, y = j.y * H, s = j.s, bw = s * (1 + .14 * p), bh = s * .72 * (1 - .12 * p);
+        if (ja > .3) hits.push({ id: 'jelly', x, y: y + s * .6, r: s * 1.6 });
         const gl = ctx.createRadialGradient(x, y, 0, x, y, s * 2.6);
         gl.addColorStop(0, `rgba(${j.c},${.22 * ja})`); gl.addColorStop(1, `rgba(${j.c},0)`);
         ctx.fillStyle = gl; ctx.beginPath(); ctx.arc(x, y, s * 2.6, 0, 6.283); ctx.fill();
@@ -261,6 +314,22 @@
           for (let u = 1; u <= 6; u++) ctx.lineTo(tx + Math.sin(t * .05 + j.ph + u * .7 + k) * (2 + u * .8), y + u * s * .38);
           ctx.strokeStyle = `rgba(${j.c},${.45 * ja})`; ctx.stroke();
         }
+      }
+      ctx.restore();
+    }
+
+    if (fa > .3 && fish.length) { let cx = 0, cy = 0; fish.forEach(f => { cx += f.x; cy += f.y; }); hits.push({ id: 'fish', x: cx / fish.length, y: cy / fish.length, r: 80 }); }
+
+    // --- disturbed plankton ---
+    if (plankton.length) {
+      ctx.save(); ctx.globalCompositeOperation = 'lighter';
+      for (let i = plankton.length - 1; i >= 0; i--) {
+        const q = plankton[i]; q.x += q.vx * dt; q.y += q.vy * dt - dy; q.l -= .018 * dt;
+        if (q.l <= 0) { plankton.splice(i, 1); continue; }
+        const a = q.l * q.l;
+        ctx.fillStyle = `rgba(80,200,255,${.07 * a})`; ctx.beginPath(); ctx.arc(q.x, q.y, q.r * 5, 0, 6.283); ctx.fill();
+        ctx.fillStyle = `rgba(120,230,255,${.16 * a})`; ctx.beginPath(); ctx.arc(q.x, q.y, q.r * 2.4, 0, 6.283); ctx.fill();
+        ctx.fillStyle = `rgba(210,250,255,${.9 * a})`; ctx.beginPath(); ctx.arc(q.x, q.y, q.r, 0, 6.283); ctx.fill();
       }
       ctx.restore();
     }
@@ -291,6 +360,7 @@
       for (const r of rocks) { const x = r.x * W, y = bedY(x, base, amp) + r.r * .35; ctx.fillStyle = '#0a1c2e'; ctx.beginPath(); ctx.ellipse(x, y, r.r, r.r * .55, 0, Math.PI, 0); ctx.fill(); }
       // hydrothermal vent: chimney, black-smoker plume, tube worms
       const vx = W * (small() ? .2 : .3), vy = bedY(vx, base, amp) + 4, ch = 70 * ba;
+      if (ba > .3) hits.push({ id: 'vent', x: vx, y: vy - ch / 2, r: 50 });
       ctx.fillStyle = '#0c1a26'; ctx.beginPath(); ctx.moveTo(vx - 26, vy); ctx.lineTo(vx - 9, vy - ch); ctx.lineTo(vx + 9, vy - ch); ctx.lineTo(vx + 24, vy); ctx.closePath(); ctx.fill();
       ctx.save(); ctx.globalCompositeOperation = 'lighter';
       const hot = ctx.createRadialGradient(vx, vy - ch, 0, vx, vy - ch, 26); hot.addColorStop(0, `rgba(255,140,60,${.45 * ba})`); hot.addColorStop(1, 'rgba(255,140,60,0)');
@@ -308,6 +378,7 @@
       }
       // ATAL parked on the seabed, lamp on
       const ax = W * .82, ay = bedY(W * .82, base, amp) - 18;
+      if (ba > .3) hits.push({ id: 'atal', x: ax, y: ay, r: 52 });
       ctx.save(); ctx.globalAlpha = ba; ctx.translate(ax, ay); ctx.rotate(-.04);
       ctx.globalCompositeOperation = 'lighter';
       const cone = ctx.createLinearGradient(44, 0, -260, 0);
@@ -372,9 +443,17 @@
     requestAnimationFrame(step);
   }
 
-  /* ---------- sonar ping on click ---------- */
+  /* ---------- tap a creature, or ping sonar ---------- */
+  addEventListener('pointerdown', e => {
+    if (document.documentElement.dataset.theme === 'hogwarts' || !e.target.closest) return;
+    if (card && !card.hidden && !e.target.closest('#fieldCard')) card.classList.remove('on');
+    if (e.target.closest('a, button, input, textarea, select, canvas#simCanvas, .viz, .compare, .el, .commit, #fieldCard')) return;
+    let best = null, bd = 1;
+    for (const h of hits) { const d = Math.hypot(e.clientX - h.x, e.clientY - h.y) / h.r; if (d < bd) { bd = d; best = h; } }
+    if (best) openCard(best.id, e.clientX, e.clientY);
+  });
   if (!reduced) addEventListener('pointerdown', e => {
-    if (e.target.closest('input, textarea, select')) return;
+    if (!e.target.closest || e.target.closest('input, textarea, select')) return;
     for (let i = 0; i < 2; i++) {
       const p = document.createElement('span');
       p.className = 'ping'; p.style.left = e.clientX + 'px'; p.style.top = e.clientY + 'px'; p.style.animationDelay = i * .18 + 's';
