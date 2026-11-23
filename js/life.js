@@ -131,13 +131,14 @@
     const dy = Math.max(-40, Math.min(40, scrollY - lastScroll)); lastScroll = scrollY;
     if (document.documentElement.dataset.theme === 'hogwarts') { requestAnimationFrame(frame); return; }
     hits.length = 0;
+    const flat = !(window.SEA3D && window.SEA3D.ok);   // 3-D creatures take over when WebGL is running
     const d = D.depth;
     ctx.clearRect(0, 0, W, H);
 
     // --- blue whale passing far off (sunlight zone) ---
     const wa = band(d, .005, .03, .12, .2);
     if (wa <= .01) whale.seen = false;
-    if (wa > .01) {
+    if (flat && wa > .01) {
       if (!whale.seen) { whale.seen = true; if (whale.x > 1 || whale.x < -.6) whale.x = .92; }
       if (!reduced) { whale.x -= .0009 * dt; whale.y -= dy * .25 / H; }
       if (whale.x < -.8) { whale.x = 1.4; whale.y = .25 + R() * .3; }
@@ -157,7 +158,7 @@
 
     // --- lanternfish with photophores (twilight) ---
     const la = band(d, .1, .16, .34, .42);
-    if (la > .01) {
+    if (flat && la > .01) {
       for (const f of lantern) {
         if (!reduced) { f.x += f.dir * f.v * .0007 * dt; f.y -= dy * .5 / H; }
         if (f.x < -.05) f.x = 1.05; if (f.x > 1.05) f.x = -.05; if (f.y < -.05) f.y = 1.05; if (f.y > 1.05) f.y = -.05;
@@ -176,7 +177,7 @@
 
     // --- siphonophore: a glowing colonial chain drifting through (twilight → midnight) ---
     const sa = band(d, .17, .22, .4, .48);
-    if (sa > .01) {
+    if (flat && sa > .01) {
       if (!reduced) { siph.y -= (.00035 * dt + dy * .4 / H); siph.x += Math.sin(t * .004) * .0003 * dt; }
       if (siph.y < -.6) { siph.y = 1.15; siph.x = .15 + R() * .7; }
       const n = 26, hx = siph.x * W, hy = siph.y * H;
@@ -193,7 +194,7 @@
 
     // --- anglerfish: only the lure gives it away (midnight → abyss) ---
     const aa = band(d, .28, .36, .66, .76);
-    if (aa > .01) {
+    if (flat && aa > .01) {
       for (const f of anglers) {
         if (!reduced) { f.x += f.dir * .00012 * dt; f.y -= dy * .3 / H; }
         if (f.x < -.15) f.x = 1.15; if (f.x > 1.15) f.x = -.15; if (f.y < -.2) f.y = 1.2; if (f.y > 1.2) f.y = -.2;
@@ -225,7 +226,7 @@
 
     // --- comb jellies: rainbow light scattering off beating cilia (abyss) ---
     const ca = band(d, .42, .5, .82, .9);
-    if (ca > .01) {
+    if (flat && ca > .01) {
       for (const c of combs) {
         if (!reduced) { c.y -= (.00018 * dt + dy * .35 / H); c.x += Math.sin(t * .005 + c.ph) * .0002 * dt; }
         if (c.y < -.1) { c.y = 1.1; c.x = R(); } if (c.y > 1.15) { c.y = -.08; c.x = R(); }
@@ -247,7 +248,7 @@
 
     // --- hadal snailfish: pale, translucent, the deepest fish ever filmed ---
     const ha = band(d, .74, .82, 2, 3);
-    if (ha > .01) {
+    if (flat && ha > .01) {
       for (const f of snails) {
         if (!reduced) { f.x += f.dir * .00022 * dt; f.y -= dy * .2 / H; }
         if (f.x < -.1) f.x = 1.1; if (f.x > 1.1) f.x = -.1; if (f.y < .05) f.y = .9; if (f.y > .95) f.y = .1;
@@ -264,7 +265,7 @@
 
     // --- fish (shallows) ---
     const fa = band(d, .02, .06, .13, .2);
-    if (fa > 0.01) {
+    if (flat && fa > 0.01) {
       for (const f of fish) {
         let cx = 0, cy = 0, ax = 0, ay = 0, sx = 0, sy = 0, n = 0;
         for (const o of fish) {
@@ -295,7 +296,7 @@
 
     // --- jellyfish (deep) ---
     const ja = band(d, .4, .52, 2, 3);
-    if (ja > 0.01) {
+    if (flat && ja > 0.01) {
       ctx.save(); ctx.globalCompositeOperation = 'lighter';
       for (const j of jellies) {
         const p = Math.sin(t * .045 + j.ph);
@@ -318,7 +319,7 @@
       ctx.restore();
     }
 
-    if (fa > .3 && fish.length) { let cx = 0, cy = 0; fish.forEach(f => { cx += f.x; cy += f.y; }); hits.push({ id: 'fish', x: cx / fish.length, y: cy / fish.length, r: 80 }); }
+    if (flat && fa > .3 && fish.length) { let cx = 0, cy = 0; fish.forEach(f => { cx += f.x; cy += f.y; }); hits.push({ id: 'fish', x: cx / fish.length, y: cy / fish.length, r: 80 }); }
 
     // --- disturbed plankton ---
     if (plankton.length) {
@@ -482,7 +483,7 @@
     if (card && !card.hidden && !e.target.closest('#fieldCard')) card.classList.remove('on');
     if (e.target.closest('a, button, input, textarea, select, canvas#simCanvas, .viz, .compare, .el, .commit, #fieldCard')) return;
     let best = null, bd = 1;
-    for (const h of hits) { const d = Math.hypot(e.clientX - h.x, e.clientY - h.y) / h.r; if (d < bd) { bd = d; best = h; } }
+    for (const h of hits.concat(window.SEA3D ? window.SEA3D.hits : [])) { const d = Math.hypot(e.clientX - h.x, e.clientY - h.y) / h.r; if (d < bd) { bd = d; best = h; } }
     if (best) openCard(best.id, e.clientX, e.clientY);
   });
   if (!reduced) addEventListener('pointerdown', e => {

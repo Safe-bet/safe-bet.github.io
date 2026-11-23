@@ -43,7 +43,7 @@
     const hint = $('torchHint');
     if (hint) {
       if (hint._sea == null) hint._sea = hint.textContent;
-      hint.textContent = hp ? (fine ? 'Your cursor is a wand. Lumos: move it to reveal the hidden ink.' : 'The wand drifts on its own. Watch the hidden ink appear.') : hint._sea;
+      hint.textContent = hp ? (fine ? 'Your cursor is a wand: move it to reveal the hidden ink. Then type nox anywhere to cast your first spell.' : 'The wand drifts on its own. Tap Spells at the bottom left to cast one.') : hint._sea;
     }
     const btn = $('themeBtn'); if (btn) btn.setAttribute('aria-label', hp ? 'Switch back to the ocean theme' : 'Switch to the Gryffindor theme');
     const meta = document.querySelector('meta[name="theme-color"]'); if (meta) meta.content = hp ? '#efe2c1' : '#020812';
@@ -155,6 +155,7 @@
 
   /* ---------------- ambient magic canvas ---------------- */
   const cv = $('magic'), g = cv.getContext('2d');
+  const gBg = g;
   let W = 0, H = 0, DPR = 1;
   const candles = [], owls = [], sparks = [];
   const FX = { flare: 0, patronus: null, snitch: null, px: -999, py: -999 };   // spell effects drawn on this canvas
@@ -212,7 +213,8 @@
   }
   // stag patronus, silvery blue, procedural
   const stag = { x: -.2, ph: 0 };
-  function drawStag(t, alpha, bx, by, s, gallop = 1) {
+  function drawStag(t, alpha, bx, by, s, gallop = 1, g2) {
+    const g = g2 || gBg;
     g.save(); g.globalAlpha = alpha; g.translate(bx, by); g.scale(s, s);
     g.shadowColor = 'rgba(120,180,255,.9)'; g.shadowBlur = 22;
     g.strokeStyle = 'rgba(170,210,255,.9)'; g.fillStyle = 'rgba(190,220,255,.55)'; g.lineWidth = 3; g.lineCap = 'round';
@@ -256,36 +258,7 @@
       drawOwl(o, now);
     }
     if (contactVis && !FX.patronus) { if (!reduced) stag.x += .0011 * dt; if (stag.x > 1.25) stag.x = -.25; const ss = Math.min(1.1, W / 900); drawStag(now, .9, stag.x * W, H - 70 * ss, ss); }
-    // Expecto patronum: a big stag gallops across the screen
-    if (FX.patronus) {
-      const P = FX.patronus; P.x += P.v * dt;
-      const ss = Math.min(2.2, W / 520);
-      drawStag(now, Math.min(1, (W + 300 - P.x) / 300, (P.x + 300) / 300), P.x, H * .62 + Math.sin(now * .012) * 10, ss, 2.6);
-      for (let k = 0; k < 3; k++) sparks.push({ x: P.x - 60 * ss + Math.random() * 120 * ss, y: H * .62 - Math.random() * 150 * ss, vx: -1.5 - Math.random() * 2, vy: -.5 + Math.random(), l: 1, c: '170,210,255' });
-      if (P.x > W + 320) FX.patronus = null;
-    }
-    // Incendio: candles flare, embers rise
-    if (FX.flare > 0) { FX.flare = Math.max(0, FX.flare - .004 * dt); if (Math.random() < FX.flare) sparks.push({ x: Math.random() * W, y: H + 5, vx: (Math.random() - .5) * .6, vy: -2 - Math.random() * 2, l: 1.4, c: '255,140,40' }); }
-    // the Golden Snitch, flitting around the page
-    if (FX.snitch) {
-      const sn = FX.snitch; sn.age += dt / 60; sn.wing += dt * .9;
-      const dx = sn.x - FX.px, dy = sn.y - FX.py, d = Math.hypot(dx, dy) || 1;
-      if (sn.summoned && sn.age < 1.6) { sn.vx += (FX.px - sn.x) * .004 * dt; sn.vy += (FX.py - sn.y) * .004 * dt; }
-      else if (d < 160) { sn.vx += dx / d * .7 * dt; sn.vy += dy / d * .7 * dt; }
-      if (Math.random() < .04 * dt) { const a = Math.random() * 6.283; sn.vx += Math.cos(a) * 3; sn.vy += Math.sin(a) * 3; }
-      if (sn.x < 30) sn.vx += .4 * dt; if (sn.x > W - 30) sn.vx -= .4 * dt; if (sn.y < 80) sn.vy += .4 * dt; if (sn.y > H - 30) sn.vy -= .4 * dt;
-      const sp = Math.hypot(sn.vx, sn.vy), cap = 6.5; if (sp > cap) { sn.vx *= cap / sp; sn.vy *= cap / sp; }
-      sn.vx *= .985; sn.vy *= .985; sn.x += sn.vx * dt; sn.y += sn.vy * dt;
-      const f = Math.sin(sn.wing) * .9;
-      const gl = g.createRadialGradient(sn.x, sn.y, 0, sn.x, sn.y, 26); gl.addColorStop(0, 'rgba(255,225,110,.6)'); gl.addColorStop(1, 'rgba(255,225,110,0)');
-      g.fillStyle = gl; g.beginPath(); g.arc(sn.x, sn.y, 26, 0, 6.283); g.fill();
-      g.fillStyle = 'rgba(250,250,255,.92)'; g.strokeStyle = 'rgba(150,150,160,.8)'; g.lineWidth = .8;
-      [-1, 1].forEach(sd => { g.beginPath(); g.moveTo(sn.x + sd * 4, sn.y - 2); g.quadraticCurveTo(sn.x + sd * 16, sn.y - 13 * f - 5, sn.x + sd * 24, sn.y - 5 * f); g.quadraticCurveTo(sn.x + sd * 14, sn.y + 2, sn.x + sd * 4, sn.y + 2); g.fill(); g.stroke(); });
-      const g2 = g.createRadialGradient(sn.x - 2, sn.y - 2, 1, sn.x, sn.y, 6); g2.addColorStop(0, '#fff3b0'); g2.addColorStop(1, '#c79a1a');
-      g.fillStyle = g2; g.beginPath(); g.arc(sn.x, sn.y, 6, 0, 6.283); g.fill();
-      if (Math.random() < .5) sparks.push({ x: sn.x, y: sn.y, vx: (Math.random() - .5) * .5, vy: (Math.random() - .5) * .5, l: .8, c: '230,180,40' });
-      if (sn.age > sn.ttl) FX.snitch = null;
-    }
+    if (FX.flare > 0) FX.flare = Math.max(0, FX.flare - .004 * dt);
     for (let i = sparks.length - 1; i >= 0; i--) {
       const p = sparks[i]; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += .02 * dt; p.l -= .025 * dt;
       if (p.l <= 0) { sparks.splice(i, 1); continue; }
@@ -461,7 +434,7 @@
     seen(mapEl, () => { vis = true; }, 0);
     new IntersectionObserver(es => { vis = es[0].isIntersecting; }).observe(mapEl);
     const foot = (x, y, ang, left, a) => {
-      sg.save(); sg.translate(x, y); sg.rotate(ang + Math.PI / 2); sg.translate(left ? -5 : 5, 0); sg.fillStyle = `rgba(74,44,18,${a})`;
+      sg.save(); sg.translate(x, y); sg.rotate(ang - Math.PI / 2); sg.translate(left ? -5 : 5, 0); sg.fillStyle = `rgba(74,44,18,${a})`;
       sg.beginPath(); sg.ellipse(0, 2, 3, 5, 0, 0, 6.283); sg.fill(); sg.beginPath(); sg.ellipse(0, -5.5, 2.4, 2.8, 0, 0, 6.283); sg.fill(); sg.restore();
     };
     const walk = () => {
@@ -515,35 +488,145 @@
   }
 
   /* ---------------- spells: type them anywhere, or use the spellbook ---------------- */
+  // Effects draw on an overlay canvas above the page so every spell is visible.
   const SPELLS = [
-    ['lumos', 'Lumos', 'Light up the castle'],
-    ['nox', 'Nox', 'Lights out. Your wand still glows.'],
-    ['wingardiumleviosa', 'Wingardium Leviosa', 'Make the page float'],
-    ['expectopatronum', 'Expecto Patronum', 'Send a stag galloping across'],
-    ['accio', 'Accio Snitch', 'Summon the Golden Snitch, then catch it'],
-    ['alohomora', 'Alohomora', 'Unlock every door and diary entry'],
-    ['incendio', 'Incendio', 'Make the candles roar'],
-    ['finite', 'Finite', 'End all spells']
+    ['nox', 'Nox', 'Darken the whole castle. Only your wand glows.'],
+    ['lumos', 'Lumos', 'Light it back up with a flash'],
+    ['wingardiumleviosa', 'Wingardium Leviosa', 'Everything floats, feathers drift up'],
+    ['expectopatronum', 'Expecto Patronum', 'A silver stag runs around your screen'],
+    ['accio', 'Accio Snitch', 'The Snitch flies to your wand. Catch it!'],
+    ['alohomora', 'Alohomora', 'Unlocks the map entries and restricted books'],
+    ['incendio', 'Incendio', 'Flames rise along the bottom of the page'],
+    ['finite', 'Finite', 'A ripple that ends every spell']
   ];
+  const fxc = $('fx'), fx = fxc.getContext('2d');
+  let FW = 0, FH = 0;
+  const fitFx = () => { const d = Math.min(devicePixelRatio || 1, 1.75); FW = innerWidth; FH = innerHeight; fxc.width = FW * d; fxc.height = FH * d; fx.setTransform(d, 0, 0, d, 0, 0); };
+  fitFx(); addEventListener('resize', fitFx);
+  const fsp = [], waves = [], feathers = [];
+  let flames = 0, lock = null, flash = null;
   const castEl = $('spellCast');
   const castSeen = new Set(JSON.parse(ls.get('hp_spells') || '[]'));
   let levT;
-  function burstAt(x, y, c = '211,166,37', n = 26) { for (let i = 0; i < n; i++) { const a = Math.random() * 6.283, v = 1 + Math.random() * 4; sparks.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, l: 1.2, c }); } }
-  function announce(text) { if (!castEl) return; castEl.textContent = text; castEl.classList.remove('on'); void castEl.offsetWidth; castEl.classList.add('on'); }
+  function burstAt(x, y, c = '211,166,37', n = 30) { for (let i = 0; i < n; i++) { const a = Math.random() * 6.283, v = 1 + Math.random() * 4.5; fsp.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, l: 1.2, c, g: .03 }); } }
+  function announce(text, sub = '') {
+    if (!castEl) return;
+    castEl.innerHTML = ''; castEl.append(mk('span', 'sc-t', text)); if (sub) castEl.append(mk('small', 'sc-s', sub));
+    castEl.classList.remove('on'); void castEl.offsetWidth; castEl.classList.add('on');
+  }
   function cast(id, x = innerWidth / 2, y = innerHeight / 2) {
     if (!isHP()) return;
     const sp = SPELLS.find(s => s[0] === id); if (!sp) return;
-    announce(sp[1] + '!'); burstAt(x, y);
+    let sub = sp[2];
+    burstAt(x, y);
     if (!castSeen.has(id)) { castSeen.add(id); ls.set('hp_spells', JSON.stringify([...castSeen])); award(5, x, y - 20); }
-    if (id === 'lumos') { root.classList.remove('hp-night'); FX.flare = .7; }
     if (id === 'nox') root.classList.add('hp-night');
-    if (id === 'wingardiumleviosa') { document.body.classList.add('levitate'); clearTimeout(levT); levT = setTimeout(() => document.body.classList.remove('levitate'), 9000); }
-    if (id === 'expectopatronum') FX.patronus = { x: -300, v: reduced ? 40 : 7 };
-    if (id === 'accio') FX.snitch = { x: -30, y: innerHeight * .35, vx: 7, vy: 0, age: 0, ttl: 18, wing: 0, summoned: true };
-    if (id === 'alohomora') { notes.forEach(n => { n.classList.add('open'); n.querySelector('.mp-seal').setAttribute('aria-expanded', 'true'); }); $('oss') && $('oss').classList.add('unlocked'); dispatchEvent(new Event('resize')); }
-    if (id === 'incendio') FX.flare = 1;
-    if (id === 'finite') { root.classList.remove('hp-night'); document.body.classList.remove('levitate'); FX.patronus = null; FX.flare = 0; $('oss') && $('oss').classList.remove('unlocked'); }
+    if (id === 'lumos') { root.classList.remove('hp-night'); FX.flare = .8; flash = { x, y, r: 0 }; }
+    if (id === 'wingardiumleviosa') {
+      document.body.classList.add('levitate'); clearTimeout(levT); levT = setTimeout(() => document.body.classList.remove('levitate'), 10000);
+      for (let i = 0; i < 14; i++) feathers.push({ x: Math.random() * FW, y: FH + 20 + Math.random() * 200, ph: Math.random() * 6, s: .7 + Math.random() * .7, vy: .8 + Math.random() * .8, l: 1 });
+    }
+    if (id === 'expectopatronum') { if (window.Patronus3D && window.Patronus3D.cast()) sub = 'Watch the stag'; else FX.patronus = { x: -300, v: 7 }; }
+    if (id === 'accio') FX.snitch = { x: -30, y: innerHeight * .35, vx: 7, vy: 0, age: 0, ttl: 20, wing: 0, summoned: true };
+    if (id === 'alohomora') {
+      notes.forEach(n => { n.classList.add('open'); n.querySelector('.mp-seal').setAttribute('aria-expanded', 'true'); });
+      $('oss') && $('oss').classList.add('unlocked'); dispatchEvent(new Event('resize'));
+      lock = { x, y, t: 0 }; sub = `Unlocked ${notes.length} map entries and ${document.querySelectorAll('#oss .oss').length} restricted books`;
+    }
+    if (id === 'incendio') { FX.flare = 1; flames = 1; }
+    if (id === 'finite') {
+      root.classList.remove('hp-night'); document.body.classList.remove('levitate'); FX.patronus = null; FX.flare = 0; flames = 0; feathers.length = 0;
+      $('oss') && $('oss').classList.remove('unlocked'); window.Patronus3D && window.Patronus3D.stop();
+      waves.push({ x, y, r: 0 });
+    }
+    announce(sp[1] + '!', sub);
   }
+  // overlay loop: snitch, flames, flash, ripples, lock, feathers, sparks, fallback 2-D stag
+  let flt = performance.now();
+  function fxFrame(now) {
+    requestAnimationFrame(fxFrame);
+    const dt = Math.min(50, now - flt) / 16.67; flt = now;
+    fx.clearRect(0, 0, FW, FH);
+    if (!isHP()) return;
+    const t = now;
+    // Incendio: tongues of fire along the bottom edge
+    if (flames > 0) {
+      flames = Math.max(0, flames - .0035 * dt);
+      const a = Math.min(1, flames * 2.2);
+      for (let x = -20; x < FW + 40; x += 26) {
+        const h = (90 + 70 * Math.sin(x * .05 + t * .006) + 50 * Math.sin(x * .13 - t * .011)) * a;
+        const gr = fx.createLinearGradient(0, FH, 0, FH - h);
+        gr.addColorStop(0, `rgba(255,120,20,${.75 * a})`); gr.addColorStop(.5, `rgba(255,190,60,${.45 * a})`); gr.addColorStop(1, 'rgba(255,240,180,0)');
+        fx.fillStyle = gr; fx.beginPath(); fx.moveTo(x - 24, FH); fx.quadraticCurveTo(x - 10 + Math.sin(t * .01 + x) * 8, FH - h * .6, x + Math.sin(t * .013 + x) * 10, FH - h); fx.quadraticCurveTo(x + 14, FH - h * .5, x + 26, FH); fx.fill();
+      }
+      if (Math.random() < a) fsp.push({ x: Math.random() * FW, y: FH - 20, vx: (Math.random() - .5) * .8, vy: -2.5 - Math.random() * 2.5, l: 1.4, c: '255,150,40', g: -.005 });
+    }
+    // Lumos: a warm flash spreading from the wand
+    if (flash) {
+      flash.r += 38 * dt; const a = Math.max(0, 1 - flash.r / Math.hypot(FW, FH));
+      const gr = fx.createRadialGradient(flash.x, flash.y, 0, flash.x, flash.y, flash.r);
+      gr.addColorStop(0, `rgba(255,250,225,${.5 * a})`); gr.addColorStop(.7, `rgba(255,236,170,${.25 * a})`); gr.addColorStop(1, 'rgba(255,236,170,0)');
+      fx.fillStyle = gr; fx.fillRect(0, 0, FW, FH); if (a <= 0) flash = null;
+    }
+    // Finite: ripples
+    for (let i = waves.length - 1; i >= 0; i--) {
+      const w = waves[i]; w.r += 22 * dt; const a = Math.max(0, 1 - w.r / 900);
+      fx.strokeStyle = `rgba(211,166,37,${a})`; fx.lineWidth = 3; fx.beginPath(); fx.arc(w.x, w.y, w.r, 0, 6.283); fx.stroke();
+      fx.strokeStyle = `rgba(127,9,9,${a * .6})`; fx.lineWidth = 1.5; fx.beginPath(); fx.arc(w.x, w.y, w.r * .8, 0, 6.283); fx.stroke();
+      if (a <= 0) waves.splice(i, 1);
+    }
+    // Alohomora: a padlock clicks open
+    if (lock) {
+      lock.t += dt / 60; const k = lock.t, a = k < 1.4 ? 1 : Math.max(0, 1 - (k - 1.4) / .6), open = Math.min(1, Math.max(0, (k - .45) / .3));
+      fx.save(); fx.globalAlpha = a; fx.translate(lock.x, lock.y - 30); fx.scale(1.6, 1.6);
+      fx.strokeStyle = '#b38a1a'; fx.lineWidth = 5; fx.lineCap = 'round'; fx.beginPath(); fx.moveTo(-10, 0); fx.lineTo(-10, -12 - open * 10); fx.arc(0, -12 - open * 10, 10, Math.PI, 0); fx.lineTo(10, -6 - open * 10); fx.stroke();
+      const lg = fx.createLinearGradient(-16, 0, 16, 24); lg.addColorStop(0, '#f7dc7b'); lg.addColorStop(1, '#a67c00');
+      fx.fillStyle = lg; fx.beginPath(); fx.roundRect(-16, 0, 32, 26, 4); fx.fill();
+      fx.fillStyle = '#3a2312'; fx.beginPath(); fx.arc(0, 10, 4, 0, 6.283); fx.fill(); fx.fillRect(-1.5, 11, 3, 8);
+      fx.restore(); if (a <= 0) lock = null;
+    }
+    // Leviosa: feathers drift up
+    for (let i = feathers.length - 1; i >= 0; i--) {
+      const f = feathers[i]; f.y -= f.vy * dt; f.x += Math.sin(t * .002 + f.ph) * 1.1;
+      if (f.y < -40) { feathers.splice(i, 1); continue; }
+      fx.save(); fx.translate(f.x, f.y); fx.rotate(Math.sin(t * .002 + f.ph) * .6); fx.scale(f.s, f.s);
+      fx.fillStyle = 'rgba(255,252,240,.95)'; fx.strokeStyle = 'rgba(140,110,70,.7)'; fx.lineWidth = 1;
+      fx.beginPath(); fx.moveTo(0, -22); fx.quadraticCurveTo(10, -6, 2, 20); fx.quadraticCurveTo(-10, -4, 0, -22); fx.fill(); fx.stroke();
+      fx.beginPath(); fx.moveTo(0, -20); fx.lineTo(1, 24); fx.stroke(); fx.restore();
+    }
+    // fallback stag when WebGL is unavailable
+    if (FX.patronus) {
+      const P = FX.patronus; P.x += P.v * dt; const ss = Math.min(2.2, FW / 520);
+      drawStag(now, 1, P.x, FH * .62, ss, 2.6, fx);
+      if (P.x > FW + 320) FX.patronus = null;
+    }
+    // the Golden Snitch
+    if (FX.snitch) {
+      const sn = FX.snitch; sn.age += dt / 60; sn.wing += dt * .9;
+      const dx = sn.x - FX.px, dy = sn.y - FX.py, d = Math.hypot(dx, dy) || 1;
+      if (sn.summoned && sn.age < 1.8) { sn.vx += (FX.px - sn.x) * .004 * dt; sn.vy += (FX.py - sn.y) * .004 * dt; }
+      else if (d < 160) { sn.vx += dx / d * .7 * dt; sn.vy += dy / d * .7 * dt; }
+      if (Math.random() < .04 * dt) { const a = Math.random() * 6.283; sn.vx += Math.cos(a) * 3; sn.vy += Math.sin(a) * 3; }
+      if (sn.x < 30) sn.vx += .4 * dt; if (sn.x > FW - 30) sn.vx -= .4 * dt; if (sn.y < 80) sn.vy += .4 * dt; if (sn.y > FH - 30) sn.vy -= .4 * dt;
+      const sp = Math.hypot(sn.vx, sn.vy), cap = 6.5; if (sp > cap) { sn.vx *= cap / sp; sn.vy *= cap / sp; }
+      sn.vx *= .985; sn.vy *= .985; sn.x += sn.vx * dt; sn.y += sn.vy * dt;
+      const f = Math.sin(sn.wing) * .9;
+      const gl = fx.createRadialGradient(sn.x, sn.y, 0, sn.x, sn.y, 30); gl.addColorStop(0, 'rgba(255,225,110,.7)'); gl.addColorStop(1, 'rgba(255,225,110,0)');
+      fx.fillStyle = gl; fx.beginPath(); fx.arc(sn.x, sn.y, 30, 0, 6.283); fx.fill();
+      fx.fillStyle = 'rgba(250,250,255,.95)'; fx.strokeStyle = 'rgba(150,150,160,.8)'; fx.lineWidth = .8;
+      [-1, 1].forEach(sd => { fx.beginPath(); fx.moveTo(sn.x + sd * 4, sn.y - 2); fx.quadraticCurveTo(sn.x + sd * 16, sn.y - 13 * f - 5, sn.x + sd * 26, sn.y - 5 * f); fx.quadraticCurveTo(sn.x + sd * 14, sn.y + 2, sn.x + sd * 4, sn.y + 2); fx.fill(); fx.stroke(); });
+      const g2 = fx.createRadialGradient(sn.x - 2, sn.y - 2, 1, sn.x, sn.y, 7); g2.addColorStop(0, '#fff3b0'); g2.addColorStop(1, '#c79a1a');
+      fx.fillStyle = g2; fx.beginPath(); fx.arc(sn.x, sn.y, 7, 0, 6.283); fx.fill();
+      if (Math.random() < .5) fsp.push({ x: sn.x, y: sn.y, vx: (Math.random() - .5) * .5, vy: (Math.random() - .5) * .5, l: .8, c: '230,180,40', g: 0 });
+      if (sn.age > sn.ttl) FX.snitch = null;
+    }
+    for (let i = fsp.length - 1; i >= 0; i--) {
+      const p = fsp[i]; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += p.g * dt; p.l -= .022 * dt;
+      if (p.l <= 0) { fsp.splice(i, 1); continue; }
+      fx.fillStyle = `rgba(${p.c},${Math.min(1, p.l)})`; fx.beginPath(); fx.arc(p.x, p.y, 1.6 + p.l * 1.6, 0, 6.283); fx.fill();
+    }
+  }
+  requestAnimationFrame(fxFrame);
   // typed spells
   let buf = '';
   addEventListener('keydown', e => {
@@ -554,21 +637,28 @@
     const hit = SPELLS.find(s => buf.endsWith(s[0]));
     if (hit) { buf = ''; cast(hit[0], FX.px > 0 ? FX.px : innerWidth / 2, FX.py > 0 ? FX.py : innerHeight / 2); }
   });
-  // the spellbook
-  const sbBtn = $('sbBtn'), sbPanel = $('sbPanel'), sbList = $('sbList');
+  // the spellbook, and a nudge so people find it
+  const sbBtn = $('sbBtn'), sbPanel = $('sbPanel'), sbList = $('sbList'), sbNudge = $('sbNudge');
   if (sbBtn) {
     SPELLS.forEach(([id, name, what]) => {
       const li = mk('li'), b = mk('button', 'sb-spell'); b.type = 'button';
       b.append(mk('b', null, name), mk('span', null, what));
-      b.addEventListener('click', e => { const r = b.getBoundingClientRect(); cast(id, r.left + r.width / 2, r.top); if (!fine) setOpen(false); });
+      b.addEventListener('click', () => { const r = b.getBoundingClientRect(); setOpen(false); cast(id, r.left + r.width / 2, r.top); });
       li.appendChild(b); sbList.appendChild(li);
     });
-    const setOpen = o => { sbPanel.hidden = !o; sbBtn.setAttribute('aria-expanded', o); };
+    const setOpen = o => { sbPanel.hidden = !o; sbBtn.setAttribute('aria-expanded', o); if (o) { sbBtn.classList.remove('call'); sbNudge && sbNudge.classList.remove('on'); ls.set('hp_sb', 1); } };
     sbBtn.addEventListener('click', () => setOpen(sbPanel.hidden));
-    addEventListener('pointerdown', e => { if (!sbPanel.hidden && !e.target.closest('#spellbook')) setOpen(false); });
+    addEventListener('pointerdown', e => { if (!sbPanel.hidden && e.target.closest && !e.target.closest('#spellbook')) setOpen(false); });
     addEventListener('keydown', e => { if (e.key === 'Escape') setOpen(false); });
+    const nudge = () => {
+      if (!isHP() || ls.get('hp_sb') || ss.get('hp_nudged')) return;
+      ss.set('hp_nudged', 1); sbBtn.classList.add('call'); sbNudge && sbNudge.classList.add('on');
+      setTimeout(() => sbNudge && sbNudge.classList.remove('on'), 9000);
+    };
+    setTimeout(nudge, 6000); onTheme(t => { if (t === 'hogwarts') setTimeout(nudge, 4000); });
+    sbNudge && sbNudge.addEventListener('click', () => setOpen(true));
   }
-  // wand light in the dark (Nox): follows the pointer or the hero wand
+  // wand light in the dark (Nox)
   const night = $('night');
   const moveLight = (x, y) => { if (night) { night.style.setProperty('--wx', x + 'px'); night.style.setProperty('--wy', y + 'px'); } };
   addEventListener('pointermove', e => moveLight(e.clientX, e.clientY), { passive: true });
@@ -576,17 +666,16 @@
   // catching the Snitch
   addEventListener('pointerdown', e => {
     const sn = FX.snitch; if (!sn || !isHP()) return;
-    if (Math.hypot(e.clientX - sn.x, e.clientY - sn.y) < (fine ? 30 : 44)) {
-      FX.snitch = null; burstAt(e.clientX, e.clientY, '255,215,90', 40); announce('Snitch caught!'); award(150, e.clientX, e.clientY - 20);
+    if (Math.hypot(e.clientX - sn.x, e.clientY - sn.y) < (fine ? 34 : 48)) {
+      FX.snitch = null; burstAt(e.clientX, e.clientY, '255,215,90', 44); announce('Snitch caught!', '+150 points to Gryffindor'); award(150, e.clientX, e.clientY - 20);
     }
   }, true);
-  // the Snitch also turns up on its own now and then
   let nextSnitch = performance.now() + 35000 + Math.random() * 20000;
   setInterval(() => {
     if (!isHP() || FX.snitch || document.hidden || reduced) return;
     if (performance.now() > nextSnitch) { FX.snitch = { x: innerWidth + 30, y: innerHeight * (.25 + Math.random() * .4), vx: -5, vy: 0, age: 0, ttl: 14, wing: 0 }; nextSnitch = performance.now() + 75000 + Math.random() * 60000; }
   }, 1000);
-  onTheme(t => { if (t !== 'hogwarts') { root.classList.remove('hp-night'); document.body.classList.remove('levitate'); FX.snitch = null; FX.patronus = null; } });
+  onTheme(t => { if (t !== 'hogwarts') { root.classList.remove('hp-night'); document.body.classList.remove('levitate'); FX.snitch = null; FX.patronus = null; flames = 0; feathers.length = 0; window.Patronus3D && window.Patronus3D.stop(); } });
   // the restricted section: hovering a chained book (or Alohomora) unlocks it
   document.querySelectorAll('#oss .oss').forEach(b => b.addEventListener('click', () => b.classList.add('free')));
 

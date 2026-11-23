@@ -379,6 +379,7 @@ button { font: inherit; color: inherit; }
    v2 — intro, sea life layers, slot reel, scroll-lit text, index, pings
    ===================================================================== */
 #life { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; }
+#sea3d { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; }
 #pal { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 47; pointer-events: none; }
 
 /* intro */

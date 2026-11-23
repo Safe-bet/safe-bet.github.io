@@ -81,7 +81,7 @@ html[data-theme="hogwarts"] code, html[data-theme="hogwarts"] pre, html[data-the
 html[data-theme="hogwarts"] code { color: #7f0909; }
 html[data-theme="hogwarts"] :focus-visible { outline-color: var(--gold); }
 html[data-theme="hogwarts"] ::selection { background: rgba(211,166,37,.4); }
-html[data-theme="hogwarts"] #ocean, html[data-theme="hogwarts"] #life,
+html[data-theme="hogwarts"] #ocean, html[data-theme="hogwarts"] #life, html[data-theme="hogwarts"] #sea3d,
 html[data-theme="hogwarts"] .gauge, html[data-theme="hogwarts"] .dive-stats, html[data-theme="hogwarts"] .vignette, html[data-theme="hogwarts"] #intro { display: none !important; }
 
 #magic { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; }
@@ -478,13 +478,31 @@ html[data-theme="hogwarts"] .oss:hover::before, html[data-theme="hogwarts"] .oss
 .spell-cast { position: fixed; left: 50%; top: 42%; z-index: 90; transform: translate(-50%, -50%); pointer-events: none; font: 700 clamp(2rem, 6vw, 4rem) 'Cinzel', serif; color: #fff7d6; text-shadow: 0 0 18px #d3a625, 0 0 40px #d3a625, 0 2px 0 #7f0909; opacity: 0; white-space: nowrap; }
 .spell-cast.on { animation: cast 1.6s ease-out forwards; }
 @keyframes cast { 0% { opacity: 0; transform: translate(-50%, -40%) scale(.6); letter-spacing: .4em; } 20% { opacity: 1; transform: translate(-50%, -50%) scale(1); letter-spacing: .05em; } 75% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -62%) scale(1.04); } }
-#night { position: fixed; inset: 0; z-index: 45; pointer-events: none; opacity: 0; visibility: hidden; transition: opacity .9s, visibility 0s .9s; background: rgba(6,8,24,.93);
+#night { position: fixed; inset: 0; z-index: 55; pointer-events: none; opacity: 0; visibility: hidden; transition: opacity .9s, visibility 0s .9s; background: rgba(6,8,24,.93);
   -webkit-mask-image: radial-gradient(circle 200px at var(--wx, 50%) var(--wy, 50%), transparent 0, rgba(0,0,0,.4) 55%, #000 100%);
           mask-image: radial-gradient(circle 200px at var(--wx, 50%) var(--wy, 50%), transparent 0, rgba(0,0,0,.4) 55%, #000 100%); }
 html.hp-night #night { opacity: 1; visibility: visible; transition: opacity .9s; }
-html.hp-night #magic { z-index: 46; }
+html.hp-night #magic { z-index: 56; }
+html.hp-night #pal, html.hp-night #fx { z-index: 57; }
+html.hp-night #patronus { z-index: 58; }
 .levitate .case, .levitate .oss, .levitate .mini, .levitate .lead-card, .levitate .book, .levitate .stats > div, .levitate .sec-head, .levitate .mp-seal, .levitate .portrait, .levitate .crest { animation: levi 3.2s ease-in-out infinite alternate; }
 .levitate .oss:nth-child(2n), .levitate .book:nth-child(2n), .levitate .stats > div:nth-child(2n) { animation-delay: -1.2s; }
 .levitate .oss:nth-child(3n), .levitate .book:nth-child(3n), .levitate .stats > div:nth-child(3n) { animation-delay: -2.1s; }
 @keyframes levi { from { transform: translateY(0) rotate(0); } to { transform: translateY(-22px) rotate(1.2deg); } }
 @media (prefers-reduced-motion: reduce) { .levitate * { animation: none !important; } .crest { animation: none; } }
+
+/* overlay canvases for spell effects and the 3-D patronus */
+#fx { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 52; pointer-events: none; }
+#patronus { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 53; pointer-events: none; opacity: 0; transition: opacity .6s; background: radial-gradient(ellipse at center, rgba(12,22,48,.12), rgba(12,22,48,.5)); }
+#patronus.on { opacity: 1; }
+/* spellbook: a pulse and a nudge so people find it */
+.sb-btn.call { animation: sb-call 1.6s ease-in-out infinite; }
+@keyframes sb-call { 0%, 100% { box-shadow: 0 0 0 0 rgba(211,166,37,.7), 0 10px 24px rgba(80,50,20,.25); } 50% { box-shadow: 0 0 0 12px rgba(211,166,37,0), 0 10px 24px rgba(80,50,20,.25); } }
+.sb-nudge { position: absolute; left: 0; bottom: 54px; width: max-content; max-width: min(300px, calc(100vw - 36px)); text-align: left; padding: .6rem .8rem; border-radius: 10px; border: 1px solid #b08a5a; background: #fbf2dc; color: #2b1a0e; font: italic 400 .98rem/1.35 'IM Fell English', serif; box-shadow: 0 14px 34px rgba(60,35,10,.3); cursor: pointer; opacity: 0; transform: translateY(8px); pointer-events: none; transition: opacity .35s, transform .35s; }
+.sb-nudge b { font: 700 .95rem 'Cinzel', serif; color: var(--scarlet); font-style: normal; }
+.sb-nudge.on { opacity: 1; transform: none; pointer-events: auto; }
+.sb-nudge::after { content: ''; position: absolute; left: 20px; bottom: -7px; width: 12px; height: 12px; background: inherit; border-right: 1px solid #b08a5a; border-bottom: 1px solid #b08a5a; transform: rotate(45deg); }
+.spell-cast { display: grid; justify-items: center; gap: .3rem; }
+.spell-cast .sc-s { font: italic 400 clamp(.95rem, 2vw, 1.2rem) 'IM Fell English', serif; color: #fff7d6; text-shadow: 0 0 10px #7f0909, 0 1px 3px #2b1a0e; letter-spacing: .02em; white-space: normal; max-width: 80vw; text-align: center; }
+/* Leviosa: a bigger, more visible float */
+@keyframes levi { from { transform: translateY(0) rotate(0); } to { transform: translateY(-34px) rotate(1.6deg); } }
