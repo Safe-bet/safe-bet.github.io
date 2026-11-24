@@ -493,7 +493,7 @@ html.hp-night #patronus { z-index: 58; }
 
 /* overlay canvases for spell effects and the 3-D patronus */
 #fx { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 52; pointer-events: none; }
-#patronus { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 53; pointer-events: none; opacity: 0; transition: opacity .6s; background: radial-gradient(ellipse at center, rgba(12,22,48,.12), rgba(12,22,48,.5)); }
+#patronus { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 53; pointer-events: none; opacity: 0; transition: opacity .6s; background: radial-gradient(ellipse at 50% 60%, rgba(10,18,42,.38), rgba(8,14,34,.72)); }
 #patronus.on { opacity: 1; }
 /* spellbook: a pulse and a nudge so people find it */
 .sb-btn.call { animation: sb-call 1.6s ease-in-out infinite; }

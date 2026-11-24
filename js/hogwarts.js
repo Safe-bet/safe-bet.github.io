@@ -627,6 +627,7 @@
     }
   }
   requestAnimationFrame(fxFrame);
+  addEventListener('patronus-fallback', () => { FX.patronus = { x: -300, v: 7 }; });
   // typed spells
   let buf = '';
   addEventListener('keydown', e => {
